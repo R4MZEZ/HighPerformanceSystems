@@ -5,10 +5,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "coordinates")
 public class CoordinatesEntity {
 
   @Id
@@ -17,9 +19,9 @@ public class CoordinatesEntity {
   private Long id;
 
   @Column(nullable = false)
-  private Double x;
+  private Double latitude;
 
   @Column(nullable = false)
-  private Double y;
+  private Double longitude;
 
 }
