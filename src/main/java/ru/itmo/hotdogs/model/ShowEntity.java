@@ -15,7 +15,7 @@ import lombok.Data;
 
 @Entity
 @Data
-//@Table(name = "shows")
+@Table(name = "shows")
 public class ShowEntity {
 
   @Id
@@ -23,18 +23,18 @@ public class ShowEntity {
   @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column
+  @Column(nullable = false)
   private Long prize;
 
-  @Column
+  @Column(nullable = false)
   private Date date;
 
   @ManyToOne
-  @JoinColumn(name = "owner_id", nullable = false)
+  @JoinColumn(name = "organizer", nullable = false)
   private OwnerEntity organizer;
 
   @ManyToOne
-  @JoinColumn(name = "user_id", nullable = true)
+  @JoinColumn(name = "winner")
   private UserEntity winner;
 
   @ManyToMany // TODO add arguments

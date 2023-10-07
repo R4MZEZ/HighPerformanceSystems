@@ -6,11 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "interests")
 public class InterestEntity {
 
     @Id
@@ -21,7 +23,7 @@ public class InterestEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "interest")
-    private List<UsersInterestsEntity> userInterests;
+//    @OneToMany(mappedBy = "interest")
+//    private List<UsersInterestsEntity> userInterests;
 
 }

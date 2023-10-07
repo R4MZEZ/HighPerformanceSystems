@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "users")
 public class UserEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +20,7 @@ public class UserEntity {
   private Integer age;
 
   @ManyToOne
-  @JoinColumn(name = "owner_id", nullable = false)
+  @JoinColumn(name = "owner", nullable = false)
   private OwnerEntity owner;
 
   @OneToMany(mappedBy = "user")

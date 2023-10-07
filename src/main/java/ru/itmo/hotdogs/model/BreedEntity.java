@@ -15,7 +15,7 @@ public class BreedEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
+  @Column(nullable = false)
   private Integer id;
 
   @Column(nullable = false)

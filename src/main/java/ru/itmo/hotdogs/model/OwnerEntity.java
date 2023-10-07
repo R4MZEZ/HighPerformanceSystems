@@ -7,10 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "owners")
 public class OwnerEntity {
 
   @Id
@@ -21,14 +23,14 @@ public class OwnerEntity {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
+  @Column
   private String surname;
 
   @Column(nullable = false)
   private Boolean is_organizer;
 
   @ManyToOne
-  @JoinColumn(name = "coordinates_id", nullable = false)
+  @JoinColumn(name = "coordinates", nullable = false)
   private CoordinatesEntity coordinates;
 
 }

@@ -6,12 +6,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import lombok.Data;
 
 @Entity
 @Data
 @IdClass(UsersInterestsEntityId.class)
+@Table(name = "users_interests")
 public class UsersInterestsEntity{
 
   @Id
@@ -24,6 +26,7 @@ public class UsersInterestsEntity{
   @JoinColumn(name = "interest_id")
   private InterestEntity interest;
 
-  @Column
+  @Column(nullable = false)
   private Integer level;
+
 }
