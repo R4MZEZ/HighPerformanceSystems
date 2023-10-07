@@ -25,7 +25,10 @@ public class UserEntity {
   @OneToMany(mappedBy = "user")
   private List<UsersInterestsEntity> userInterests;
 
-  @ManyToMany()
+  @ManyToMany // TODO add arguments
   private Set<UserEntity> userMatches;
+
+  @ManyToMany // TODO add arguments
+  private Set<UserEntity> userLikes;
 
 }
