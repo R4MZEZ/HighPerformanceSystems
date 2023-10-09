@@ -1,0 +1,466 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1696878533070-1
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: breeds_pkey
+                  name: id
+                  startWith: 4
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+            tableName: breeds
+  - changeSet:
+      id: 1696878533070-2
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: coordinates_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: latitude
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: longitude
+                  type: BIGINT
+            tableName: coordinates
+  - changeSet:
+      id: 1696878533070-3
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: owners_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  name: surname
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: is_organizer
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: coordinates
+                  type: BIGINT
+            tableName: owners
+  - changeSet:
+      id: 1696878533070-4
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: age
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: breed
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: owner
+                  type: BIGINT
+            tableName: users
+  - changeSet:
+      id: 1696878533070-5
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: likes_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  name: sender_id
+                  type: BIGINT
+              - column:
+                  name: receiver_id
+                  type: BIGINT
+            tableName: likes
+  - changeSet:
+      id: 1696878533070-6
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: matches_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  name: user1_id
+                  type: BIGINT
+              - column:
+                  name: user2_id
+                  type: BIGINT
+            tableName: matches
+  - changeSet:
+      id: 1696878533070-7
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: interests_pkey
+                  name: id
+                  startWith: 2
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(50)
+            tableName: interests
+  - changeSet:
+      id: 1696878533070-8
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_interests_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: interest_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: level
+                  type: INTEGER
+            tableName: users_interests
+  - changeSet:
+      id: 1696878533070-9
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: shows_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date
+                  type: date
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prize
+                  type: BIGINT
+              - column:
+                  name: winner
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: organizer
+                  type: BIGINT
+            tableName: shows
+  - changeSet:
+      id: 1696878533070-10
+      author: r4mzez
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: allowed_breeds_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  name: breed_id
+                  type: BIGINT
+              - column:
+                  name: show_id
+                  type: BIGINT
+            tableName: allowed_breeds
+  - changeSet:
+      id: 1696878533070-11
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: breed_id
+            baseTableName: allowed_breeds
+            constraintName: allowed_breeds_breed_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: breeds
+            validate: true
+  - changeSet:
+      id: 1696878533070-12
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: show_id
+            baseTableName: allowed_breeds
+            constraintName: allowed_breeds_show_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: shows
+            validate: true
+  - changeSet:
+      id: 1696878533070-13
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: receiver_id
+            baseTableName: likes
+            constraintName: likes_receiver_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-14
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_id
+            baseTableName: likes
+            constraintName: likes_sender_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-15
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user1_id
+            baseTableName: matches
+            constraintName: matches_user1_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-16
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user2_id
+            baseTableName: matches
+            constraintName: matches_user2_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-17
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: coordinates
+            baseTableName: owners
+            constraintName: owners_coordinates_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: coordinates
+            validate: true
+  - changeSet:
+      id: 1696878533070-18
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: organizer
+            baseTableName: shows
+            constraintName: shows_organizer_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: owners
+            validate: true
+  - changeSet:
+      id: 1696878533070-19
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: winner
+            baseTableName: shows
+            constraintName: shows_winner_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-20
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: breed
+            baseTableName: users
+            constraintName: users_breed_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: breeds
+            validate: true
+  - changeSet:
+      id: 1696878533070-21
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: interest_id
+            baseTableName: users_interests
+            constraintName: users_interests_interest_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: interests
+            validate: true
+  - changeSet:
+      id: 1696878533070-22
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: users_interests
+            constraintName: users_interests_user_id_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1696878533070-23
+      author: r4mzez
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: owner
+            baseTableName: users
+            constraintName: users_owner_fkey
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: owners
+            validate: true
+  - changeSet:
+      id: 24
+      author: r4mzez
+      comment: "insert breed"
+      changes:
+        - insert:
+            tableName: breeds
+            columns:
+              - column:
+                  name: name
+                  value: "taksa"
+
