@@ -29,7 +29,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}/recommend")
-  public ResponseEntity<List<UserEntity>> getUsersNear(@PathVariable long id) {
+  public ResponseEntity<List<UserDto>> getUsersNear(@PathVariable long id) {
     try {
       return ResponseEntity.ok(userService.findAround(id));
     }catch (NotFoundException e){

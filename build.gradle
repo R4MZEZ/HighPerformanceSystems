@@ -35,6 +35,10 @@ dependencies {
 	//testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:postgresql'
+
+	implementation 'com.bedatadriven:jackson-datatype-jts:2.2'
+	implementation 'org.locationtech.jts:jts-core:1.15.0'
+	implementation 'org.hibernate:hibernate-spatial:6.2.4.Final'
 }
 
 //tasks.named('test') {
