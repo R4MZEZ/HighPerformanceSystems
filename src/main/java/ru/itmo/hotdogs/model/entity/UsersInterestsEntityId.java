@@ -1,4 +1,4 @@
-package ru.itmo.hotdogs.model;
+package ru.itmo.hotdogs.model.entity;
 
 import java.io.Serializable;
 

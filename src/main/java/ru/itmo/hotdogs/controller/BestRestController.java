@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import ru.itmo.hotdogs.model.BreedEntity;
+import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.service.BreedService;
 
 
