@@ -1,0 +1,1 @@
+CREATE INDEX postgis_index ON owners USING GIST(location);
