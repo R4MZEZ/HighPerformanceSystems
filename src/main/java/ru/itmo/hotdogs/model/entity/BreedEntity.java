@@ -7,10 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "breeds")
+@NoArgsConstructor
 public class BreedEntity {
 
   @Id
@@ -21,4 +23,7 @@ public class BreedEntity {
   @Column(nullable = false)
   private String name;
 
+  public BreedEntity(String name) {
+    this.name = name;
+  }
 }
