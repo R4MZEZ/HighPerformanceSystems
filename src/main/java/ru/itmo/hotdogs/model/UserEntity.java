@@ -20,6 +20,10 @@ public class UserEntity {
   private Integer age;
 
   @ManyToOne
+  @JoinColumn(name = "breed", nullable = false)
+  private BreedEntity breed;
+
+  @ManyToOne
   @JoinColumn(name = "owner", nullable = false)
   private OwnerEntity owner;
 
