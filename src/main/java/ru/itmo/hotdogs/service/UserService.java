@@ -5,7 +5,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
-import ru.itmo.hotdogs.model.dto.UserDto;
+import ru.itmo.hotdogs.model.dto.RecommendedUserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
@@ -19,10 +19,10 @@ public class UserService {
     return userRepository.findAll();
   }
 
-  public UserEntity save(UserDto userDto) {
+  public UserEntity save(RecommendedUserDto recommendedUserDto) {
     var user = UserEntity.builder()
-        .name(userDto.getUsername())
-        .age(userDto.getAge())
+        .name(recommendedUserDto.getUsername())
+        .age(recommendedUserDto.getAge())
         .build();
     return userRepository.save(user);
   }
@@ -40,7 +40,7 @@ public class UserService {
 //  }
 
 
-  public List<UserDto> findAround(Long id) throws NotFoundException {
+  public List<RecommendedUserDto> findAround(Long id) throws NotFoundException {
     Optional<UserEntity> user = userRepository.findById(id);
     if (user.isPresent()) {
       return userRepository.findNearest(user.get().getOwner().getLocation().getX(), user.get().getOwner().getLocation().getY());

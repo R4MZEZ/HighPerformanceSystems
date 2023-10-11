@@ -1,11 +1,6 @@
 package ru.itmo.hotdogs.model.dto;
 
-//import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-//import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 
 /**
@@ -17,13 +12,9 @@ import ru.itmo.hotdogs.model.entity.UserEntity;
 //                      Set<UserEntity> userLikes) {
 //
 //}
-@Data
-public class UserDto {
-  private String username;
-  private Integer age;
+public interface RecommendedUserDto {
+  String getUsername();
+  Integer getAge();
+  Double getDistance();
 
-  public UserDto(String username, Integer age) {
-    this.username = username;
-    this.age = age;
-  }
 }

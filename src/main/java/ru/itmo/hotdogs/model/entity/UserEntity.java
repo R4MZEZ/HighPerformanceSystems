@@ -8,16 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.itmo.hotdogs.model.dto.UserDto;
 
-
-@NamedNativeQuery(name = "UserEntity.findNearest",
-    query = "SELECT users.name as username, age from users inner join owners on users.owner = owners.id order by ST_Distance(location, (ST_MakePoint(:longitude, :latitude)))",
-    resultSetMapping = "Mapping.UserDto")
-@SqlResultSetMapping(name = "Mapping.UserDto",
-    classes = @ConstructorResult(targetClass = UserDto.class,
-        columns = {@ColumnResult(name = "username"),
-                    @ColumnResult(name = "age")}))
 @Data
 @Entity
 @Builder
@@ -25,6 +16,7 @@ import ru.itmo.hotdogs.model.dto.UserDto;
 @AllArgsConstructor
 @Table(name = "users")
 public class UserEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

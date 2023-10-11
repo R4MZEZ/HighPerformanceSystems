@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.itmo.hotdogs.model.dto.UserDto;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
+import ru.itmo.hotdogs.model.dto.RecommendedUserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.service.UserService;
 
@@ -23,13 +22,13 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping(path = "/new")
-  public ResponseEntity<?> createUser(@RequestBody UserDto user) {
+  public ResponseEntity<?> createUser(@RequestBody RecommendedUserDto user) {
     userService.save(user);
     return ResponseEntity.ok("Пользователь успешно создан");
   }
 
   @GetMapping("/{id}/recommend")
-  public ResponseEntity<List<UserDto>> getUsersNear(@PathVariable long id) {
+  public ResponseEntity<List<RecommendedUserDto>> getUsersNear(@PathVariable long id) {
     try {
       return ResponseEntity.ok(userService.findAround(id));
     }catch (NotFoundException e){
