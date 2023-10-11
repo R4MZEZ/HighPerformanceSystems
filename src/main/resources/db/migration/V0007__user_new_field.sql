@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN cur_recommended BIGINT references users;

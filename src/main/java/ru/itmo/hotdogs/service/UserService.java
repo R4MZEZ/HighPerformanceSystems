@@ -40,12 +40,17 @@ public class UserService {
 //  }
 
 
-  public List<RecommendedUserDto> findAround(Long id) throws NotFoundException {
+  public RecommendedUserDto findAround(Long id) throws NotFoundException {
     Optional<UserEntity> user = userRepository.findById(id);
     if (user.isPresent()) {
-      return userRepository.findNearest(user.get().getOwner().getLocation().getX(), user.get().getOwner().getLocation().getY());
-    }else
+      RecommendedUserDto recommendedUser = userRepository.findNearest(
+          user.get().getOwner().getLocation().getX(),
+          user.get().getOwner().getLocation().getY()).get(0);
+      user.get().setCurRecommended(userRepository.findById(recommendedUser.getId()).get());
+      return recommendedUser;
+    } else {
       throw new NotFoundException();
+    }
   }
 
 

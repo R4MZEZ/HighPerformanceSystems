@@ -36,6 +36,10 @@ public class UserEntity {
   @JsonIgnore
   private OwnerEntity owner;
 
+  @ManyToOne
+  @JoinColumn(name = "cur_recommended")
+  private UserEntity curRecommended;
+
   @OneToMany(mappedBy = "user")
   private List<UsersInterestsEntity> userInterests;
 

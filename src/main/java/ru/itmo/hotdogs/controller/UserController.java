@@ -28,11 +28,11 @@ public class UserController {
   }
 
   @GetMapping("/{id}/recommend")
-  public ResponseEntity<List<RecommendedUserDto>> getUsersNear(@PathVariable long id) {
+  public ResponseEntity<?> getUsersNear(@PathVariable long id) {
     try {
       return ResponseEntity.ok(userService.findAround(id));
     }catch (NotFoundException e){
-      return ResponseEntity.badRequest().build();
+      return ResponseEntity.status(418).body("Пользователь с указанным id не существует.");
     }
   }
 
