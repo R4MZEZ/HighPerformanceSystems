@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,12 +28,27 @@ public class UserController {
     return ResponseEntity.ok("Пользователь успешно создан");
   }
 
+  @PostMapping(path = "/{id}/like")
+  public ResponseEntity<String> likeRecommended(@PathVariable long id) {
+    try {
+      userService.rateRecommended(id, true);
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT)
+          .body("Пользователь с указанным id не существует.");
+    } catch (NullPointerException e) {
+      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT)
+          .body("Сначала необходимо получить рекомендацию");
+    }
+    return new ResponseEntity<>("redirect:/users/%d/recommend".formatted(id), HttpStatus.FOUND);
+  }
+
   @GetMapping("/{id}/recommend")
   public ResponseEntity<?> getUsersNear(@PathVariable long id) {
     try {
-      return ResponseEntity.ok(userService.findAround(id));
-    }catch (NotFoundException e){
-      return ResponseEntity.status(418).body("Пользователь с указанным id не существует.");
+      return ResponseEntity.ok(userService.findNearest(id));
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT)
+          .body("Пользователь с указанным id не существует.");
     }
   }
 
@@ -40,4 +56,5 @@ public class UserController {
   public ResponseEntity<List<UserEntity>> findAll() {
     return ResponseEntity.ok(userService.findAll());
   }
+
 }
