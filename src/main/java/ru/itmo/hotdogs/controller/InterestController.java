@@ -1,13 +1,14 @@
 package ru.itmo.hotdogs.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
-import ru.itmo.hotdogs.service.BreedService;
 import ru.itmo.hotdogs.service.InterestService;
 
 
