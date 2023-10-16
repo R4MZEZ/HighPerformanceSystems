@@ -6,16 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "shows")
+@NoArgsConstructor
 public class ShowEntity {
 
 	@Id
@@ -37,8 +40,26 @@ public class ShowEntity {
 	@JoinColumn(name = "winner")
 	private UserEntity winner;
 
-	@ManyToMany // TODO add arguments
-	private List<BreedEntity> allowed_breeds;
+	@ManyToMany
+	@JoinTable(
+		name = "allowed_breeds",
+		joinColumns = @JoinColumn(name = "show_id"),
+		inverseJoinColumns = @JoinColumn(name = "breed_id")
+	)
+	private Set<BreedEntity> allowedBreeds;
 
+	@ManyToMany
+	@JoinTable(
+		name = "shows_participants",
+		joinColumns = @JoinColumn(name = "show_id")
+	)
+	private Set<UserEntity> participants;
 
+	public ShowEntity(Long prize, Date date, OwnerEntity organizer,
+		Set<BreedEntity> allowedBreeds) {
+		this.prize = prize;
+		this.date = date;
+		this.organizer = organizer;
+		this.allowedBreeds = allowedBreeds;
+	}
 }
