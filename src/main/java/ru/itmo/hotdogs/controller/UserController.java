@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.model.dto.RecommendedUserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
@@ -28,10 +29,10 @@ public class UserController {
     return ResponseEntity.ok("Пользователь успешно создан");
   }
 
-  @PostMapping(path = "/{id}/like")
-  public ResponseEntity<String> likeRecommended(@PathVariable long id) {
+  @PostMapping(path = "/{id}/rate")
+  public ResponseEntity<String> likeRecommended(@PathVariable long id, @RequestParam boolean is_like) {
     try {
-      userService.rateRecommended(id, true);
+      userService.rateRecommended(id, is_like);
     } catch (NotFoundException e) {
       return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT)
           .body("Пользователь с указанным id не существует.");
