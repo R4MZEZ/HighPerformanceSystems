@@ -31,18 +31,26 @@ public class UserController {
 	}
 
 	@PostMapping(path = "/{id}/rate")
-	public ResponseEntity<String> likeRecommended(@PathVariable long id,
+	public ResponseEntity<?> likeRecommended(@PathVariable long id,
 		@RequestParam boolean is_like) {
 		try {
-			userService.rateRecommended(id, is_like);
+			RecommendedUserDto matchedUser = userService.rateRecommended(id, is_like);
+			if (matchedUser != null) {
+				return new ResponseEntity<>(
+					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
+						matchedUser.getName(),
+						matchedUser.getAge(),
+						matchedUser.getDistance() / 1000), HttpStatus.FOUND);
+			} else {
+				return ResponseEntity.ok(getNewRecommendation(id));
+			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
-		return new ResponseEntity<>("redirect:/users/%d/recommend".formatted(id), HttpStatus.FOUND);
 	}
 
 	@GetMapping("/{id}/recommend")
-	public ResponseEntity<?> getUsersNear(@PathVariable long id) {
+	public ResponseEntity<?> getNewRecommendation(@PathVariable long id) {
 		try {
 			return ResponseEntity.ok(userService.findNearest(id));
 		} catch (NotFoundException e) {

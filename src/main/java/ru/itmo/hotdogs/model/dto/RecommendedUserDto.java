@@ -16,7 +16,7 @@ public interface RecommendedUserDto {
 
 	Long getId();
 
-	String getUsername();
+	String getName();
 
 	Integer getAge();
 
