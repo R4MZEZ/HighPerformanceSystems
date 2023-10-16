@@ -1,6 +1,5 @@
 package ru.itmo.hotdogs.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +32,6 @@ public class UserEntity {
 
   @ManyToOne
   @JoinColumn(name = "owner", nullable = false)
-  @JsonIgnore
   private OwnerEntity owner;
 
   @ManyToOne
@@ -41,12 +39,22 @@ public class UserEntity {
   private UserEntity curRecommended;
 
   @OneToMany(mappedBy = "user")
-  private List<UsersInterestsEntity> userInterests;
+  private List<UsersInterestsEntity> interests;
 
-  @ManyToMany // TODO add arguments
-  private Set<UserEntity> userMatches;
+  @ManyToMany
+  @JoinTable(
+      name = "users_matches",
+      joinColumns = @JoinColumn(name = "user1_id"),
+      inverseJoinColumns = @JoinColumn(name = "user2_id")
+  )
+  private Set<UserEntity> matches;
 
-  @ManyToMany // TODO add arguments
-  private Set<UserEntity> userLikes;
+  @ManyToMany
+  @JoinTable(
+      name = "users_interactions",
+      joinColumns = @JoinColumn(name = "sender_id"),
+      inverseJoinColumns = @JoinColumn(name = "receiver_id")
+  )
+  private Set<UserEntity> interactions;
 
 }

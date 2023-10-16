@@ -1,0 +1,1 @@
+ALTER TABLE matches RENAME TO users_matches;
