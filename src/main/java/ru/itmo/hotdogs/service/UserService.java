@@ -110,7 +110,7 @@ public class UserService {
 
 	public void addInterest(long userId, int interestId, int level)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException {
-		if (level < 1 || level > 10){
+		if (level < 1 || level > 10) {
 			throw new IllegalLevelException("Значение level должно быть в интервале (0;10].");
 		}
 
@@ -122,8 +122,9 @@ public class UserService {
 		UserEntity user = findById(userId);
 		InterestEntity interest = interestOptional.get();
 
-		if (user.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))){
-			throw new AlreadyExistsException("У данного пользователя уже существует такой интерес.");
+		if (user.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
+			throw new AlreadyExistsException(
+				"У данного пользователя уже существует такой интерес.");
 		}
 
 		UsersInterestsEntity interest_record = new UsersInterestsEntity(user, interest, level);

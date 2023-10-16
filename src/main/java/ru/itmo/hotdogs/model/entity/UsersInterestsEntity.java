@@ -17,27 +17,27 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "users_interests")
 @NoArgsConstructor
-public class UsersInterestsEntity{
+public class UsersInterestsEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  @JsonIgnore
-  private UserEntity user;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	@JsonIgnore
+	private UserEntity user;
 
-  @ManyToOne
-  @JoinColumn(name = "interest_id")
-  private InterestEntity interest;
+	@ManyToOne
+	@JoinColumn(name = "interest_id")
+	private InterestEntity interest;
 
-  @Column(nullable = false)
-  private Integer level;
+	@Column(nullable = false)
+	private Integer level;
 
-  public UsersInterestsEntity(UserEntity user, InterestEntity interest, Integer level) {
-    this.user = user;
-    this.interest = interest;
-    this.level = level;
-  }
+	public UsersInterestsEntity(UserEntity user, InterestEntity interest, Integer level) {
+		this.user = user;
+		this.interest = interest;
+		this.level = level;
+	}
 }

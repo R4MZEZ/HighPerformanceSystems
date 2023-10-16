@@ -18,27 +18,27 @@ import lombok.Data;
 @Table(name = "shows")
 public class ShowEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
+	private Long id;
 
-  @Column(nullable = false)
-  private Long prize;
+	@Column(nullable = false)
+	private Long prize;
 
-  @Column(nullable = false)
-  private Date date;
+	@Column(nullable = false)
+	private Date date;
 
-  @ManyToOne
-  @JoinColumn(name = "organizer", nullable = false)
-  private OwnerEntity organizer;
+	@ManyToOne
+	@JoinColumn(name = "organizer", nullable = false)
+	private OwnerEntity organizer;
 
-  @ManyToOne
-  @JoinColumn(name = "winner")
-  private UserEntity winner;
+	@ManyToOne
+	@JoinColumn(name = "winner")
+	private UserEntity winner;
 
-  @ManyToMany // TODO add arguments
-  private List<BreedEntity> allowed_breeds;
+	@ManyToMany // TODO add arguments
+	private List<BreedEntity> allowed_breeds;
 
 
 }

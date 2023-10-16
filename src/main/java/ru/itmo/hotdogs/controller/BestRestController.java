@@ -14,15 +14,15 @@ import ru.itmo.hotdogs.service.BreedService;
 @RestController
 public class BestRestController {
 
-  private final BreedService breedService;
+	private final BreedService breedService;
 
-  @GetMapping("/breeds")
-  public ResponseEntity<List<BreedEntity>> findAll() {
-    return ResponseEntity.ok(breedService.findAll());
-  }
+	@GetMapping("/breeds")
+	public ResponseEntity<List<BreedEntity>> findAll() {
+		return ResponseEntity.ok(breedService.findAll());
+	}
 
-  @GetMapping("/hello")
-  public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-    return String.format("Helloooo %s!", name);
-  }
+	@GetMapping("/hello")
+	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
+		return String.format("Helloooo %s!", name);
+	}
 }

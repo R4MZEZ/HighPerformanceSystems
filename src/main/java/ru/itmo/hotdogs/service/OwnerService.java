@@ -11,13 +11,13 @@ import ru.itmo.hotdogs.repository.OwnerRepository;
 public class OwnerService {
 
 
-  private final OwnerRepository ownerRepository;
+	private final OwnerRepository ownerRepository;
 
-  public OwnerEntity save(OwnerEntity owner) {
-    return ownerRepository.save(owner);
-  }
+	public OwnerEntity save(OwnerEntity owner) {
+		return ownerRepository.save(owner);
+	}
 
-  public List<OwnerEntity> findAll() {
-    return ownerRepository.findAll();
-  }
+	public List<OwnerEntity> findAll() {
+		return ownerRepository.findAll();
+	}
 }

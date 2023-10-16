@@ -15,23 +15,23 @@ import org.locationtech.jts.geom.Point;
 @Table(name = "owners")
 public class OwnerEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(nullable = false)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false)
+	private Long id;
 
-  @Column(nullable = false)
-  private String name;
+	@Column(nullable = false)
+	private String name;
 
-  @Column
-  private String surname;
+	@Column
+	private String surname;
 
-  @Column(nullable = false)
-  private Boolean is_organizer;
+	@Column(nullable = false)
+	private Boolean is_organizer;
 
-  @JsonIgnore
-  @Column(columnDefinition = "geography", nullable = false)
-  private Point location;
+	@JsonIgnore
+	@Column(columnDefinition = "geography", nullable = false)
+	private Point location;
 
 
 }

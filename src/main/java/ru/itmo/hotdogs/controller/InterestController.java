@@ -16,16 +16,16 @@ import ru.itmo.hotdogs.service.InterestService;
 @RestController
 public class InterestController {
 
-  private final InterestService interestService;
+	private final InterestService interestService;
 
-  @GetMapping
-  public ResponseEntity<List<InterestEntity>> findAll() {
-    return ResponseEntity.ok(interestService.findAll());
-  }
+	@GetMapping
+	public ResponseEntity<List<InterestEntity>> findAll() {
+		return ResponseEntity.ok(interestService.findAll());
+	}
 
-  @PostMapping("/new")
-  public ResponseEntity<?> addInterest(@RequestBody InterestEntity interest) {
-    interestService.save(interest);
-    return ResponseEntity.ok("Интерес успешно создан");
-  }
+	@PostMapping("/new")
+	public ResponseEntity<?> addInterest(@RequestBody InterestEntity interest) {
+		interestService.save(interest);
+		return ResponseEntity.ok("Интерес успешно создан");
+	}
 }

@@ -16,45 +16,45 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 public class UserEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @Column(nullable = false)
-  private String name;
+	@Column(nullable = false)
+	private String name;
 
-  @Column(nullable = false)
-  private Integer age;
+	@Column(nullable = false)
+	private Integer age;
 
-  @ManyToOne
-  @JoinColumn(name = "breed", nullable = false)
-  private BreedEntity breed;
+	@ManyToOne
+	@JoinColumn(name = "breed", nullable = false)
+	private BreedEntity breed;
 
-  @ManyToOne
-  @JoinColumn(name = "owner", nullable = false)
-  private OwnerEntity owner;
+	@ManyToOne
+	@JoinColumn(name = "owner", nullable = false)
+	private OwnerEntity owner;
 
-  @ManyToOne
-  @JoinColumn(name = "cur_recommended")
-  private UserEntity curRecommended;
+	@ManyToOne
+	@JoinColumn(name = "cur_recommended")
+	private UserEntity curRecommended;
 
-  @OneToMany(mappedBy = "user")
-  private List<UsersInterestsEntity> interests;
+	@OneToMany(mappedBy = "user")
+	private List<UsersInterestsEntity> interests;
 
-  @ManyToMany
-  @JoinTable(
-      name = "users_matches",
-      joinColumns = @JoinColumn(name = "user1_id"),
-      inverseJoinColumns = @JoinColumn(name = "user2_id")
-  )
-  private Set<UserEntity> matches;
+	@ManyToMany
+	@JoinTable(
+		name = "users_matches",
+		joinColumns = @JoinColumn(name = "user1_id"),
+		inverseJoinColumns = @JoinColumn(name = "user2_id")
+	)
+	private Set<UserEntity> matches;
 
-  @ManyToMany
-  @JoinTable(
-      name = "users_interactions",
-      joinColumns = @JoinColumn(name = "sender_id"),
-      inverseJoinColumns = @JoinColumn(name = "receiver_id")
-  )
-  private Set<UserEntity> interactions;
+	@ManyToMany
+	@JoinTable(
+		name = "users_interactions",
+		joinColumns = @JoinColumn(name = "sender_id"),
+		inverseJoinColumns = @JoinColumn(name = "receiver_id")
+	)
+	private Set<UserEntity> interactions;
 
 }

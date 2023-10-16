@@ -14,27 +14,27 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "users_interactions")
 @NoArgsConstructor
-public class UsersInteractionsEntity{
+public class UsersInteractionsEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @ManyToOne
+	@ManyToOne
 //  @JoinColumn(name = "sender_id")
-  private UserEntity sender;
+	private UserEntity sender;
 
-  @ManyToOne
+	@ManyToOne
 //  @JoinColumn(name = "receiver_id")
-  private UserEntity receiver;
+	private UserEntity receiver;
 
-  @Column(nullable = false)
-  private Boolean is_liked;
+	@Column(nullable = false)
+	private Boolean is_liked;
 
-  public UsersInteractionsEntity(UserEntity sender, UserEntity receiver, Boolean is_liked) {
-    this.sender = sender;
-    this.receiver = receiver;
-    this.is_liked = is_liked;
-  }
+	public UsersInteractionsEntity(UserEntity sender, UserEntity receiver, Boolean is_liked) {
+		this.sender = sender;
+		this.receiver = receiver;
+		this.is_liked = is_liked;
+	}
 }
 

@@ -15,12 +15,12 @@ import lombok.Data;
 @Table(name = "interests")
 public class InterestEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @Column(nullable = false)
-    private String name;
+	@Column(nullable = false)
+	private String name;
 
 //    @OneToMany(mappedBy = "interest")
 //    private List<UsersInterestsEntity> userInterests;

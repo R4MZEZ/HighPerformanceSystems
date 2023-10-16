@@ -6,5 +6,5 @@ import ru.itmo.hotdogs.model.entity.UsersInteractionsEntity;
 
 public interface UsersInteractionsRepository extends JpaRepository<UsersInteractionsEntity, Long> {
 
-  UsersInteractionsEntity findBySenderAndReceiver(UserEntity sender, UserEntity receiver);
+	UsersInteractionsEntity findBySenderAndReceiver(UserEntity sender, UserEntity receiver);
 }

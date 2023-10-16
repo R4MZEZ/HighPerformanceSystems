@@ -13,9 +13,13 @@ import ru.itmo.hotdogs.model.entity.UserEntity;
 //
 //}
 public interface RecommendedUserDto {
-  Long getId();
-  String getUsername();
-  Integer getAge();
-  Double getDistance();
+
+	Long getId();
+
+	String getUsername();
+
+	Integer getAge();
+
+	Double getDistance();
 
 }

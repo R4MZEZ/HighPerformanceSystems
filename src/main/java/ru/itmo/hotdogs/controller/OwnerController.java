@@ -17,16 +17,16 @@ import ru.itmo.hotdogs.service.OwnerService;
 @RestController
 public class OwnerController {
 
-  private final OwnerService ownerService;
+	private final OwnerService ownerService;
 
-  @GetMapping
-  public ResponseEntity<List<OwnerEntity>> findAll() {
-    return ResponseEntity.ok(ownerService.findAll());
-  }
+	@GetMapping
+	public ResponseEntity<List<OwnerEntity>> findAll() {
+		return ResponseEntity.ok(ownerService.findAll());
+	}
 
-  @PostMapping(path = "/new")
-  public ResponseEntity<?> createOwner(@RequestBody OwnerEntity owner) {
-    ownerService.save(owner);
-    return ResponseEntity.ok("Владелец успешно создан");
-  }
+	@PostMapping(path = "/new")
+	public ResponseEntity<?> createOwner(@RequestBody OwnerEntity owner) {
+		ownerService.save(owner);
+		return ResponseEntity.ok("Владелец успешно создан");
+	}
 }

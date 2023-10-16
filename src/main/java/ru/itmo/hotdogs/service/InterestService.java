@@ -11,11 +11,13 @@ import ru.itmo.hotdogs.repository.InterestRepository;
 public class InterestService {
 
 
-  private final InterestRepository interestRepository;
+	private final InterestRepository interestRepository;
 
-  public List<InterestEntity> findAll() {
-    return interestRepository.findAll();
-  }
+	public List<InterestEntity> findAll() {
+		return interestRepository.findAll();
+	}
 
-  public void save(InterestEntity interest){ interestRepository.save(interest); }
+	public void save(InterestEntity interest) {
+		interestRepository.save(interest);
+	}
 }

@@ -11,9 +11,9 @@ import ru.itmo.hotdogs.repository.BreedRepository;
 public class BreedService {
 
 
-  private final BreedRepository breedRepository;
+	private final BreedRepository breedRepository;
 
-  public List<BreedEntity> findAll() {
-    return breedRepository.findAll();
-  }
+	public List<BreedEntity> findAll() {
+		return breedRepository.findAll();
+	}
 }
