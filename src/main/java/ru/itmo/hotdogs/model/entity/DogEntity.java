@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class UserEntity {
+@Table(name = "dogs")
+public class DogEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,25 +36,25 @@ public class UserEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "cur_recommended")
-	private UserEntity curRecommended;
+	private DogEntity curRecommended;
 
-	@OneToMany(mappedBy = "user")
-	private List<UsersInterestsEntity> interests;
+	@OneToMany(mappedBy = "dog")
+	private List<DogsInterestsEntity> interests;
 
 	@ManyToMany
 	@JoinTable(
-		name = "users_matches",
-		joinColumns = @JoinColumn(name = "user1_id"),
-		inverseJoinColumns = @JoinColumn(name = "user2_id")
+		name = "dogs_matches",
+		joinColumns = @JoinColumn(name = "dog1_id"),
+		inverseJoinColumns = @JoinColumn(name = "dog2_id")
 	)
-	private Set<UserEntity> matches;
+	private Set<DogEntity> matches;
 
 	@ManyToMany
 	@JoinTable(
-		name = "users_interactions",
+		name = "dogs_interactions",
 		joinColumns = @JoinColumn(name = "sender_id"),
 		inverseJoinColumns = @JoinColumn(name = "receiver_id")
 	)
-	private Set<UserEntity> interactions;
+	private Set<DogEntity> interactions;
 
 }

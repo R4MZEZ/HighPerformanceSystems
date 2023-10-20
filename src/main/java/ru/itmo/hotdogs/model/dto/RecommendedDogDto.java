@@ -1,10 +1,10 @@
 package ru.itmo.hotdogs.model.dto;
 
 
-import ru.itmo.hotdogs.model.entity.UserEntity;
+import ru.itmo.hotdogs.model.entity.DogEntity;
 
 /**
- * DTO for {@link UserEntity}
+ * DTO for {@link DogEntity}
  */
 //@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 //public record UserDto(String name, Integer age, BreedEntity breed, OwnerEntity owner,
@@ -12,7 +12,7 @@ import ru.itmo.hotdogs.model.entity.UserEntity;
 //                      Set<UserEntity> userLikes) {
 //
 //}
-public interface RecommendedUserDto {
+public interface RecommendedDogDto {
 
 	Long getId();
 

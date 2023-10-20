@@ -38,7 +38,7 @@ public class ShowEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "winner")
-	private UserEntity winner;
+	private DogEntity winner;
 
 	@ManyToMany
 	@JoinTable(
@@ -51,9 +51,10 @@ public class ShowEntity {
 	@ManyToMany
 	@JoinTable(
 		name = "shows_participants",
-		joinColumns = @JoinColumn(name = "show_id")
+		joinColumns = @JoinColumn(name = "show_id"),
+		inverseJoinColumns = @JoinColumn(name = "dog_id")
 	)
-	private Set<UserEntity> participants;
+	private Set<DogEntity> participants;
 
 	public ShowEntity(Long prize, Date date, OwnerEntity organizer,
 		Set<BreedEntity> allowedBreeds) {

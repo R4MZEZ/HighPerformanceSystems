@@ -20,7 +20,5 @@ public class InterestEntity {
 	@Column(nullable = false)
 	private String name;
 
-//    @OneToMany(mappedBy = "interest")
-//    private List<UsersInterestsEntity> userInterests;
 
 }

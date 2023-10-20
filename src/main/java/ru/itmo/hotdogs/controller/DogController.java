@@ -13,34 +13,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
-import ru.itmo.hotdogs.model.dto.RecommendedUserDto;
-import ru.itmo.hotdogs.model.entity.UserEntity;
-import ru.itmo.hotdogs.service.UserService;
+import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.service.DogService;
 
 @RequiredArgsConstructor
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/dogs")
 @RestController
-public class UserController {
+public class DogController {
 
-	private final UserService userService;
+	private final DogService dogService;
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> createUser(@RequestBody RecommendedUserDto user) {
-		userService.save(user);
-		return ResponseEntity.ok("Пользователь успешно создан");
+	public ResponseEntity<?> createNewDog(@RequestBody RecommendedDogDto dog) {
+		dogService.save(dog);
+		return ResponseEntity.ok("Собака успешно создана");
 	}
 
 	@PostMapping(path = "/{id}/rate")
 	public ResponseEntity<?> likeRecommended(@PathVariable long id,
 		@RequestParam boolean is_like) {
 		try {
-			RecommendedUserDto matchedUser = userService.rateRecommended(id, is_like);
-			if (matchedUser != null) {
+			RecommendedDogDto matchedDog = dogService.rateRecommended(id, is_like);
+			if (matchedDog != null) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
-						matchedUser.getName(),
-						matchedUser.getAge(),
-						matchedUser.getDistance() / 1000), HttpStatus.FOUND);
+						matchedDog.getName(),
+						matchedDog.getAge(),
+						matchedDog.getDistance() / 1000), HttpStatus.FOUND);
 			} else {
 				return ResponseEntity.ok(getNewRecommendation(id));
 			}
@@ -52,32 +52,32 @@ public class UserController {
 	@GetMapping("/{id}/recommend")
 	public ResponseEntity<?> getNewRecommendation(@PathVariable long id) {
 		try {
-			return ResponseEntity.ok(userService.findNearest(id));
+			return ResponseEntity.ok(dogService.findNearest(id));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
 	}
 
-	@PatchMapping("/{userId}/add-interest")
-	public ResponseEntity<?> addInterest(@PathVariable long userId, @RequestParam int id,
+	@PatchMapping("/{dogId}/add-interest")
+	public ResponseEntity<?> addInterest(@PathVariable long dogId, @RequestParam int id,
 		@RequestParam int level) {
 		try {
-			userService.addInterest(userId, id, level);
-			return ResponseEntity.ok("Интерес успешно добавлен пользователю.");
+			dogService.addInterest(dogId, id, level);
+			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
 	}
 
 	@GetMapping()
-	public ResponseEntity<List<UserEntity>> findAll() {
-		return ResponseEntity.ok(userService.findAll());
+	public ResponseEntity<List<DogEntity>> findAll() {
+		return ResponseEntity.ok(dogService.findAll());
 	}
 
 	@GetMapping("{id}")
 	public ResponseEntity<?> findById(@PathVariable long id) {
 		try {
-			return ResponseEntity.ok(userService.findById(id));
+			return ResponseEntity.ok(dogService.findById(id));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}

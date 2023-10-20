@@ -11,6 +11,8 @@ public class ShowService {
 
 	ShowRepository showRepository;
 
-	public ShowEntity save(ShowEntity show){ return showRepository.save(show); }
+	public void save(ShowEntity show){
+		showRepository.save(show);
+	}
 
 }

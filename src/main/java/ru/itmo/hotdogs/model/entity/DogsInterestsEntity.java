@@ -1,10 +1,12 @@
 package ru.itmo.hotdogs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -12,29 +14,29 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "users_interactions")
+@Table(name = "dogs_interests")
 @NoArgsConstructor
-public class UsersInteractionsEntity {
+public class DogsInterestsEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
-//  @JoinColumn(name = "sender_id")
-	private UserEntity sender;
+	@JoinColumn(name = "dog_id")
+	@JsonIgnore
+	private DogEntity dog;
 
 	@ManyToOne
-//  @JoinColumn(name = "receiver_id")
-	private UserEntity receiver;
+	@JoinColumn(name = "interest_id")
+	private InterestEntity interest;
 
 	@Column(nullable = false)
-	private Boolean is_liked;
+	private Integer level;
 
-	public UsersInteractionsEntity(UserEntity sender, UserEntity receiver, Boolean is_liked) {
-		this.sender = sender;
-		this.receiver = receiver;
-		this.is_liked = is_liked;
+	public DogsInterestsEntity(DogEntity dog, InterestEntity interest, Integer level) {
+		this.dog = dog;
+		this.interest = interest;
+		this.level = level;
 	}
 }
-

@@ -2,9 +2,7 @@ package ru.itmo.hotdogs.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.AccessDeniedException;
@@ -13,9 +11,7 @@ import ru.itmo.hotdogs.model.dto.ShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
-import ru.itmo.hotdogs.repository.BreedRepository;
 import ru.itmo.hotdogs.repository.OwnerRepository;
-import ru.itmo.hotdogs.repository.ShowRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +22,8 @@ public class OwnerService {
 	private final ShowService showService;
 	private final BreedService breedService;
 
-	public OwnerEntity save(OwnerEntity owner) {
-		return ownerRepository.save(owner);
+	public void save(OwnerEntity owner) {
+		ownerRepository.save(owner);
 	}
 
 	public List<OwnerEntity> findAll() {
