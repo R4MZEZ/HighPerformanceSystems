@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
@@ -16,4 +17,6 @@ public class BreedService {
 	public List<BreedEntity> findAll() {
 		return breedRepository.findAll();
 	}
+
+	public Optional<BreedEntity> findById(Integer id){ return breedRepository.findById(id); }
 }

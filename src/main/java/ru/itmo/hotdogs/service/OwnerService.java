@@ -23,8 +23,8 @@ public class OwnerService {
 
 
 	private final OwnerRepository ownerRepository;
-	private final ShowRepository showRepository;
-	private final BreedRepository breedRepository;
+	private final ShowService showService;
+	private final BreedService breedService;
 
 	public OwnerEntity save(OwnerEntity owner) {
 		return ownerRepository.save(owner);
@@ -35,23 +35,22 @@ public class OwnerService {
 	}
 
 	public void createShow(Long id, ShowDto showDto) throws NotFoundException, AccessDeniedException {
-		Optional<OwnerEntity> ownerOptional = ownerRepository.findById(id);
-		if (ownerOptional.isEmpty())
-			throw new NotFoundException("Владельца с таким id не существует");
-		OwnerEntity owner = ownerOptional.get();
+		OwnerEntity owner = ownerRepository.findById(id).orElseThrow(
+			() -> new NotFoundException("Владельца с таким id не существует")
+		);
 
 		if (!owner.getIs_organizer())
 			throw new AccessDeniedException("Вы не организатор");
 
 		Set<BreedEntity> allowedBreeds = new HashSet<>();
 		for (Integer breedId : showDto.getAllowed_breeds()) {
-			BreedEntity breed = breedRepository.findById(breedId)
+			BreedEntity breed = breedService.findById(breedId)
 				.orElseThrow(() -> new NotFoundException("Breed not found with id: " + breedId));
 			allowedBreeds.add(breed);
 		}
 
 		ShowEntity show = new ShowEntity(showDto.getPrize(), showDto.getDate(), owner, allowedBreeds);
-		showRepository.save(show);
+		showService.save(show);
 	}
 
 }

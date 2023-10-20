@@ -33,12 +33,10 @@ public class UserService {
 	}
 
 	public UserEntity findById(long id) throws NotFoundException {
-		Optional<UserEntity> userOptional = userRepository.findById(id);
-		if (userOptional.isEmpty()) {
-			throw new NotFoundException("Пользователя с таким id не существует");
-		}
 
-		return userOptional.get();
+		return userRepository.findById(id).orElseThrow(
+			() -> new NotFoundException("Пользователя с таким id не существует")
+		);
 	}
 
 	public UserEntity save(RecommendedUserDto recommendedUserDto) {
@@ -63,11 +61,9 @@ public class UserService {
 
 
 	public RecommendedUserDto findNearest(Long id) throws NotFoundException {
-		Optional<UserEntity> userOptional = userRepository.findById(id);
-		if (userOptional.isEmpty()) {
-			throw new NotFoundException("Пользователя с таким id не существует");
-		}
-		UserEntity user = userOptional.get();
+		UserEntity user = userRepository.findById(id).orElseThrow(
+			() -> new NotFoundException("Пользователя с таким id не существует")
+		);
 		RecommendedUserDto recommendedUser = userRepository.findNearest(
 			user.getOwner().getLocation().getX(),
 			user.getOwner().getLocation().getY(),
@@ -86,11 +82,10 @@ public class UserService {
 	 */
 	public RecommendedUserDto rateRecommended(Long id, boolean is_like)
 		throws NotFoundException, NullRecommendationException {
-		Optional<UserEntity> userOptional = userRepository.findById(id);
-		if (userOptional.isEmpty()) {
-			throw new NotFoundException("Пользователя с таким id не существует");
-		}
-		UserEntity user = userOptional.get();
+		UserEntity user = userRepository.findById(id).orElseThrow(
+			() -> new NotFoundException("Пользователя с таким id не существует")
+		);
+
 		UserEntity recommended = user.getCurRecommended();
 		if (recommended == null) {
 			throw new NullRecommendationException("Сначала необходимо получить рекомендацию");
@@ -128,13 +123,10 @@ public class UserService {
 			throw new IllegalLevelException("Значение level должно быть в интервале (0;10].");
 		}
 
-		Optional<InterestEntity> interestOptional = interestRepository.findById(interestId);
-		if (interestOptional.isEmpty()) {
-			throw new NotFoundException("Интереса с таким id не существует.");
-		}
+		InterestEntity interest = interestRepository.findById(interestId).orElseThrow(
+			() -> new NotFoundException("Интереса с таким id не существует."));
 
 		UserEntity user = findById(userId);
-		InterestEntity interest = interestOptional.get();
 
 		if (user.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
 			throw new AlreadyExistsException(
