@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
 
 @Data
 @NoArgsConstructor
