@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.configs;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,18 @@ import ru.itmo.hotdogs.service.UserService;
 @Configuration
 public class SecurityConfig {
 
-	private final UserService userService;
-	private final JwtRequestFilter jwtRequestFilter;
+	private UserService userService;
+	private JwtRequestFilter jwtRequestFilter;
+
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	@Autowired
+	public void setJwtRequestFilter(JwtRequestFilter jwtRequestFilter) {
+		this.jwtRequestFilter = jwtRequestFilter;
+	}
 
 	@Bean
 	public DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -50,6 +61,7 @@ public class SecurityConfig {
 		http
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers("/owners/shows/**").hasRole("ORGANIZER")
+				.requestMatchers("/owners/new").hasRole("ADMIN")
 				.requestMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
 				.requestMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.anyRequest().permitAll())

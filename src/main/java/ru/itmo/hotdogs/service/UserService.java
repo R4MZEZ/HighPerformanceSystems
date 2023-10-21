@@ -19,7 +19,25 @@ import ru.itmo.hotdogs.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-	private final UserRepository userRepository;
+	private UserRepository userRepository;
+	private PasswordEncoder passwordEncoder;
+	private RoleService roleService;
+
+	@Autowired
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	@Autowired
+	public void setPasswordEncoder(
+		PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	@Autowired
+	public void setRoleService(RoleService roleService) {
+		this.roleService = roleService;
+	}
 
 	public UserEntity findByLogin(String login) throws NotFoundException{
 		return userRepository.findByLogin(login).orElseThrow(
