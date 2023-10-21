@@ -1,0 +1,1 @@
+alter table owners add column balance real not null default 0;

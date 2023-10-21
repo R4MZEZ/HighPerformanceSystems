@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.itmo.hotdogs.exceptions.AccessDeniedException;
-import ru.itmo.hotdogs.exceptions.NotFoundException;
-import ru.itmo.hotdogs.model.dto.ShowDto;
+import ru.itmo.hotdogs.model.dto.NewShowDto;
+import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.service.OwnerService;
 
@@ -36,11 +36,21 @@ public class OwnerController {
 		return ResponseEntity.ok("Владелец успешно создан");
 	}
 
-	@PostMapping(path = "/create-show")
-	public ResponseEntity<?> createShow(Principal principal, @RequestBody ShowDto showDto) {
+	@PostMapping(path = "/shows/create")
+	public ResponseEntity<?> createShow(Principal principal, @RequestBody NewShowDto newShowDto) {
 		try {
-			ownerService.createShow(principal.getName(), showDto);
+			ownerService.createShow(principal.getName(), newShowDto);
 			return ResponseEntity.ok("Выставка успешно создана");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		}
+	}
+
+	@PostMapping(path = "/shows/{showId}/finish")
+	public ResponseEntity<?> finishShow(Principal principal, @PathVariable Long showId, @RequestParam Long winnerId){
+		try {
+			DogEntity winner = ownerService.finishShow(principal.getName(), showId, winnerId);
+			return ResponseEntity.ok("Выставка успешно завершена! Победитель: %s!".formatted(winner.getName()));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}

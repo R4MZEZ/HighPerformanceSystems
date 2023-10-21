@@ -3,23 +3,26 @@ package ru.itmo.hotdogs.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
+import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
-import ru.itmo.hotdogs.exceptions.ShowDateExpiredException;
+import ru.itmo.hotdogs.exceptions.ShowDateException;
+import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.dto.NewShowDto;
+import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
-import ru.itmo.hotdogs.repository.InterestRepository;
 import ru.itmo.hotdogs.repository.DogRepository;
 import ru.itmo.hotdogs.repository.DogsInteractionsRepository;
 import ru.itmo.hotdogs.repository.DogsInterestsRepository;
@@ -47,12 +50,20 @@ public class DogService {
 		);
 	}
 
-	public List<ShowEntity> findAppliedShows(String login) throws NotFoundException{
-		return findByLogin(login).getAppliedShows();
+	public DogEntity findById(long id) throws NotFoundException {
+		return dogRepository.findById(id).orElseThrow(
+			() -> new NotFoundException("Собаки с таким id не существует")
+		);
+	}
+
+	public List<ExistingShowDto> findAppliedShows(String login) throws NotFoundException{
+		return findByLogin(login).getAppliedShows().stream().map(
+			show -> new ExistingShowDto(show.getDate(), show.getPrize(), show.getAllowedBreeds().stream().map(
+				BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName())).toList();
 	}
 
 	public void applyToShow(String login, Long showId)
-		throws NotFoundException, BreedNotAllowedException, ShowDateExpiredException, AlreadyExistsException {
+		throws NotFoundException, BreedNotAllowedException, ShowDateException, AlreadyExistsException, CheatingException {
 		ShowEntity show = showService.findById(showId);
 		DogEntity dog = findByLogin(login);
 
@@ -61,11 +72,15 @@ public class DogService {
 		}
 
 		if (new Date().after(show.getDate())){
-			throw new ShowDateExpiredException();
+			throw new ShowDateException("Выставка уже прошла");
 		}
 
 		if (show.getParticipants().contains(dog)){
 			throw new AlreadyExistsException("Вы уже участвуете в этой выставке");
+		}
+
+		if (show.getOrganizer().equals(dog.getOwner())){
+			throw new CheatingException();
 		}
 
 

@@ -32,6 +32,12 @@ public class OwnerEntity {
 	@Column
 	private String surname;
 
+	@Column
+	private Float balance;
+
+	@Column(name = "reserved_balance")
+	private Float reservedBalance;
+
 	@JsonIgnore
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
