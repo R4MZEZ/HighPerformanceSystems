@@ -11,6 +11,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.Set;
 import lombok.Data;
@@ -28,6 +30,7 @@ public class ShowEntity {
 	private Long id;
 
 	@Column(nullable = false)
+	@Min(0)
 	private Long prize;
 
 	@Column(nullable = false)
@@ -42,6 +45,7 @@ public class ShowEntity {
 	private DogEntity winner;
 
 	@ManyToMany
+	@NotEmpty
 	@JoinTable(
 		name = "allowed_breeds",
 		joinColumns = @JoinColumn(name = "show_id"),

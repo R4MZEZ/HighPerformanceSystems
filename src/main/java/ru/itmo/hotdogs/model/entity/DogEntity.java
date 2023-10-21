@@ -1,12 +1,26 @@
 package ru.itmo.hotdogs.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Entity
@@ -25,9 +39,12 @@ public class DogEntity {
 	private UserEntity user;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
 
 	@Column(nullable = false)
+	@Range(min = 0, max = 30)
 	private Integer age;
 
 	@ManyToOne

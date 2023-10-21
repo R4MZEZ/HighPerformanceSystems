@@ -9,6 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -29,15 +32,20 @@ public class OwnerEntity {
 	private UserEntity user;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
 
 	@Column
+	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String surname;
 
 	@Column
+	@Min(0)
 	private Float balance;
 
 	@Column(name = "reserved_balance")
+	@Min(0)
 	private Float reservedBalance;
 
 	@JsonIgnore

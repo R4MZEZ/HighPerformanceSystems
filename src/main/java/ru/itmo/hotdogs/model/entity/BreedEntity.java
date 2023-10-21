@@ -5,11 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import java.util.Set;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,16 +23,8 @@ public class BreedEntity {
 	private Integer id;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
-//
-//	@ManyToMany
-//	@JoinTable(
-//		name = "allowed_breeds",
-//		joinColumns = @JoinColumn(name = "breed_id")
-//	)
-//	private Set<ShowEntity> show;
 
-	public BreedEntity(String name) {
-		this.name = name;
-	}
 }
