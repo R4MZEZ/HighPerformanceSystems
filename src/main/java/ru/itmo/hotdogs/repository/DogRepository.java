@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 
 @Repository

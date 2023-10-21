@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,25 @@ public class DogController {
 		try {
 			dogService.addInterest(principal.getName(), id, level);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/shows")
+	public ResponseEntity<?> appliedShows(Principal principal){
+		try {
+			return ResponseEntity.ok(dogService.findAppliedShows(principal.getName()));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		}
+	}
+
+	@PostMapping("/shows/{showId}/apply")
+	public ResponseEntity<?> applyToShow(Principal principal, @PathVariable Long showId){
+		try {
+			dogService.applyToShow(principal.getName(), showId);
+			return ResponseEntity.ok("Вы стали участником выставки!");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}

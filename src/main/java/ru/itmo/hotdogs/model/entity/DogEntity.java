@@ -61,4 +61,12 @@ public class DogEntity {
 	)
 	private Set<DogEntity> interactions;
 
+	@ManyToMany
+	@JoinTable(
+		name = "shows_participants",
+		joinColumns = @JoinColumn(name = "dog_id"),
+		inverseJoinColumns = @JoinColumn(name = "show_id")
+	)
+	private List<ShowEntity> appliedShows;
+
 }

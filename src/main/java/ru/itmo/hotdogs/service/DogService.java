@@ -1,18 +1,23 @@
 package ru.itmo.hotdogs.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
+import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
+import ru.itmo.hotdogs.exceptions.ShowDateExpiredException;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
+import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.InterestRepository;
 import ru.itmo.hotdogs.repository.DogRepository;
@@ -28,6 +33,7 @@ public class DogService {
 	private final InterestService interestService;
 	private final DogsInterestsRepository dogsInterestsRepository;
 	private final UserService userService;
+	private final ShowService showService;
 
 	public List<DogEntity> findAll() {
 		return dogRepository.findAll();
@@ -39,6 +45,31 @@ public class DogService {
 		return dogRepository.findByUser(user).orElseThrow(
 			() -> new NotFoundException("Собаки с таким логином не существует")
 		);
+	}
+
+	public List<ShowEntity> findAppliedShows(String login) throws NotFoundException{
+		return findByLogin(login).getAppliedShows();
+	}
+
+	public void applyToShow(String login, Long showId)
+		throws NotFoundException, BreedNotAllowedException, ShowDateExpiredException, AlreadyExistsException {
+		ShowEntity show = showService.findById(showId);
+		DogEntity dog = findByLogin(login);
+
+		if (!show.getAllowedBreeds().contains(dog.getBreed())){
+			throw new BreedNotAllowedException();
+		}
+
+		if (new Date().after(show.getDate())){
+			throw new ShowDateExpiredException();
+		}
+
+		if (show.getParticipants().contains(dog)){
+			throw new AlreadyExistsException("Вы уже участвуете в этой выставке");
+		}
+
+
+		showService.addParticipant(show, dog);
 	}
 
 	public DogEntity save(RecommendedDogDto recommendedDogDto) {
@@ -86,7 +117,7 @@ public class DogService {
 
 		DogEntity recommended = dog.getCurRecommended();
 		if (recommended == null) {
-			throw new NullRecommendationException("Сначала необходимо получить рекомендацию");
+			throw new NullRecommendationException();
 		}
 		DogsInteractionsEntity interaction_record = new DogsInteractionsEntity(dog, recommended,
 			is_like);
@@ -118,7 +149,7 @@ public class DogService {
 	public void addInterest(String login, int interestId, int level)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException {
 		if (level < 1 || level > 10) {
-			throw new IllegalLevelException("Значение level должно быть в интервале (0;10].");
+			throw new IllegalLevelException();
 		}
 
 		InterestEntity interest = interestService.findById(interestId);
