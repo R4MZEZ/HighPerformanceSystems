@@ -23,7 +23,7 @@ public class AuthService {
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
 		}catch (BadCredentialsException e){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Вы не авторизованы");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Логин и/или пароль неверные");
 		}
 		UserDetails userDetails = userService.loadUserByUsername(request.getLogin());
 		String token = jwtTokenUtils.generateToken(userDetails);

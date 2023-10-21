@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.itmo.hotdogs.service.UserService;
 
 @EnableWebSecurity
@@ -24,7 +25,7 @@ import ru.itmo.hotdogs.service.UserService;
 public class SecurityConfig {
 
 	private final UserService userService;
-
+	private final JwtRequestFilter jwtRequestFilter;
 
 	@Bean
 	public DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -48,17 +49,17 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/owners/**").hasRole("OWNER")
-				.requestMatchers("/dogs/**").hasRole("DOG")
+				.requestMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
+				.requestMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.anyRequest().permitAll())
 			.sessionManagement(
 				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.exceptionHandling(
 				exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(
-					HttpStatus.UNAUTHORIZED))
-			)
+					HttpStatus.UNAUTHORIZED)))
 			.csrf(AbstractHttpConfigurer::disable)
-			.cors(AbstractHttpConfigurer::disable);
+			.cors(AbstractHttpConfigurer::disable)
+			.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
