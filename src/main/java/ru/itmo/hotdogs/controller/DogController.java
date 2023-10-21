@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
+import ru.itmo.hotdogs.model.dto.NewDogDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.service.DogService;
@@ -26,9 +27,8 @@ public class DogController {
 	private final DogService dogService;
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> createNewDog(@RequestBody RecommendedDogDto dog) {
-		dogService.save(dog);
-		return ResponseEntity.ok("Собака успешно создана");
+	public ResponseEntity<?> createNewDog(@RequestBody NewDogDto dog) {
+		return dogService.createNewDog(dog);
 	}
 
 	@PostMapping(path = "/rate")

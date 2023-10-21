@@ -1,10 +1,14 @@
 package ru.itmo.hotdogs.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
@@ -14,13 +18,13 @@ import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.ExistingShowDto;
+import ru.itmo.hotdogs.model.dto.NewDogDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
-import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
+import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
@@ -37,6 +41,8 @@ public class DogService {
 	private final DogsInterestsRepository dogsInterestsRepository;
 	private final UserService userService;
 	private final ShowService showService;
+	private final BreedService breedService;
+	private final OwnerService ownerService;
 
 	public List<DogEntity> findAll() {
 		return dogRepository.findAll();
@@ -87,25 +93,38 @@ public class DogService {
 		showService.addParticipant(show, dog);
 	}
 
-	public DogEntity save(RecommendedDogDto recommendedDogDto) {
-		var dog = DogEntity.builder()
-			.name(recommendedDogDto.getName())
-			.age(recommendedDogDto.getAge())
-			.build();
-		return dogRepository.save(dog);
+	public ResponseEntity<?> createNewDog(NewDogDto newDogDto) {
+		DogEntity dog;
+		try {
+			userService.findByLogin(newDogDto.getLogin());
+			return ResponseEntity.badRequest()
+				.body("Пользователь с указанным именем уже существует");
+		} catch (NotFoundException ex) {
+			try {
+				UserEntity user = userService.createNewUser(newDogDto, List.of("ROLE_DOG"));
+				dog = new DogEntity(user,
+					newDogDto.getName(),
+					newDogDto.getAge(),
+					breedService.findByName(newDogDto.getBreed()),
+					ownerService.findByLogin(newDogDto.getOwnerLogin()));
+
+				List<DogsInterestsEntity> interests = new ArrayList<>();
+				for (Map.Entry<String, Integer> interest : newDogDto.getInterests().entrySet()){
+					interests.add(new DogsInterestsEntity(dog, interestService.findByName(interest.getKey()), interest.getValue()));
+				}
+				dog.setInterests(interests);
+			} catch (NotFoundException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			}
+			dogRepository.save(dog);
+			return ResponseEntity.ok(new NewDogDto(
+				newDogDto.getName(),
+				newDogDto.getAge(),
+				newDogDto.getBreed(),
+				newDogDto.getOwnerLogin(),
+				newDogDto.getInterests()));
+		}
 	}
-//  }  public UserEntity save(UserDto userDto) {
-//    var user = UserEntity.builder()
-//        .name(userDto.name())
-//        .age(userDto.age())
-//        .breed(userDto.breed())
-//        .owner(userDto.owner())
-//        .userInterests(userDto.userInterests())
-//        .userLikes(userDto.userLikes())
-//        .userMatches(userDto.userMatches())
-//        .build();
-//    return userRepository.save(user);
-//  }
 
 
 	public RecommendedDogDto findNearest(String login) throws NotFoundException {
@@ -176,11 +195,6 @@ public class DogService {
 		}
 
 		DogsInterestsEntity interest_record = new DogsInterestsEntity(dog, interest, level);
-//		List<UsersInterestsEntity> userInterests = user.getInterests();
-//		userInterests.add(interest_record);
-//		userInterests.sort(Comparator.comparing(UsersInterestsEntity::getLevel));
-//		user.setInterests(userInterests);
-
 		dogsInterestsRepository.save(interest_record);
 		dogRepository.save(dog);
 	}

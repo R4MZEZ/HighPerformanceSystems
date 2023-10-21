@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "dogs")
+@AllArgsConstructor
 public class DogEntity {
 
 	@Id
@@ -69,4 +69,12 @@ public class DogEntity {
 	)
 	private List<ShowEntity> appliedShows;
 
+	public DogEntity(UserEntity user, String name, Integer age, BreedEntity breed,
+		OwnerEntity owner) {
+		this.user = user;
+		this.name = name;
+		this.age = age;
+		this.breed = breed;
+		this.owner = owner;
+	}
 }

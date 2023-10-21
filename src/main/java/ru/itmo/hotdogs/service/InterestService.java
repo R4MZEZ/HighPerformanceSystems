@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
+import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.repository.InterestRepository;
 
@@ -26,5 +27,10 @@ public class InterestService {
 		return interestRepository.findById(id).orElseThrow(
 			() -> new NotFoundException("Интереса с таким id не существует.")
 		);
+	}
+
+	public InterestEntity findByName(String name) throws NotFoundException {
+		return interestRepository.findByName(name)
+			.orElseThrow(() -> new NotFoundException("Интереса с названием %s не существует".formatted(name)));
 	}
 }

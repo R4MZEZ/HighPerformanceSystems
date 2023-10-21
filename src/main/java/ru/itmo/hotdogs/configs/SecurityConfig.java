@@ -64,6 +64,7 @@ public class SecurityConfig {
 				.requestMatchers("/owners/new").hasRole("ADMIN")
 				.requestMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
 				.requestMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
+				.requestMatchers("/dogs/new").hasRole("ADMIN")
 				.anyRequest().permitAll())
 			.sessionManagement(
 				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
