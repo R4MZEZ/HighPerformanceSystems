@@ -10,11 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
 @Data
 @Entity
 @Table(name = "owners")
+@NoArgsConstructor
 public class OwnerEntity {
 
 	@Id
@@ -42,5 +44,14 @@ public class OwnerEntity {
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
+	public OwnerEntity(UserEntity user, String name, String surname, Float balance,
+		Point location) {
+		this.user = user;
+		this.name = name;
+		this.surname = surname;
+		this.location = location;
 
+		this.balance = balance == null ? 0f : balance;
+		this.reservedBalance = 0f;
+	}
 }

@@ -5,12 +5,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AccessDeniedException;
 import ru.itmo.hotdogs.exceptions.NotEnoughMoneyException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
+import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
@@ -34,6 +39,30 @@ public class OwnerService {
 		ownerRepository.save(owner);
 	}
 
+	public ResponseEntity<?> createNewOwner(NewOwnerDto ownerUserDto) {
+		try {
+			userService.findByLogin(ownerUserDto.getLogin());
+			return ResponseEntity.badRequest()
+				.body("Пользователь с указанным именем уже существует");
+		} catch (NotFoundException ex) {
+			UserEntity user = userService.createNewUser(ownerUserDto, List.of("ROLE_OWNER"));
+			GeometryFactory geometryFactory = new GeometryFactory();
+			Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(), ownerUserDto.getLongitude());
+			OwnerEntity owner = new OwnerEntity(user,
+				ownerUserDto.getName(),
+				ownerUserDto.getSurname(),
+				ownerUserDto.getBalance(),
+				geometryFactory.createPoint(coordinate));
+			ownerRepository.save(owner);
+			return ResponseEntity.ok(new NewOwnerDto(
+				ownerUserDto.getName(),
+				ownerUserDto.getSurname(),
+				ownerUserDto.getBalance(),
+				ownerUserDto.getLatitude(),
+				ownerUserDto.getLongitude()));
+		}
+	}
+
 	public List<OwnerEntity> findAll() {
 		return ownerRepository.findAll();
 	}
@@ -50,7 +79,7 @@ public class OwnerService {
 		throws NotFoundException, NotEnoughMoneyException {
 		OwnerEntity owner = findByLogin(login);
 
-		if (owner.getBalance() < newShowDto.getPrize()){
+		if (owner.getBalance() < newShowDto.getPrize()) {
 			throw new NotEnoughMoneyException();
 		}
 
@@ -65,7 +94,8 @@ public class OwnerService {
 		owner.setReservedBalance(owner.getReservedBalance() + newShowDto.getPrize());
 		ownerRepository.save(owner);
 
-		ShowEntity show = new ShowEntity(newShowDto.getPrize(), newShowDto.getDate(), owner, allowedBreeds);
+		ShowEntity show = new ShowEntity(newShowDto.getPrize(), newShowDto.getDate(), owner,
+			allowedBreeds);
 		showService.save(show);
 	}
 
@@ -75,17 +105,17 @@ public class OwnerService {
 		OwnerEntity organizer = findByLogin(login);
 		ShowEntity show = showService.findById(showId);
 
-		if (!show.getOrganizer().equals(organizer)){
+		if (!show.getOrganizer().equals(organizer)) {
 			throw new AccessDeniedException("Вы не можете завершить не свою выставку.");
 		}
 
 		DogEntity winner = dogService.findById(winnerId);
 
-		if (!show.getParticipants().contains(winner)){
+		if (!show.getParticipants().contains(winner)) {
 			throw new NotFoundException("Данной собаки нет в списке участников.");
 		}
 
-		if (new Date().before(show.getDate())){
+		if (new Date().before(show.getDate())) {
 			throw new ShowDateException("Вы не можете завершить выставку до ее начала.");
 		}
 

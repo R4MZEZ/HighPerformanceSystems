@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
@@ -31,9 +32,8 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> createOwner(@RequestBody OwnerEntity owner) {
-		ownerService.save(owner);
-		return ResponseEntity.ok("Владелец успешно создан");
+	public ResponseEntity<?> createOwner(@RequestBody NewOwnerDto owner) {
+		return ownerService.createNewOwner(owner);
 	}
 
 	@PostMapping(path = "/shows/create")
