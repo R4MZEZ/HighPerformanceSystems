@@ -9,7 +9,7 @@ import ru.itmo.hotdogs.repository.ShowRepository;
 @RequiredArgsConstructor
 public class ShowService {
 
-	ShowRepository showRepository;
+	private final ShowRepository showRepository;
 
 	public void save(ShowEntity show){
 		showRepository.save(show);

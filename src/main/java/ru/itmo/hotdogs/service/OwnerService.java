@@ -30,13 +30,10 @@ public class OwnerService {
 		return ownerRepository.findAll();
 	}
 
-	public void createShow(Long id, ShowDto showDto) throws NotFoundException, AccessDeniedException {
+	public void createShow(Long id, ShowDto showDto) throws NotFoundException {
 		OwnerEntity owner = ownerRepository.findById(id).orElseThrow(
 			() -> new NotFoundException("Владельца с таким id не существует")
 		);
-
-		if (!owner.getIs_organizer())
-			throw new AccessDeniedException("Вы не организатор");
 
 		Set<BreedEntity> allowedBreeds = new HashSet<>();
 		for (Integer breedId : showDto.getAllowed_breeds()) {

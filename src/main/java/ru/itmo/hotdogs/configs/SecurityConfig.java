@@ -49,6 +49,7 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/owners/*/create-show").hasRole("ORGANIZER")
 				.requestMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
 				.requestMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.anyRequest().permitAll())

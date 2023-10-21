@@ -26,9 +26,6 @@ public class OwnerEntity {
 	@Column
 	private String surname;
 
-	@Column(nullable = false)
-	private Boolean is_organizer;
-
 	@JsonIgnore
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
