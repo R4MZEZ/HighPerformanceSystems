@@ -1,4 +1,4 @@
-package ru.itmo.hotdogs.configs;
+package ru.itmo.hotdogs.utils;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
