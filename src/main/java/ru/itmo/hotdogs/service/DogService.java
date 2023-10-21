@@ -25,7 +25,7 @@ public class DogService {
 
 	private final DogRepository dogRepository;
 	private final DogsInteractionsRepository dogsInteractionsRepository;
-	private final InterestRepository interestRepository;
+	private final InterestService interestService;
 	private final DogsInterestsRepository dogsInterestsRepository;
 	private final UserService userService;
 
@@ -121,9 +121,7 @@ public class DogService {
 			throw new IllegalLevelException("Значение level должно быть в интервале (0;10].");
 		}
 
-		InterestEntity interest = interestRepository.findById(interestId).orElseThrow(
-			() -> new NotFoundException("Интереса с таким id не существует."));
-
+		InterestEntity interest = interestService.findById(interestId);
 		DogEntity dog = findByLogin(login);
 
 		if (dog.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
