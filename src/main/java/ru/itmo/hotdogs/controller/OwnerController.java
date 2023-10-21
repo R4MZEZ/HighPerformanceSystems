@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.controller;
 
+import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,10 @@ public class OwnerController {
 		return ResponseEntity.ok("Владелец успешно создан");
 	}
 
-	@PostMapping(path = "/{id}/create-show")
-	public ResponseEntity<?> createShow(@PathVariable long id, @RequestBody ShowDto showDto) {
+	@PostMapping(path = "/create-show")
+	public ResponseEntity<?> createShow(Principal principal, @RequestBody ShowDto showDto) {
 		try {
-			ownerService.createShow(id, showDto);
+			ownerService.createShow(principal.getName(), showDto);
 			return ResponseEntity.ok("Выставка успешно создана");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());

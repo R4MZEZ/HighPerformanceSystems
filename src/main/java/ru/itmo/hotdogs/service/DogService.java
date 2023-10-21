@@ -13,6 +13,7 @@ import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
+import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.InterestRepository;
 import ru.itmo.hotdogs.repository.DogRepository;
 import ru.itmo.hotdogs.repository.DogsInteractionsRepository;
@@ -26,15 +27,17 @@ public class DogService {
 	private final DogsInteractionsRepository dogsInteractionsRepository;
 	private final InterestRepository interestRepository;
 	private final DogsInterestsRepository dogsInterestsRepository;
+	private final UserService userService;
 
 	public List<DogEntity> findAll() {
 		return dogRepository.findAll();
 	}
 
-	public DogEntity findById(long id) throws NotFoundException {
 
-		return dogRepository.findById(id).orElseThrow(
-			() -> new NotFoundException("Пользователя с таким id не существует")
+	public DogEntity findByLogin(String login) throws NotFoundException {
+		UserEntity user = userService.findByLogin(login);
+		return dogRepository.findByUser(user).orElseThrow(
+			() -> new NotFoundException("Собаки с таким логином не существует")
 		);
 	}
 
@@ -59,10 +62,8 @@ public class DogService {
 //  }
 
 
-	public RecommendedDogDto findNearest(Long id) throws NotFoundException {
-		DogEntity dog = dogRepository.findById(id).orElseThrow(
-			() -> new NotFoundException("Собаки с таким id не существует")
-		);
+	public RecommendedDogDto findNearest(String login) throws NotFoundException {
+		DogEntity dog = findByLogin(login);
 		RecommendedDogDto recommendedDog = dogRepository.findNearest(
 			dog.getOwner().getLocation().getX(),
 			dog.getOwner().getLocation().getY(),
@@ -79,11 +80,9 @@ public class DogService {
 	/**
 	 * @return возвращает экземпляр RecommendedDogDto, если был достигнут мэтч, иначе - null
 	 */
-	public RecommendedDogDto rateRecommended(Long id, boolean is_like)
+	public RecommendedDogDto rateRecommended(String login, boolean is_like)
 		throws NotFoundException, NullRecommendationException {
-		DogEntity dog = dogRepository.findById(id).orElseThrow(
-			() -> new NotFoundException("Собаки с таким id не существует")
-		);
+		DogEntity dog = findByLogin(login);
 
 		DogEntity recommended = dog.getCurRecommended();
 		if (recommended == null) {
@@ -116,7 +115,7 @@ public class DogService {
 	}
 
 
-	public void addInterest(long dogId, int interestId, int level)
+	public void addInterest(String login, int interestId, int level)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException {
 		if (level < 1 || level > 10) {
 			throw new IllegalLevelException("Значение level должно быть в интервале (0;10].");
@@ -125,7 +124,7 @@ public class DogService {
 		InterestEntity interest = interestRepository.findById(interestId).orElseThrow(
 			() -> new NotFoundException("Интереса с таким id не существует."));
 
-		DogEntity dog = findById(dogId);
+		DogEntity dog = findByLogin(login);
 
 		if (dog.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
 			throw new AlreadyExistsException(

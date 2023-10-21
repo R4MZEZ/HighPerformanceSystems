@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
@@ -15,6 +16,13 @@ import ru.itmo.hotdogs.repository.UserRepository;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 	private final UserRepository userRepository;
+
+	public UserEntity findByLogin(String login) throws NotFoundException{
+		return userRepository.findByLogin(login).orElseThrow(
+			() -> new NotFoundException("Пользователь с таким логином не существует")
+		);
+	}
+
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

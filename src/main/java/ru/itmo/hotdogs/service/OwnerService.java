@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.service;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +12,7 @@ import ru.itmo.hotdogs.model.dto.ShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
+import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.OwnerRepository;
 
 @Service
@@ -21,6 +23,7 @@ public class OwnerService {
 	private final OwnerRepository ownerRepository;
 	private final ShowService showService;
 	private final BreedService breedService;
+	private final UserService userService;
 
 	public void save(OwnerEntity owner) {
 		ownerRepository.save(owner);
@@ -30,9 +33,10 @@ public class OwnerService {
 		return ownerRepository.findAll();
 	}
 
-	public void createShow(Long id, ShowDto showDto) throws NotFoundException {
-		OwnerEntity owner = ownerRepository.findById(id).orElseThrow(
-			() -> new NotFoundException("Владельца с таким id не существует")
+	public void createShow(String login, ShowDto showDto) throws NotFoundException {
+		UserEntity user = userService.findByLogin(login);
+		OwnerEntity owner = ownerRepository.findByUser(user).orElseThrow(
+			() -> new NotFoundException("Владельца с таким логином существует")
 		);
 
 		Set<BreedEntity> allowedBreeds = new HashSet<>();

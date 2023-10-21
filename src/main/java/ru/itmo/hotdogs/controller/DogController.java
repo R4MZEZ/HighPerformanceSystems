@@ -1,12 +1,12 @@
 package ru.itmo.hotdogs.controller;
 
+import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +30,10 @@ public class DogController {
 		return ResponseEntity.ok("Собака успешно создана");
 	}
 
-	@PostMapping(path = "/{id}/rate")
-	public ResponseEntity<?> likeRecommended(@PathVariable long id,
-		@RequestParam boolean is_like) {
+	@PostMapping(path = "/rate")
+	public ResponseEntity<?> likeRecommended(Principal principal, @RequestParam boolean is_like) {
 		try {
-			RecommendedDogDto matchedDog = dogService.rateRecommended(id, is_like);
+			RecommendedDogDto matchedDog = dogService.rateRecommended(principal.getName(), is_like);
 			if (matchedDog != null) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
@@ -42,27 +41,27 @@ public class DogController {
 						matchedDog.getAge(),
 						matchedDog.getDistance() / 1000), HttpStatus.FOUND);
 			} else {
-				return ResponseEntity.ok(getNewRecommendation(id));
+				return ResponseEntity.ok(getNewRecommendation(principal));
 			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
 	}
 
-	@GetMapping("/{id}/recommend")
-	public ResponseEntity<?> getNewRecommendation(@PathVariable long id) {
+	@GetMapping("/recommend")
+	public ResponseEntity<?> getNewRecommendation(Principal principal) {
 		try {
-			return ResponseEntity.ok(dogService.findNearest(id));
+			return ResponseEntity.ok(dogService.findNearest(principal.getName()));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
 	}
 
-	@PatchMapping("/{dogId}/add-interest")
-	public ResponseEntity<?> addInterest(@PathVariable long dogId, @RequestParam int id,
+	@PatchMapping("/add-interest")
+	public ResponseEntity<?> addInterest(Principal principal, @RequestParam int id,
 		@RequestParam int level) {
 		try {
-			dogService.addInterest(dogId, id, level);
+			dogService.addInterest(principal.getName(), id, level);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
@@ -74,10 +73,10 @@ public class DogController {
 		return ResponseEntity.ok(dogService.findAll());
 	}
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> findById(@PathVariable long id) {
+	@GetMapping("/me")
+	public ResponseEntity<?> getInfo(Principal principal) {
 		try {
-			return ResponseEntity.ok(dogService.findById(id));
+			return ResponseEntity.ok(dogService.findByLogin(principal.getName()));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
