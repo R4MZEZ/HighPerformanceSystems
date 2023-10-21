@@ -7,7 +7,9 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +35,12 @@ public class OwnerService {
 	private final ShowService showService;
 	private final BreedService breedService;
 	private final UserService userService;
-	private final DogService dogService;
+	private DogService dogService;
+
+	@Autowired
+	public void setDogService(DogService dogService) {
+		this.dogService = dogService;
+	}
 
 	public void save(OwnerEntity owner) {
 		ownerRepository.save(owner);
@@ -45,7 +52,8 @@ public class OwnerService {
 			return ResponseEntity.badRequest()
 				.body("Пользователь с указанным именем уже существует");
 		} catch (NotFoundException ex) {
-			UserEntity user = userService.createNewUser(ownerUserDto, List.of("ROLE_OWNER"));
+			List<String> roles = ownerUserDto.getIsOrganizer() ? List.of("ROLE_OWNER", "ROLE_ORGANIZER") : List.of("ROLE_OWNER");
+			UserEntity user = userService.createNewUser(ownerUserDto, roles);
 			GeometryFactory geometryFactory = new GeometryFactory();
 			Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(), ownerUserDto.getLongitude());
 			OwnerEntity owner = new OwnerEntity(user,
@@ -59,12 +67,13 @@ public class OwnerService {
 				ownerUserDto.getSurname(),
 				ownerUserDto.getBalance(),
 				ownerUserDto.getLatitude(),
-				ownerUserDto.getLongitude()));
+				ownerUserDto.getLongitude(),
+				ownerUserDto.getIsOrganizer()));
 		}
 	}
 
-	public List<OwnerEntity> findAll() {
-		return ownerRepository.findAll();
+	public Page<OwnerEntity> findAll(Pageable pageable) {
+		return ownerRepository.findAll(pageable);
 	}
 
 	public OwnerEntity findByLogin(String login) throws NotFoundException {

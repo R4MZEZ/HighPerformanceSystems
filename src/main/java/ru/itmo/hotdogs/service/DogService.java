@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,10 +45,15 @@ public class DogService {
 	private final UserService userService;
 	private final ShowService showService;
 	private final BreedService breedService;
-	private final OwnerService ownerService;
+	private OwnerService ownerService;
 
-	public List<DogEntity> findAll() {
-		return dogRepository.findAll();
+	@Autowired
+	public void setOwnerService(OwnerService ownerService) {
+		this.ownerService = ownerService;
+	}
+
+	public Page<DogEntity> findAll(Pageable pageable) {
+		return dogRepository.findAll(pageable);
 	}
 
 

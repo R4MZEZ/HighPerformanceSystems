@@ -76,7 +76,7 @@ public class DogEntity {
 		joinColumns = @JoinColumn(name = "sender_id"),
 		inverseJoinColumns = @JoinColumn(name = "receiver_id")
 	)
-	private Set<DogEntity> interactions;
+	private Set<DogsInteractionsEntity> interactions;
 
 	@ManyToMany
 	@JoinTable(

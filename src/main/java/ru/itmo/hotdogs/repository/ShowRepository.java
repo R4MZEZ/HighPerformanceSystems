@@ -7,5 +7,4 @@ import ru.itmo.hotdogs.model.entity.ShowEntity;
 
 @Repository
 public interface ShowRepository extends JpaRepository<ShowEntity, Long> {
-//	Optional<ShowEntity> findById(Long id);
 }

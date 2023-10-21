@@ -13,4 +13,5 @@ public class NewOwnerDto extends NewUserDto{
 	Float balance;
 	Double latitude;
 	Double longitude;
+	Boolean isOrganizer;
 }

@@ -2,7 +2,12 @@ package ru.itmo.hotdogs.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,17 +19,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
+import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.NewDogDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.service.DogService;
+import ru.itmo.hotdogs.utils.ControllerConfig;
 
 @RequiredArgsConstructor
 @RequestMapping(path = "/dogs")
 @RestController
 public class DogController {
 
-	private final DogService dogService;
+	private DogService dogService;
+
+	@Autowired
+	public void setDogService(DogService dogService) {
+		this.dogService = dogService;
+	}
 
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> createNewDog(@RequestBody NewDogDto dog) {
@@ -32,7 +45,7 @@ public class DogController {
 	}
 
 	@PostMapping(path = "/rate")
-	public ResponseEntity<?> likeRecommended(Principal principal, @RequestParam boolean is_like) {
+	public ResponseEntity<?> likeRecommended(Principal principal, @RequestParam(defaultValue = "true") boolean is_like) {
 		try {
 			RecommendedDogDto matchedDog = dogService.rateRecommended(principal.getName(), is_like);
 			if (matchedDog != null) {
@@ -70,9 +83,12 @@ public class DogController {
 	}
 
 	@GetMapping("/shows")
-	public ResponseEntity<?> appliedShows(Principal principal){
+	public ResponseEntity<?> appliedShows(Principal principal, @RequestParam(defaultValue = "0") int page){
 		try {
-			return ResponseEntity.ok(dogService.findAppliedShows(principal.getName()));
+			List<ExistingShowDto> result = dogService.findAppliedShows(principal.getName());
+			int fromIndex = result.size() > page * ControllerConfig.pageSize ? page * ControllerConfig.pageSize : 0;
+			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.pageSize);
+			return ResponseEntity.ok(result.subList(fromIndex, toIndex));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
 		}
@@ -88,9 +104,21 @@ public class DogController {
 		}
 	}
 
-	@GetMapping()
-	public ResponseEntity<List<DogEntity>> findAll() {
-		return ResponseEntity.ok(dogService.findAll());
+	@GetMapping
+	public ResponseEntity<List<NewDogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
+		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize, Sort.by(Sort.Order.asc("id")));
+		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
+
+		return ResponseEntity.ok()
+			.header("X-Total-Count", String.valueOf(entityPage.getTotalElements()))
+			.body(entityPage.getContent().stream().map(dog -> new NewDogDto(
+				dog.getName(),
+				dog.getAge(),
+				dog.getBreed().getName(),
+				dog.getOwner().getUser().getLogin(),
+				dog.getInterests().stream().collect(Collectors.toMap(
+						interest -> interest.getInterest().getName(),
+						DogsInterestsEntity::getLevel)))).toList());
 	}
 
 	@GetMapping("/me")

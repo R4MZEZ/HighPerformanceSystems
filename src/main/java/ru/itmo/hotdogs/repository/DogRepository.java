@@ -1,6 +1,8 @@
 package ru.itmo.hotdogs.repository;
 
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,4 +25,6 @@ public interface DogRepository extends JpaRepository<DogEntity, Long> {
 	RecommendedDogDto findDistance(Long id, Double longitude1, Double latitude1, Double longitude2, Double latitude2);
 
 	Optional<DogEntity> findByUser(UserEntity userEntity);
+
+	Page<DogEntity> findAll(Pageable pageable);
 }
