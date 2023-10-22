@@ -14,9 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
 import ru.itmo.hotdogs.exceptions.CheatingException;
@@ -83,7 +82,7 @@ public class DogService {
 						BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName()))
 			.toList();
 	}
-
+	@Transactional
 	public void applyToShow(String login, Long showId)
 		throws NotFoundException, BreedNotAllowedException, ShowDateException, AlreadyExistsException, CheatingException {
 		ShowEntity show = showService.findById(showId);
@@ -224,4 +223,5 @@ public class DogService {
 	}
 
 
+	public void deleteAll() { dogRepository.deleteAll(); }
 }

@@ -25,13 +25,11 @@ public class ShowService {
 	private final Validator validator;
 	private final BreedService breedService;
 
-	public void save(@Valid ShowEntity show) throws ConstraintViolationException {
-		Set<ConstraintViolation<ShowEntity>> violations = validator.validate(show);
-		if (!validator.validate(show).isEmpty()) {
-			throw new ConstraintViolationException(violations);
-		}
+	public void save(ShowEntity show) {
 		showRepository.save(show);
 	}
+
+	public void deleteAll(){ showRepository.deleteAll(); }
 
 	public ShowEntity findById(Long id) throws NotFoundException {
 		return showRepository.findById(id)
@@ -47,7 +45,7 @@ public class ShowService {
 	}
 
 	@Transactional
-	public void createShow(OwnerEntity owner, @Valid NewShowDto newShowDto)
+	public ShowEntity createShow(OwnerEntity owner, @Valid NewShowDto newShowDto)
 		throws ConstraintViolationException, NotFoundException {
 
 		Set<ConstraintViolation<NewShowDto>> violations = validator.validate(newShowDto);
@@ -56,14 +54,14 @@ public class ShowService {
 		}
 
 		Set<BreedEntity> allowedBreeds = new HashSet<>();
-		for (Integer breedId : newShowDto.getAllowed_breeds()) {
-			BreedEntity breed = breedService.findById(breedId)
-				.orElseThrow(() -> new NotFoundException("Breed not found with id: " + breedId));
+		for (String breedName : newShowDto.getAllowed_breeds()) {
+			BreedEntity breed = breedService.findByName(breedName);
 			allowedBreeds.add(breed);
 		}
 
 		ShowEntity show = new ShowEntity(newShowDto.getPrize(), newShowDto.getDate(), owner,allowedBreeds);
 		save(show);
+		return show;
 	}
 
 }

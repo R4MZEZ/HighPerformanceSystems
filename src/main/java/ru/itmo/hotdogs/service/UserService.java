@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.NewUserDto;
-import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
@@ -44,6 +43,10 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	public void setRoleService(RoleService roleService) {
 		this.roleService = roleService;
+	}
+
+	public void deleteAll(){
+		userRepository.deleteAll();
 	}
 
 	public UserEntity findByLogin(String login) throws NotFoundException{
@@ -72,7 +75,7 @@ public class UserService implements UserDetailsService {
 		UserEntity user = new UserEntity();
 		user.setLogin(newUserDto.getLogin());
 		user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
-		user.setRoles(roles.stream().map(roleService::findByName).toList());
+		user.setRoles(roles.stream().map(roleService::findByName).collect(Collectors.toSet()));
 
 		return userRepository.save(user);
 	}

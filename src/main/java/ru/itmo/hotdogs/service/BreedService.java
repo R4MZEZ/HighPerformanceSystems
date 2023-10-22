@@ -1,6 +1,5 @@
 package ru.itmo.hotdogs.service;
 
-import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -26,10 +25,6 @@ public class BreedService {
 		return breedRepository.findAll(pageable);
 	}
 
-	public Optional<BreedEntity> findById(Integer id) {
-		return breedRepository.findById(id);
-	}
-
 	public BreedEntity findByName(String name) throws NotFoundException {
 		return breedRepository.findByName(name)
 			.orElseThrow(() -> new NotFoundException("Породы с таким названием не существует"));
@@ -41,5 +36,9 @@ public class BreedService {
 			throw new ConstraintViolationException(violations);
 		}
 		return breedRepository.save(breed);
+	}
+
+	public void deleteAll(){
+		breedRepository.deleteAll();
 	}
 }

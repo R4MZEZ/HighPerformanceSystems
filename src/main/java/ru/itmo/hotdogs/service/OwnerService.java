@@ -1,7 +1,6 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -23,9 +22,7 @@ import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
-import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
@@ -38,7 +35,6 @@ public class OwnerService {
 
 	private final OwnerRepository ownerRepository;
 	private final ShowService showService;
-	private final BreedService breedService;
 	private final UserService userService;
 	private final Validator validator;
 	private DogService dogService;
@@ -50,12 +46,12 @@ public class OwnerService {
 
 	public void deleteAll(){ ownerRepository.deleteAll(); }
 
-	public OwnerEntity save(@Valid OwnerEntity owner) {
+	public void save(@Valid OwnerEntity owner) {
 		Set<ConstraintViolation<OwnerEntity>> violations = validator.validate(owner);
 		if (!validator.validate(owner).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
-		return ownerRepository.save(owner);
+		ownerRepository.save(owner);
 	}
 
 	public NewOwnerDto createNewOwner(@Valid NewOwnerDto ownerUserDto) throws AlreadyExistsException, ConstraintViolationException {
@@ -98,8 +94,8 @@ public class OwnerService {
 			() -> new NotFoundException("Владельца с таким логином не существует")
 		);
 	}
-	@Transactional
-	public void createShow(String login, @Valid NewShowDto newShowDto)
+//	@Transactional
+	public ShowEntity createShow(String login, @Valid NewShowDto newShowDto)
 		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
 		OwnerEntity owner = findByLogin(login);
 
@@ -107,13 +103,12 @@ public class OwnerService {
 			throw new NotEnoughMoneyException();
 		}
 
-		showService.createShow(owner, newShowDto);
+		ShowEntity show = showService.createShow(owner, newShowDto);
 
 		owner.setBalance(owner.getBalance() - newShowDto.getPrize());
 		owner.setReservedBalance(owner.getReservedBalance() + newShowDto.getPrize());
 		ownerRepository.save(owner);
-
-
+		return show;
 	}
 
 	@Transactional
