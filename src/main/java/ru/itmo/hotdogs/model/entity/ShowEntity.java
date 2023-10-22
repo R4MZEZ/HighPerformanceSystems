@@ -36,7 +36,7 @@ public class ShowEntity {
 	private Long prize;
 
 	@Column(nullable = false)
-	private Date date;
+	private Timestamp date;
 
 	@ManyToOne
 	@JoinColumn(name = "organizer", nullable = false)
@@ -63,7 +63,7 @@ public class ShowEntity {
 	)
 	private Set<DogEntity> participants;
 
-	public ShowEntity(Long prize, Date date, OwnerEntity organizer,
+	public ShowEntity(Long prize, Timestamp date, OwnerEntity organizer,
 		Set<BreedEntity> allowedBreeds) {
 		this.prize = prize;
 		this.date = date;
