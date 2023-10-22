@@ -1,0 +1,13 @@
+spring:
+    datasource:
+        url: jdbc:tc:postgis:15-3.4:///postgres
+        username: ${POSTGRES_USERNAME}
+        password: ${POSTGRES_PASSWORD}
+
+        driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+    sql:
+        init:
+            mode: always
+    main:
+        allow-circular-references: true
