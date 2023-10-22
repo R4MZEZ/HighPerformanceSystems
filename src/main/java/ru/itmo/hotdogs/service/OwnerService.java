@@ -140,7 +140,7 @@ public class OwnerService {
 
 		show.setWinner(winner);
 
-		organizer.setReservedBalance(owner.getReservedBalance() - show.getPrize());
+		organizer.setReservedBalance(organizer.getReservedBalance() - show.getPrize());
 		owner.setBalance(owner.getBalance() + show.getPrize());
 
 		showService.save(show);
