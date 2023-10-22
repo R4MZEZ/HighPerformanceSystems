@@ -1,6 +1,5 @@
 package ru.itmo.hotdogs.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,15 +10,18 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import java.util.Date;
-import java.util.Set;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "shows")
 @NoArgsConstructor
 public class ShowEntity {
@@ -53,7 +55,6 @@ public class ShowEntity {
 	)
 	private Set<BreedEntity> allowedBreeds;
 
-	@JsonIgnore
 	@ManyToMany
 	@JoinTable(
 		name = "shows_participants",
@@ -68,5 +69,6 @@ public class ShowEntity {
 		this.date = date;
 		this.organizer = organizer;
 		this.allowedBreeds = allowedBreeds;
+		this.participants = new HashSet<>();
 	}
 }

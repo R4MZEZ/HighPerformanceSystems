@@ -12,11 +12,13 @@ import jakarta.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "owners")
 @NoArgsConstructor
