@@ -19,14 +19,10 @@ public class AuthService {
 	private final JwtTokenUtils jwtTokenUtils;
 	private final AuthenticationManager authenticationManager;
 
-	public ResponseEntity<?> createAuthToken(JwtRequest request){
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
-		}catch (BadCredentialsException e){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Логин и/или пароль неверные");
-		}
+	public JwtResponse createAuthToken(JwtRequest request) throws BadCredentialsException{
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
 		UserDetails userDetails = userService.loadUserByUsername(request.getLogin());
 		String token = jwtTokenUtils.generateToken(userDetails);
-		return ResponseEntity.ok(new JwtResponse(token));
+		return new JwtResponse(token);
 	}
 }

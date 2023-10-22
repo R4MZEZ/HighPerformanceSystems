@@ -70,10 +70,12 @@ public class DogService {
 		);
 	}
 
-	public List<ExistingShowDto> findAppliedShows(String login) throws NotFoundException{
+	public List<ExistingShowDto> findAppliedShows(String login) throws NotFoundException {
 		return findByLogin(login).getAppliedShows().stream().map(
-			show -> new ExistingShowDto(show.getDate(), show.getPrize(), show.getAllowedBreeds().stream().map(
-				BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName())).toList();
+				show -> new ExistingShowDto(show.getDate(), show.getPrize(),
+					show.getAllowedBreeds().stream().map(
+						BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName()))
+			.toList();
 	}
 
 	public void applyToShow(String login, Long showId)
@@ -81,58 +83,57 @@ public class DogService {
 		ShowEntity show = showService.findById(showId);
 		DogEntity dog = findByLogin(login);
 
-		if (!show.getAllowedBreeds().contains(dog.getBreed())){
+		if (!show.getAllowedBreeds().contains(dog.getBreed())) {
 			throw new BreedNotAllowedException();
 		}
 
-		if (new Date().after(show.getDate())){
+		if (new Date().after(show.getDate())) {
 			throw new ShowDateException("Выставка уже прошла");
 		}
 
-		if (show.getParticipants().contains(dog)){
+		if (show.getParticipants().contains(dog)) {
 			throw new AlreadyExistsException("Вы уже участвуете в этой выставке");
 		}
 
-		if (show.getOrganizer().equals(dog.getOwner())){
+		if (show.getOrganizer().equals(dog.getOwner())) {
 			throw new CheatingException();
 		}
-
 
 		showService.addParticipant(show, dog);
 	}
 
-	public ResponseEntity<?> createNewDog(NewDogDto newDogDto) {
+	public NewDogDto createNewDog(NewDogDto newDogDto)
+		throws AlreadyExistsException, NotFoundException {
 		DogEntity dog;
 		try {
 			userService.findByLogin(newDogDto.getLogin());
-			return ResponseEntity.badRequest()
-				.body("Пользователь с указанным именем уже существует");
+			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
 		} catch (NotFoundException ex) {
-			try {
-				UserEntity user = userService.createNewUser(newDogDto, List.of("ROLE_DOG"));
-				dog = new DogEntity(user,
-					newDogDto.getName(),
-					newDogDto.getAge(),
-					breedService.findByName(newDogDto.getBreed()),
-					ownerService.findByLogin(newDogDto.getOwnerLogin()));
-
-				List<DogsInterestsEntity> interests = new ArrayList<>();
-				for (Map.Entry<String, Integer> interest : newDogDto.getInterests().entrySet()){
-					interests.add(new DogsInterestsEntity(dog, interestService.findByName(interest.getKey()), interest.getValue()));
-				}
-				dog.setInterests(interests);
-			} catch (NotFoundException e) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-			}
-			dogRepository.save(dog);
-			return ResponseEntity.ok(new NewDogDto(
+			UserEntity user = userService.createNewUser(newDogDto, List.of("ROLE_DOG"));
+			dog = new DogEntity(user,
 				newDogDto.getName(),
 				newDogDto.getAge(),
-				newDogDto.getBreed(),
-				newDogDto.getOwnerLogin(),
-				newDogDto.getInterests()));
+				breedService.findByName(newDogDto.getBreed()),
+				ownerService.findByLogin(newDogDto.getOwnerLogin()));
+
+			List<DogsInterestsEntity> interests = new ArrayList<>();
+			for (Map.Entry<String, Integer> interest : newDogDto.getInterests().entrySet()) {
+				interests.add(
+					new DogsInterestsEntity(dog, interestService.findByName(interest.getKey()),
+						interest.getValue()));
+			}
+			dog.setInterests(interests);
 		}
+		dogRepository.save(dog);
+		return new NewDogDto(
+			newDogDto.getName(),
+			newDogDto.getAge(),
+			newDogDto.getBreed(),
+			newDogDto.getOwnerLogin(),
+			newDogDto.getInterests());
 	}
+
+
 
 
 	public RecommendedDogDto findNearest(String login) throws NotFoundException {

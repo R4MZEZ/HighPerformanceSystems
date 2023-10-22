@@ -10,10 +10,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AccessDeniedException;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotEnoughMoneyException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
@@ -46,11 +46,10 @@ public class OwnerService {
 		ownerRepository.save(owner);
 	}
 
-	public ResponseEntity<?> createNewOwner(NewOwnerDto ownerUserDto) {
+	public NewOwnerDto createNewOwner(NewOwnerDto ownerUserDto) throws AlreadyExistsException {
 		try {
 			userService.findByLogin(ownerUserDto.getLogin());
-			return ResponseEntity.badRequest()
-				.body("Пользователь с указанным именем уже существует");
+			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
 		} catch (NotFoundException ex) {
 			List<String> roles = ownerUserDto.getIsOrganizer() ? List.of("ROLE_OWNER", "ROLE_ORGANIZER") : List.of("ROLE_OWNER");
 			UserEntity user = userService.createNewUser(ownerUserDto, roles);
@@ -62,13 +61,13 @@ public class OwnerService {
 				ownerUserDto.getBalance(),
 				geometryFactory.createPoint(coordinate));
 			ownerRepository.save(owner);
-			return ResponseEntity.ok(new NewOwnerDto(
+			return new NewOwnerDto(
 				ownerUserDto.getName(),
 				ownerUserDto.getSurname(),
 				ownerUserDto.getBalance(),
 				ownerUserDto.getLatitude(),
 				ownerUserDto.getLongitude(),
-				ownerUserDto.getIsOrganizer()));
+				ownerUserDto.getIsOrganizer());
 		}
 	}
 

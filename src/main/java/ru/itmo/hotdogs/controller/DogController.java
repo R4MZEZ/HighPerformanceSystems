@@ -18,7 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
+import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
+import ru.itmo.hotdogs.exceptions.CheatingException;
+import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
+import ru.itmo.hotdogs.exceptions.NullRecommendationException;
+import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.NewDogDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
@@ -41,7 +47,13 @@ public class DogController {
 
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> createNewDog(@RequestBody NewDogDto dog) {
-		return dogService.createNewDog(dog);
+		try{
+			return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createNewDog(dog));
+		} catch (AlreadyExistsException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
 	}
 
 	@PostMapping(path = "/rate")
@@ -57,8 +69,10 @@ public class DogController {
 			} else {
 				return ResponseEntity.ok(getNewRecommendation(principal));
 			}
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		} catch (NullRecommendationException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
@@ -67,7 +81,7 @@ public class DogController {
 		try {
 			return ResponseEntity.ok(dogService.findNearest(principal.getName()));
 		} catch (NotFoundException e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
@@ -77,8 +91,10 @@ public class DogController {
 		try {
 			dogService.addInterest(principal.getName(), id, level);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		} catch (AlreadyExistsException | IllegalLevelException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
@@ -89,8 +105,8 @@ public class DogController {
 			int fromIndex = result.size() > page * ControllerConfig.pageSize ? page * ControllerConfig.pageSize : 0;
 			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.pageSize);
 			return ResponseEntity.ok(result.subList(fromIndex, toIndex));
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
@@ -99,8 +115,12 @@ public class DogController {
 		try {
 			dogService.applyToShow(principal.getName(), showId);
 			return ResponseEntity.ok("Вы стали участником выставки!");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+		} catch (CheatingException | AlreadyExistsException | ShowDateException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (BreedNotAllowedException e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		}
 	}
 
@@ -126,7 +146,7 @@ public class DogController {
 		try {
 			return ResponseEntity.ok(dogService.findByLogin(principal.getName()));
 		} catch (NotFoundException e) {
-			return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 

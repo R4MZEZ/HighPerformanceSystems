@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
@@ -41,7 +42,11 @@ public class OwnerController {
 
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> createOwner(@RequestBody NewOwnerDto owner) {
-		return ownerService.createNewOwner(owner);
+		try{
+			return ResponseEntity.ok(ownerService.createNewOwner(owner));
+		} catch (AlreadyExistsException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 
 	@PostMapping(path = "/shows/create")
