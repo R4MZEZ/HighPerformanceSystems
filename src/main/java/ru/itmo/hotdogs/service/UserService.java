@@ -1,7 +1,12 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
@@ -22,6 +28,7 @@ public class UserService implements UserDetailsService {
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private RoleService roleService;
+	private final Validator validator;
 
 	@Autowired
 	public void setUserRepository(UserRepository userRepository) {
@@ -57,7 +64,11 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList()));
 	}
 
-	public UserEntity createNewUser(NewUserDto newUserDto, List<String> roles) {
+	public UserEntity createNewUser(@Valid NewUserDto newUserDto, List<String> roles) {
+		Set<ConstraintViolation<NewUserDto>> violations = validator.validate(newUserDto);
+		if (!validator.validate(newUserDto).isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
 		UserEntity user = new UserEntity();
 		user.setLogin(newUserDto.getLogin());
 		user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));

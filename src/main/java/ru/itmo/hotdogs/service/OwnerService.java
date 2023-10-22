@@ -4,6 +4,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -21,6 +25,7 @@ import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
@@ -35,6 +40,7 @@ public class OwnerService {
 	private final ShowService showService;
 	private final BreedService breedService;
 	private final UserService userService;
+	private final Validator validator;
 	private DogService dogService;
 
 	@Autowired
@@ -42,8 +48,12 @@ public class OwnerService {
 		this.dogService = dogService;
 	}
 
-	public void save(OwnerEntity owner) {
-		ownerRepository.save(owner);
+	public OwnerEntity save(@Valid OwnerEntity owner) {
+		Set<ConstraintViolation<OwnerEntity>> violations = validator.validate(owner);
+		if (!validator.validate(owner).isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
+		return ownerRepository.save(owner);
 	}
 
 	public NewOwnerDto createNewOwner(NewOwnerDto ownerUserDto) throws AlreadyExistsException {
@@ -83,8 +93,12 @@ public class OwnerService {
 	}
 
 	@Transactional
-	public void createShow(String login, NewShowDto newShowDto)
-		throws NotFoundException, NotEnoughMoneyException {
+	public void createShow(String login, @Valid NewShowDto newShowDto)
+		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
+		Set<ConstraintViolation<NewShowDto>> violations = validator.validate(newShowDto);
+		if (!validator.validate(newShowDto).isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
 		OwnerEntity owner = findByLogin(login);
 
 		if (owner.getBalance() < newShowDto.getPrize()) {

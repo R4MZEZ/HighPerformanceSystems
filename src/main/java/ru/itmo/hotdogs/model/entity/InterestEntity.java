@@ -6,13 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "interests")
+@NoArgsConstructor
 public class InterestEntity {
 
 	@Id
@@ -25,5 +27,7 @@ public class InterestEntity {
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
 
-
+	public InterestEntity(String name) {
+		this.name = name;
+	}
 }

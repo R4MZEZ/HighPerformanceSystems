@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,7 @@ import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.NewDogDto;
+import ru.itmo.hotdogs.model.dto.NewDogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
@@ -45,6 +50,7 @@ public class DogService {
 	private final UserService userService;
 	private final ShowService showService;
 	private final BreedService breedService;
+	private final Validator validator;
 	private OwnerService ownerService;
 
 	@Autowired
@@ -102,8 +108,14 @@ public class DogService {
 		showService.addParticipant(show, dog);
 	}
 
-	public NewDogDto createNewDog(NewDogDto newDogDto)
-		throws AlreadyExistsException, NotFoundException {
+	public NewDogDto createNewDog(@Valid NewDogDto newDogDto)
+		throws AlreadyExistsException, NotFoundException, ConstraintViolationException {
+
+		Set<ConstraintViolation<NewDogDto>> violations = validator.validate(newDogDto);
+		if (!validator.validate(newDogDto).isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
+
 		DogEntity dog;
 		try {
 			userService.findByLogin(newDogDto.getLogin());
@@ -189,13 +201,15 @@ public class DogService {
 	}
 
 
-	public void addInterest(String login, int interestId, int level)
+	public void addInterest(String login, @Valid NewDogInterestDto interestDto)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException {
-		if (level < 1 || level > 10) {
-			throw new IllegalLevelException();
+
+		Set<ConstraintViolation<NewDogInterestDto>> violations = validator.validate(interestDto);
+		if (!validator.validate(interestDto).isEmpty()) {
+			throw new ConstraintViolationException(violations);
 		}
 
-		InterestEntity interest = interestService.findById(interestId);
+		InterestEntity interest = interestService.findById(interestDto.getInterestId());
 		DogEntity dog = findByLogin(login);
 
 		if (dog.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
@@ -203,7 +217,8 @@ public class DogService {
 				"У данной собаки уже существует такой интерес.");
 		}
 
-		DogsInterestsEntity interest_record = new DogsInterestsEntity(dog, interest, level);
+		DogsInterestsEntity interest_record = new DogsInterestsEntity(dog, interest,
+			interestDto.getLevel());
 		dogsInterestsRepository.save(interest_record);
 		dogRepository.save(dog);
 	}

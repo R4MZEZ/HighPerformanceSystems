@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.controller;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.NewDogDto;
+import ru.itmo.hotdogs.model.dto.NewDogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
@@ -49,7 +51,7 @@ public class DogController {
 	public ResponseEntity<?> createNewDog(@RequestBody NewDogDto dog) {
 		try{
 			return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createNewDog(dog));
-		} catch (AlreadyExistsException e) {
+		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -86,10 +88,9 @@ public class DogController {
 	}
 
 	@PatchMapping("/add-interest")
-	public ResponseEntity<?> addInterest(Principal principal, @RequestParam int id,
-		@RequestParam int level) {
+	public ResponseEntity<?> addInterest(Principal principal, @RequestParam NewDogInterestDto interestDto) {
 		try {
-			dogService.addInterest(principal.getName(), id, level);
+			dogService.addInterest(principal.getName(), interestDto);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
 		} catch (AlreadyExistsException | IllegalLevelException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
