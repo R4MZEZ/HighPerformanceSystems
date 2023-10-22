@@ -29,4 +29,6 @@ public class BreedService {
 		return breedRepository.findByName(name)
 			.orElseThrow(() -> new NotFoundException("Породы с таким названием не существует"));
 	}
+
+	public BreedEntity createBreed(BreedEntity breed){ return breedRepository.save(breed); }
 }

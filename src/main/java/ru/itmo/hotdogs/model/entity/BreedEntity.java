@@ -27,4 +27,7 @@ public class BreedEntity {
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
 
+	public BreedEntity(String name) {
+		this.name = name;
+	}
 }
