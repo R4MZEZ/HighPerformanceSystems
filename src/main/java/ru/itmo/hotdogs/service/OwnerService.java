@@ -48,6 +48,8 @@ public class OwnerService {
 		this.dogService = dogService;
 	}
 
+	public void deleteAll(){ ownerRepository.deleteAll(); }
+
 	public OwnerEntity save(@Valid OwnerEntity owner) {
 		Set<ConstraintViolation<OwnerEntity>> violations = validator.validate(owner);
 		if (!validator.validate(owner).isEmpty()) {
@@ -56,7 +58,12 @@ public class OwnerService {
 		return ownerRepository.save(owner);
 	}
 
-	public NewOwnerDto createNewOwner(NewOwnerDto ownerUserDto) throws AlreadyExistsException {
+	public NewOwnerDto createNewOwner(@Valid NewOwnerDto ownerUserDto) throws AlreadyExistsException, ConstraintViolationException {
+		Set<ConstraintViolation<NewOwnerDto>> violations = validator.validate(ownerUserDto);
+		if (!validator.validate(ownerUserDto).isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
+
 		try {
 			userService.findByLogin(ownerUserDto.getLogin());
 			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
@@ -88,37 +95,25 @@ public class OwnerService {
 	public OwnerEntity findByLogin(String login) throws NotFoundException {
 		UserEntity user = userService.findByLogin(login);
 		return ownerRepository.findByUser(user).orElseThrow(
-			() -> new NotFoundException("Владельца с таким логином существует")
+			() -> new NotFoundException("Владельца с таким логином не существует")
 		);
 	}
-
 	@Transactional
 	public void createShow(String login, @Valid NewShowDto newShowDto)
 		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
-		Set<ConstraintViolation<NewShowDto>> violations = validator.validate(newShowDto);
-		if (!validator.validate(newShowDto).isEmpty()) {
-			throw new ConstraintViolationException(violations);
-		}
 		OwnerEntity owner = findByLogin(login);
 
 		if (owner.getBalance() < newShowDto.getPrize()) {
 			throw new NotEnoughMoneyException();
 		}
 
-		Set<BreedEntity> allowedBreeds = new HashSet<>();
-		for (Integer breedId : newShowDto.getAllowed_breeds()) {
-			BreedEntity breed = breedService.findById(breedId)
-				.orElseThrow(() -> new NotFoundException("Breed not found with id: " + breedId));
-			allowedBreeds.add(breed);
-		}
+		showService.createShow(owner, newShowDto);
 
 		owner.setBalance(owner.getBalance() - newShowDto.getPrize());
 		owner.setReservedBalance(owner.getReservedBalance() + newShowDto.getPrize());
 		ownerRepository.save(owner);
 
-		ShowEntity show = new ShowEntity(newShowDto.getPrize(), newShowDto.getDate(), owner,
-			allowedBreeds);
-		showService.save(show);
+
 	}
 
 	@Transactional
