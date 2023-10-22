@@ -122,7 +122,7 @@ public class OwnerService {
 		OwnerEntity organizer = findByLogin(login);
 		ShowEntity show = showService.findById(showId);
 
-		if (!show.getOrganizer().equals(organizer)) {
+		if (!show.getOrganizer().getId().equals(organizer.getId())) {
 			throw new AccessDeniedException("Вы не можете завершить не свою выставку.");
 		}
 

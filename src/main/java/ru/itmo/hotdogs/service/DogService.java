@@ -101,7 +101,7 @@ public class DogService {
 			throw new AlreadyExistsException("Вы уже участвуете в этой выставке");
 		}
 
-		if (show.getOrganizer().equals(dog.getOwner())) {
+		if (show.getOrganizer().getId().equals(dog.getOwner().getId())) {
 			throw new CheatingException();
 		}
 
@@ -212,7 +212,7 @@ public class DogService {
 		InterestEntity interest = interestService.findById(interestDto.getInterestId());
 		DogEntity dog = findByLogin(login);
 
-		if (dog.getInterests().stream().anyMatch((x) -> x.getInterest().equals(interest))) {
+		if (dog.getInterests().stream().anyMatch((x) -> x.getInterest().getId().equals(interest.getId()))) {
 			throw new AlreadyExistsException(
 				"У данной собаки уже существует такой интерес.");
 		}
