@@ -20,4 +20,14 @@ public class NewDogDto extends NewUserDto{
 	String breed;
 	String ownerLogin;
 	Map<String, Integer> interests;
+
+	public NewDogDto(@NotBlank String login, @NotBlank String password, String name, Integer age,
+		String breed, String ownerLogin, Map<String, Integer> interests) {
+		super(login, password);
+		this.name = name;
+		this.age = age;
+		this.breed = breed;
+		this.ownerLogin = ownerLogin;
+		this.interests = interests;
+	}
 }
