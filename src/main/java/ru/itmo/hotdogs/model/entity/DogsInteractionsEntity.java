@@ -5,8 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "dogs_interactions")
 @NoArgsConstructor
+@AllArgsConstructor
 public class DogsInteractionsEntity {
 
 	@Id
@@ -23,11 +26,11 @@ public class DogsInteractionsEntity {
 	private Long id;
 
 	@ManyToOne
-//  @JoinColumn(name = "sender_id")
+	@JoinColumn(name = "sender_id")
 	private DogEntity sender;
 
 	@ManyToOne
-//  @JoinColumn(name = "receiver_id")
+	@JoinColumn(name = "receiver_id")
 	private DogEntity receiver;
 
 	@Column(nullable = false)

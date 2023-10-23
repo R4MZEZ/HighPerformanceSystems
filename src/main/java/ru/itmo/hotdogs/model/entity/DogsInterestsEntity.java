@@ -27,7 +27,7 @@ public class DogsInterestsEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "dog_id")
-	@JsonIgnore
+//	@JsonIgnore
 	private DogEntity dog;
 
 	@ManyToOne
@@ -35,7 +35,7 @@ public class DogsInterestsEntity {
 	private InterestEntity interest;
 
 	@Range(min=1, max=10)
-	@Column(nullable = false)
+	@Column
 	private Integer level;
 
 	public DogsInterestsEntity(DogEntity dog, InterestEntity interest, Integer level) {
