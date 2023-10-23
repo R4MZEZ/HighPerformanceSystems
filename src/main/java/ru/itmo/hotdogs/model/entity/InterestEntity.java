@@ -18,12 +18,9 @@ import lombok.Setter;
 @Table(name = "interests")
 @NoArgsConstructor
 public class InterestEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
-
 	@Column(nullable = false)
 	@NotBlank
 	@Pattern(regexp = "^[a-zA-Z]+$")

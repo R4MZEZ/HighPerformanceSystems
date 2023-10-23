@@ -7,8 +7,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
+import java.util.Objects;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -54,6 +57,10 @@ public class OwnerEntity {
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
+	@OneToMany
+	@JoinColumn(name = "organizer", nullable = true)
+	private List<ShowEntity> shows;
+
 	public OwnerEntity(UserEntity user, String name, String surname, Float balance,
 		Point location) {
 		this.user = user;
@@ -63,5 +70,45 @@ public class OwnerEntity {
 
 		this.balance = balance == null ? 0f : balance;
 		this.reservedBalance = 0f;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		OwnerEntity owner = (OwnerEntity) o;
+
+		if (!id.equals(owner.id)) {
+			return false;
+		}
+		if (!name.equals(owner.name)) {
+			return false;
+		}
+		if (!Objects.equals(surname, owner.surname)) {
+			return false;
+		}
+		if (!balance.equals(owner.balance)) {
+			return false;
+		}
+		if (!reservedBalance.equals(owner.reservedBalance)) {
+			return false;
+		}
+		return location.equals(owner.location);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id.hashCode();
+		result = 31 * result + name.hashCode();
+		result = 31 * result + (surname != null ? surname.hashCode() : 0);
+		result = 31 * result + balance.hashCode();
+		result = 31 * result + reservedBalance.hashCode();
+		result = 31 * result + location.hashCode();
+		return result;
 	}
 }

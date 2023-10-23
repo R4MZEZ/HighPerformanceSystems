@@ -11,12 +11,14 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.Set;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class UserEntity {
 
 	@Id
@@ -37,4 +39,10 @@ public class UserEntity {
 		inverseJoinColumns = @JoinColumn(name = "role_id")
 	)
 	private Set<RoleEntity> roles;
+
+	public UserEntity(String login, String password, Set<RoleEntity> roles) {
+		this.login = login;
+		this.password = password;
+		this.roles = roles;
+	}
 }

@@ -4,14 +4,16 @@ import java.util.Map;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewDogDto extends NewUserDto{
+public class NewDogDto{
 	@NotBlank
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	String name;
@@ -21,13 +23,4 @@ public class NewDogDto extends NewUserDto{
 	String ownerLogin;
 	Map<String, Integer> interests;
 
-	public NewDogDto(@NotBlank String login, @NotBlank String password, String name, Integer age,
-		String breed, String ownerLogin, Map<String, Integer> interests) {
-		super(login, password);
-		this.name = name;
-		this.age = age;
-		this.breed = breed;
-		this.ownerLogin = ownerLogin;
-		this.interests = interests;
-	}
 }

@@ -24,6 +24,8 @@ public class InterestService {
 		return interestRepository.findAll();
 	}
 
+	public void deleteAll() { interestRepository.deleteAll(); }
+
 	public InterestEntity save(@Valid InterestEntity interest) throws ConstraintViolationException{
 		Set<ConstraintViolation<InterestEntity>> violations = validator.validate(interest);
 		if (!validator.validate(interest).isEmpty()) {

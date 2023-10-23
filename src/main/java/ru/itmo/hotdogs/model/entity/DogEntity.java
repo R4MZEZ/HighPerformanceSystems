@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -99,5 +100,41 @@ public class DogEntity {
 		this.age = age;
 		this.breed = breed;
 		this.owner = owner;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		DogEntity dog = (DogEntity) o;
+
+		if (!id.equals(dog.id)) {
+			return false;
+		}
+		if (!name.equals(dog.name)) {
+			return false;
+		}
+		if (!Objects.equals(age, dog.age)) {
+			return false;
+		}
+		if (!breed.equals(dog.breed)) {
+			return false;
+		}
+		return owner.equals(dog.owner);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = id.hashCode();
+		result = 31 * result + name.hashCode();
+		result = 31 * result + (age != null ? age.hashCode() : 0);
+		result = 31 * result + breed.hashCode();
+		result = 31 * result + owner.hashCode();
+		return result;
 	}
 }

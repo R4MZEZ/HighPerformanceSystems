@@ -1,16 +1,22 @@
 package ru.itmo.hotdogs.model.dto;
 
+import java.util.Objects;
+import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewOwnerDto extends NewUserDto{
+public class NewOwnerDto{
+
 	@NotBlank
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	String name;
@@ -22,15 +28,23 @@ public class NewOwnerDto extends NewUserDto{
 	Double longitude;
 	Boolean isOrganizer;
 
-	public NewOwnerDto(@NotBlank String login, @NotBlank String password, String name,
-		String surname,
-		Float balance, Double latitude, Double longitude, Boolean isOrganizer) {
-		super(login, password);
-		this.name = name;
-		this.surname = surname;
-		this.balance = balance;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.isOrganizer = isOrganizer;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		NewOwnerDto that = (NewOwnerDto) o;
+		return Objects.equals(name, that.name) && Objects.equals(surname,
+			that.surname) && Objects.equals(balance, that.balance)
+			&& Objects.equals(latitude, that.latitude) && Objects.equals(longitude,
+			that.longitude) && Objects.equals(isOrganizer, that.isOrganizer);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, surname, balance, latitude, longitude, isOrganizer);
 	}
 }
