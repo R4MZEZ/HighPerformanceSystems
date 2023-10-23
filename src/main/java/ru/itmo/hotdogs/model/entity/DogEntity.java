@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -61,7 +60,12 @@ public class DogEntity {
 	@JoinColumn(name = "cur_recommended")
 	private DogEntity curRecommended;
 
-	@OneToMany(mappedBy = "dog")
+	@ManyToMany
+	@JoinTable(
+		name = "dogs_interests",
+		joinColumns = @JoinColumn(name = "dog_id"),
+		inverseJoinColumns = @JoinColumn(name = "interest_id")
+	)
 	private List<DogsInterestsEntity> interests;
 
 	@ManyToMany
