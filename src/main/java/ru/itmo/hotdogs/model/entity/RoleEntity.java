@@ -9,12 +9,14 @@ import jakarta.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "roles")
+@NoArgsConstructor
 public class RoleEntity {
 
 	@Id
@@ -24,7 +26,11 @@ public class RoleEntity {
 
 	@Column
 	@NotBlank
-	@Pattern(regexp = "^[a-zA-Z]+$")
+	@Pattern(regexp = "^[a-zA-Z_]+$")
 	private String name;
 
+
+	public RoleEntity(String name) {
+		this.name = name;
+	}
 }
