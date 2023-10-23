@@ -66,6 +66,8 @@ public class SecurityConfig {
 				.requestMatchers("/owners").hasRole("ADMIN")
 				.requestMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.requestMatchers("/dogs/new").hasRole("ADMIN")
+				.requestMatchers("/breeds/new").hasRole("ADMIN")
+				.requestMatchers("/interests/new").hasRole("ADMIN")
 				.requestMatchers("/dogs").hasRole("ADMIN")
 				.anyRequest().permitAll())
 			.sessionManagement(
