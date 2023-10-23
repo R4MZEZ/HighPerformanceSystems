@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.repository.BreedRepository;
@@ -30,15 +31,21 @@ public class BreedService {
 			.orElseThrow(() -> new NotFoundException("Породы с таким названием не существует"));
 	}
 
-	public BreedEntity createBreed(@Valid BreedEntity breed) throws ConstraintViolationException{
+	public BreedEntity createBreed(@Valid BreedEntity breed)
+		throws ConstraintViolationException, AlreadyExistsException {
 		Set<ConstraintViolation<BreedEntity>> violations = validator.validate(breed);
 		if (!validator.validate(breed).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
-		return breedRepository.save(breed);
+		try {
+			findByName(breed.getName());
+			throw new AlreadyExistsException("Такая порода уже существует");
+		} catch (NotFoundException e) {
+			return breedRepository.save(breed);
+		}
 	}
 
-	public void deleteAll(){
+	public void deleteAll() {
 		breedRepository.deleteAll();
 	}
 }
