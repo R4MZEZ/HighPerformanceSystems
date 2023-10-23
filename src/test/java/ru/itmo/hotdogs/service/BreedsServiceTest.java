@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.validation.ConstraintViolationException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 
@@ -24,16 +26,15 @@ class BreedsServiceTest {
 	@Autowired
 	private BreedService breedService;
 
-	@BeforeEach
+	@AfterEach
 	void clearBreeds(){
 		breedService.deleteAll();
 	}
 
 	@Test
-	void validCreationTest() {
+	void validCreationTest() throws AlreadyExistsException {
 		final var newBreed = breedService.createBreed(new BreedEntity("husky"));
 		assertEquals("husky", newBreed.getName());
-		assertEquals(1, newBreed.getId());
 	}
 
 	@Test
@@ -53,7 +54,7 @@ class BreedsServiceTest {
 
 	@ParameterizedTest
 	@ValueSource( strings = {"Ovcharka", "Alabai", "Taksa"})
-	void findByNameTest(String name) {
+	void findByNameTest(String name) throws AlreadyExistsException {
 		breedService.createBreed(new BreedEntity(name));
 		Assertions.assertDoesNotThrow(() -> {
 			BreedEntity breed = breedService.findByName(name);

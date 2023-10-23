@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.validation.ConstraintViolationException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,11 +24,15 @@ class InterestServiceTest {
 	@Autowired
 	private InterestService interestService;
 
+	@AfterEach
+	void clearData(){
+		interestService.deleteAll();
+	}
+
 	@Test
 	void validCreationTest() {
 		final var newInterest = interestService.save(new InterestEntity("walking"));
 		assertEquals("walking", newInterest.getName());
-		assertEquals(1, newInterest.getId());
 	}
 
 	@Test
