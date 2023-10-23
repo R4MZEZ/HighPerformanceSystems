@@ -30,10 +30,12 @@ import ru.itmo.hotdogs.model.dto.ExistingShowDto;
 import ru.itmo.hotdogs.model.dto.NewDogDto;
 import ru.itmo.hotdogs.model.dto.NewDogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.dto.UserDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.service.DogService;
 import ru.itmo.hotdogs.utils.ControllerConfig;
+import ru.itmo.hotdogs.utils.DtoConverter;
 
 @RequiredArgsConstructor
 @RequestMapping(path = "/dogs")
@@ -48,9 +50,10 @@ public class DogController {
 	}
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> createNewDog(@RequestBody NewDogDto dog) {
-		try{
-			return ResponseEntity.status(HttpStatus.CREATED).body(dogService.createNewDog(dog));
+	public ResponseEntity<?> registerNewDog(@RequestBody UserDogDto userDogDto) {
+		try {
+			return ResponseEntity.status(HttpStatus.CREATED)
+				.body(dogService.createNewDog(userDogDto.getUserDto(), userDogDto.getDogDto()));
 		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {
@@ -59,9 +62,11 @@ public class DogController {
 	}
 
 	@PostMapping(path = "/rate")
-	public ResponseEntity<?> likeRecommended(Principal principal, @RequestParam(defaultValue = "true") boolean is_like) {
+	public ResponseEntity<?> likeRecommended(Principal principal,
+		@RequestParam(defaultValue = "true") boolean is_like) {
 		try {
-			RecommendedDogDto matchedDog = dogService.rateRecommended(principal.getName(), is_like);
+			DogEntity dog = dogService.findByLogin(principal.getName());
+			RecommendedDogDto matchedDog = dogService.rateRecommended(dog, is_like);
 			if (matchedDog != null) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
@@ -81,18 +86,21 @@ public class DogController {
 	@GetMapping("/recommend")
 	public ResponseEntity<?> getNewRecommendation(Principal principal) {
 		try {
-			return ResponseEntity.ok(dogService.findNearest(principal.getName()));
+			DogEntity dog = dogService.findByLogin(principal.getName());
+			return ResponseEntity.ok(dogService.findNearest(dog));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
 	@PatchMapping("/add-interest")
-	public ResponseEntity<?> addInterest(Principal principal, @RequestParam NewDogInterestDto interestDto) {
+	public ResponseEntity<?> addInterest(Principal principal,
+		@RequestBody NewDogInterestDto interestDto) {
 		try {
-			dogService.addInterest(principal.getName(), interestDto);
+			DogEntity dog = dogService.findByLogin(principal.getName());
+			dogService.addInterest(dog, interestDto);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
-		} catch (AlreadyExistsException | IllegalLevelException e) {
+		} catch (AlreadyExistsException | IllegalLevelException | ConstraintViolationException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -100,10 +108,13 @@ public class DogController {
 	}
 
 	@GetMapping("/shows")
-	public ResponseEntity<?> appliedShows(Principal principal, @RequestParam(defaultValue = "0") int page){
+	public ResponseEntity<?> appliedShows(Principal principal,
+		@RequestParam(defaultValue = "0") int page) {
 		try {
 			List<ExistingShowDto> result = dogService.findAppliedShows(principal.getName());
-			int fromIndex = result.size() > page * ControllerConfig.pageSize ? page * ControllerConfig.pageSize : 0;
+			int fromIndex =
+				result.size() > page * ControllerConfig.pageSize ? page * ControllerConfig.pageSize
+					: 0;
 			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.pageSize);
 			return ResponseEntity.ok(result.subList(fromIndex, toIndex));
 		} catch (NotFoundException e) {
@@ -112,9 +123,10 @@ public class DogController {
 	}
 
 	@PostMapping("/shows/{showId}/apply")
-	public ResponseEntity<?> applyToShow(Principal principal, @PathVariable Long showId){
+	public ResponseEntity<?> applyToShow(Principal principal, @PathVariable Long showId) {
 		try {
-			dogService.applyToShow(principal.getName(), showId);
+			DogEntity dog = dogService.findByLogin(principal.getName());
+			dogService.applyToShow(dog, showId);
 			return ResponseEntity.ok("Вы стали участником выставки!");
 		} catch (CheatingException | AlreadyExistsException | ShowDateException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -127,7 +139,8 @@ public class DogController {
 
 	@GetMapping
 	public ResponseEntity<List<NewDogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize, Sort.by(Sort.Order.asc("id")));
+		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize,
+			Sort.by(Sort.Order.asc("id")));
 		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
 
 		return ResponseEntity.ok()
@@ -138,14 +151,15 @@ public class DogController {
 				dog.getBreed().getName(),
 				dog.getOwner().getUser().getLogin(),
 				dog.getInterests().stream().collect(Collectors.toMap(
-						interest -> interest.getInterest().getName(),
-						DogsInterestsEntity::getLevel)))).toList());
+					interest -> interest.getInterest().getName(),
+					DogsInterestsEntity::getLevel)))).toList());
 	}
 
 	@GetMapping("/me")
 	public ResponseEntity<?> getInfo(Principal principal) {
 		try {
-			return ResponseEntity.ok(dogService.findByLogin(principal.getName()));
+			DogEntity dog = dogService.findByLogin(principal.getName());
+			return ResponseEntity.ok(DtoConverter.dogEntityToDto(dog));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

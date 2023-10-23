@@ -25,8 +25,8 @@ public class ShowService {
 	private final Validator validator;
 	private final BreedService breedService;
 
-	public void save(ShowEntity show) {
-		showRepository.save(show);
+	public ShowEntity save(ShowEntity show) {
+		return showRepository.save(show);
 	}
 
 	public void deleteAll(){ showRepository.deleteAll(); }
@@ -37,11 +37,11 @@ public class ShowService {
 	}
 
 	@Transactional
-	public void addParticipant(ShowEntity show, DogEntity dog) {
+	public ShowEntity addParticipant(ShowEntity show, DogEntity dog) {
 		Set<DogEntity> participants = show.getParticipants();
 		participants.add(dog);
 		show.setParticipants(participants);
-		showRepository.save(show);
+		return showRepository.save(show);
 	}
 
 	@Transactional
@@ -60,8 +60,7 @@ public class ShowService {
 		}
 
 		ShowEntity show = new ShowEntity(newShowDto.getPrize(), newShowDto.getDate(), owner,allowedBreeds);
-		save(show);
-		return show;
+		return save(show);
 	}
 
 }
