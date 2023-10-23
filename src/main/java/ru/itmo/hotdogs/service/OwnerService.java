@@ -1,7 +1,6 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -22,6 +21,7 @@ import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.NewOwnerDto;
 import ru.itmo.hotdogs.model.dto.NewShowDto;
+import ru.itmo.hotdogs.model.dto.NewUserDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
@@ -44,7 +44,10 @@ public class OwnerService {
 		this.dogService = dogService;
 	}
 
-	public void deleteAll(){ ownerRepository.deleteAll(); }
+	public void deleteAll() {
+		ownerRepository.deleteAll();
+	}
+
 
 	public void save(@Valid OwnerEntity owner) {
 		Set<ConstraintViolation<OwnerEntity>> violations = validator.validate(owner);
@@ -54,34 +57,28 @@ public class OwnerService {
 		ownerRepository.save(owner);
 	}
 
-	public NewOwnerDto createNewOwner(@Valid NewOwnerDto ownerUserDto) throws AlreadyExistsException, ConstraintViolationException {
+	public OwnerEntity createNewOwner(@Valid NewUserDto newUserDto, @Valid NewOwnerDto ownerUserDto)
+		throws AlreadyExistsException, ConstraintViolationException {
 		Set<ConstraintViolation<NewOwnerDto>> violations = validator.validate(ownerUserDto);
 		if (!validator.validate(ownerUserDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
 
-		try {
-			userService.findByLogin(ownerUserDto.getLogin());
-			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
-		} catch (NotFoundException ex) {
-			List<String> roles = ownerUserDto.getIsOrganizer() ? List.of("ROLE_OWNER", "ROLE_ORGANIZER") : List.of("ROLE_OWNER");
-			UserEntity user = userService.createNewUser(ownerUserDto, roles);
-			GeometryFactory geometryFactory = new GeometryFactory();
-			Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(), ownerUserDto.getLongitude());
-			OwnerEntity owner = new OwnerEntity(user,
-				ownerUserDto.getName(),
-				ownerUserDto.getSurname(),
-				ownerUserDto.getBalance(),
-				geometryFactory.createPoint(coordinate));
-			ownerRepository.save(owner);
-			return new NewOwnerDto(
-				ownerUserDto.getName(),
-				ownerUserDto.getSurname(),
-				ownerUserDto.getBalance(),
-				ownerUserDto.getLatitude(),
-				ownerUserDto.getLongitude(),
-				ownerUserDto.getIsOrganizer());
-		}
+		Set<String> roles = ownerUserDto.getIsOrganizer() ? Set.of("ROLE_OWNER", "ROLE_ORGANIZER")
+			: Set.of("ROLE_OWNER");
+		newUserDto.setRoles(roles);
+		UserEntity user = userService.createNewUser(newUserDto);
+
+		GeometryFactory geometryFactory = new GeometryFactory();
+		Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(),
+			ownerUserDto.getLongitude());
+		OwnerEntity owner = new OwnerEntity(user,
+			ownerUserDto.getName(),
+			ownerUserDto.getSurname(),
+			ownerUserDto.getBalance(),
+			geometryFactory.createPoint(coordinate));
+		return ownerRepository.save(owner);
+
 	}
 
 	public Page<OwnerEntity> findAll(Pageable pageable) {
@@ -94,7 +91,8 @@ public class OwnerService {
 			() -> new NotFoundException("Владельца с таким логином не существует")
 		);
 	}
-//	@Transactional
+
+	@Transactional
 	public ShowEntity createShow(String login, @Valid NewShowDto newShowDto)
 		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
 		OwnerEntity owner = findByLogin(login);

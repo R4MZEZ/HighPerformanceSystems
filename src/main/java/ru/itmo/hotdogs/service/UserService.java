@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.NewUserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
@@ -49,6 +51,7 @@ public class UserService implements UserDetailsService {
 		userRepository.deleteAll();
 	}
 
+
 	public UserEntity findByLogin(String login) throws NotFoundException{
 		return userRepository.findByLogin(login).orElseThrow(
 			() -> new NotFoundException("Пользователь с таким логином не существует")
@@ -57,6 +60,7 @@ public class UserService implements UserDetailsService {
 
 
 	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserEntity user = userRepository.findByLogin(username).orElseThrow(
 			() -> new UsernameNotFoundException(
@@ -67,16 +71,20 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList()));
 	}
 
-	public UserEntity createNewUser(@Valid NewUserDto newUserDto, List<String> roles) {
+	public UserEntity createNewUser(@Valid NewUserDto newUserDto) throws AlreadyExistsException {
 		Set<ConstraintViolation<NewUserDto>> violations = validator.validate(newUserDto);
 		if (!validator.validate(newUserDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
-		UserEntity user = new UserEntity();
-		user.setLogin(newUserDto.getLogin());
-		user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
-		user.setRoles(roles.stream().map(roleService::findByName).collect(Collectors.toSet()));
-
-		return userRepository.save(user);
+		try{
+			findByLogin(newUserDto.getLogin());
+			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
+		}catch (NotFoundException ex){
+			UserEntity user = new UserEntity();
+			user.setLogin(newUserDto.getLogin());
+			user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
+			user.setRoles(newUserDto.getRoles().stream().map(roleService::findByName).collect(Collectors.toSet()));
+			return userRepository.save(user);
+		}
 	}
 }
