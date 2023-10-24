@@ -1,4 +1,4 @@
-package ru.itmo.hotdogs.utils;
+package ru.itmo.hotdogs.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -14,7 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.itmo.hotdogs.utils.JwtTokenUtils;
 
 @Component
 @RequiredArgsConstructor

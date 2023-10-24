@@ -1,4 +1,4 @@
-package ru.itmo.hotdogs.utils;
+package ru.itmo.hotdogs.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

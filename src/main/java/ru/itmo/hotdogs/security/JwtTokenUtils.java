@@ -1,4 +1,4 @@
-package ru.itmo.hotdogs.utils;
+package ru.itmo.hotdogs.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
