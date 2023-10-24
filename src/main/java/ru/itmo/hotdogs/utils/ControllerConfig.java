@@ -1,5 +1,5 @@
 package ru.itmo.hotdogs.utils;
 
-public class ControllerConfig {
-	public static final int pageSize = 50;
+public final class ControllerConfig {
+	public static final int PAGE_SIZE = 50;
 }
