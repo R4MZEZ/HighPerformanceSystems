@@ -33,7 +33,7 @@ public class OwnerController {
 
 	@GetMapping
 	public ResponseEntity<List<OwnerEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize, Sort.by(Sort.Order.asc("id")));
+		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE, Sort.by(Sort.Order.asc("id")));
 		Page<OwnerEntity> entityPage = ownerService.findAll(pageRequest);
 
 		return ResponseEntity.ok().body(entityPage.getContent());

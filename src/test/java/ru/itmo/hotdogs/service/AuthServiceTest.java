@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,7 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.itmo.hotdogs.model.dto.JwtRequest;
 import ru.itmo.hotdogs.model.dto.JwtResponse;
 import ru.itmo.hotdogs.model.dto.NewUserDto;
-import ru.itmo.hotdogs.utils.JwtTokenUtils;
+import ru.itmo.hotdogs.security.JwtTokenUtils;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers

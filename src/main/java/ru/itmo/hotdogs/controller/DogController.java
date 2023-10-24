@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,12 +41,8 @@ import ru.itmo.hotdogs.utils.DtoConverter;
 @RestController
 public class DogController {
 
-	private DogService dogService;
+	private final DogService dogService;
 
-	@Autowired
-	public void setDogService(DogService dogService) {
-		this.dogService = dogService;
-	}
 
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> registerNewDog(@RequestBody UserDogDto userDogDto) {
@@ -113,9 +108,10 @@ public class DogController {
 		try {
 			List<ExistingShowDto> result = dogService.findAppliedShows(principal.getName());
 			int fromIndex =
-				result.size() > page * ControllerConfig.pageSize ? page * ControllerConfig.pageSize
+				result.size() > page * ControllerConfig.PAGE_SIZE
+					? page * ControllerConfig.PAGE_SIZE
 					: 0;
-			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.pageSize);
+			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.PAGE_SIZE);
 			return ResponseEntity.ok(result.subList(fromIndex, toIndex));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -139,7 +135,7 @@ public class DogController {
 
 	@GetMapping
 	public ResponseEntity<List<NewDogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize,
+		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE,
 			Sort.by(Sort.Order.asc("id")));
 		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
 

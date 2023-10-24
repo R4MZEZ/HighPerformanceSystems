@@ -28,7 +28,7 @@ public class BreedsController {
 
 	@GetMapping
 	public ResponseEntity<List<BreedEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.pageSize, Sort.by(Sort.Order.asc("id")));
+		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE, Sort.by(Sort.Order.asc("id")));
 		Page<BreedEntity> entityPage = breedService.findAll(pageRequest);
 
 		return ResponseEntity.ok()
