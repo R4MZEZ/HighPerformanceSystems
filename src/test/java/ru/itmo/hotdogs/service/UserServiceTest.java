@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.RoleEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 
@@ -41,7 +41,7 @@ public class UserServiceTest {
 		String password = "password";
 		Set<String> roles = Set.of("ROLE_ADMIN");
 		Assertions.assertDoesNotThrow(() -> {
-			UserEntity user = userService.createNewUser(new NewUserDto(login, password, roles));
+			UserEntity user = userService.createNewUser(new UserDto(login, password, roles));
 			Assertions.assertAll(
 				() -> assertEquals(login, user.getLogin()),
 				() -> assertEquals(roles.stream().map(
@@ -55,7 +55,7 @@ public class UserServiceTest {
 	@MethodSource("generateData")
 	void invalidCreationUserTest(String login, String password, Set<String> roles) {
 		Assertions.assertThrows(ConstraintViolationException.class,
-			() -> userService.createNewUser(new NewUserDto(login, password, roles)));
+			() -> userService.createNewUser(new UserDto(login, password, roles)));
 
 	}
 

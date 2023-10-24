@@ -1,6 +1,5 @@
 package ru.itmo.hotdogs.service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
@@ -71,19 +70,19 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList()));
 	}
 
-	public UserEntity createNewUser(@Valid NewUserDto newUserDto) throws AlreadyExistsException {
-		Set<ConstraintViolation<NewUserDto>> violations = validator.validate(newUserDto);
-		if (!validator.validate(newUserDto).isEmpty()) {
+	public UserEntity createNewUser(@Valid UserDto userDto) throws AlreadyExistsException {
+		Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
+		if (!validator.validate(userDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
 		try{
-			findByLogin(newUserDto.getLogin());
+			findByLogin(userDto.getLogin());
 			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
 		}catch (NotFoundException ex){
 			UserEntity user = new UserEntity();
-			user.setLogin(newUserDto.getLogin());
-			user.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
-			user.setRoles(newUserDto.getRoles().stream().map(roleService::findByName).collect(Collectors.toSet()));
+			user.setLogin(userDto.getLogin());
+			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+			user.setRoles(userDto.getRoles().stream().map(roleService::findByName).collect(Collectors.toSet()));
 			return userRepository.save(user);
 		}
 	}

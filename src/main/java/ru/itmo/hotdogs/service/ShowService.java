@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoRequest;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
@@ -45,10 +45,10 @@ public class ShowService {
 	}
 
 	@Transactional
-	public ShowEntity createShow(OwnerEntity owner, @Valid NewShowDto newShowDto)
+	public ShowEntity createShow(OwnerEntity owner, @Valid ShowDtoRequest newShowDto)
 		throws ConstraintViolationException, NotFoundException {
 
-		Set<ConstraintViolation<NewShowDto>> violations = validator.validate(newShowDto);
+		Set<ConstraintViolation<ShowDtoRequest>> violations = validator.validate(newShowDto);
 		if (!validator.validate(newShowDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}

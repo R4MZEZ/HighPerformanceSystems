@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Range;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewDogDto{
+public class DogDto {
 	@NotBlank
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	String name;

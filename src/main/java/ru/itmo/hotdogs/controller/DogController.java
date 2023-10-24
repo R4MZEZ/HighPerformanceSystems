@@ -25,11 +25,11 @@ import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.ExistingShowDto;
-import ru.itmo.hotdogs.model.dto.NewDogDto;
-import ru.itmo.hotdogs.model.dto.NewDogInterestDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
+import ru.itmo.hotdogs.model.dto.DogDto;
+import ru.itmo.hotdogs.model.dto.DogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
-import ru.itmo.hotdogs.model.dto.UserDogDto;
+import ru.itmo.hotdogs.model.dto.RegistrationDogDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.service.DogService;
@@ -45,10 +45,10 @@ public class DogController {
 
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> registerNewDog(@RequestBody UserDogDto userDogDto) {
+	public ResponseEntity<?> registerNewDog(@RequestBody RegistrationDogDto registrationDogDto) {
 		try {
 			return ResponseEntity.status(HttpStatus.CREATED)
-				.body(dogService.createNewDog(userDogDto.getUserDto(), userDogDto.getDogDto()));
+				.body(dogService.createNewDog(registrationDogDto.getUserInfo(), registrationDogDto.getDogInfo()));
 		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {
@@ -90,7 +90,7 @@ public class DogController {
 
 	@PatchMapping("/add-interest")
 	public ResponseEntity<?> addInterest(Principal principal,
-		@RequestBody NewDogInterestDto interestDto) {
+		@RequestBody DogInterestDto interestDto) {
 		try {
 			DogEntity dog = dogService.findByLogin(principal.getName());
 			dogService.addInterest(dog, interestDto);
@@ -106,7 +106,7 @@ public class DogController {
 	public ResponseEntity<?> appliedShows(Principal principal,
 		@RequestParam(defaultValue = "0") int page) {
 		try {
-			List<ExistingShowDto> result = dogService.findAppliedShows(principal.getName());
+			List<ShowDtoResponse> result = dogService.findAppliedShows(principal.getName());
 			int fromIndex =
 				result.size() > page * ControllerConfig.PAGE_SIZE
 					? page * ControllerConfig.PAGE_SIZE
@@ -134,14 +134,14 @@ public class DogController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<NewDogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
+	public ResponseEntity<List<DogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
 		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE,
 			Sort.by(Sort.Order.asc("id")));
 		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
 
 		return ResponseEntity.ok()
 			.header("X-Total-Count", String.valueOf(entityPage.getTotalElements()))
-			.body(entityPage.getContent().stream().map(dog -> new NewDogDto(
+			.body(entityPage.getContent().stream().map(dog -> new DogDto(
 				dog.getName(),
 				dog.getAge(),
 				dog.getBreed().getName(),

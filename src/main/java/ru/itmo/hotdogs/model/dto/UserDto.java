@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewUserDto {
+public class UserDto {
 	@NotBlank
 	String login;
 
@@ -20,7 +20,7 @@ public class NewUserDto {
 	@NotEmpty
 	Set<String> roles;
 
-	public NewUserDto(String login, String password) {
+	public UserDto(String login, String password) {
 		this.login = login;
 		this.password = password;
 	}

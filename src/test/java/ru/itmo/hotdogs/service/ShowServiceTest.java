@@ -26,10 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
-import ru.itmo.hotdogs.model.dto.NewDogDto;
-import ru.itmo.hotdogs.model.dto.NewOwnerDto;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.DogDto;
+import ru.itmo.hotdogs.model.dto.OwnerDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoRequest;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -60,8 +60,8 @@ public class ShowServiceTest {
 	@BeforeEach
 	void createOrganizer() throws AlreadyExistsException {
 		ownerService.createNewOwner(
-			new NewUserDto("login", "password"),
-			new NewOwnerDto("Elton", "John", 100000f, 1d, 1d, true));
+			new UserDto("login", "password"),
+			new OwnerDto("Elton", "John", 100000f, 1d, 1d, true));
 	}
 	@BeforeAll
 	void fillBreeds() throws AlreadyExistsException {
@@ -83,7 +83,7 @@ public class ShowServiceTest {
 	@Test
 	void createShowTest() throws NotFoundException {
 		var datetime = new Timestamp(new Date().getTime() + 5000);
-		final var newShowDto = new NewShowDto(
+		final var newShowDto = new ShowDtoRequest(
 			datetime,
 			500L,
 			Set.of("husky", "taksa"));
@@ -105,7 +105,7 @@ public class ShowServiceTest {
 	void invalidCreateShowTest(Timestamp datetime, Long prize, Set<String> allowedBreeds)
 		throws NotFoundException {
 		final var ownerEntity = ownerService.findByLogin("login");
-		final var newShowDto = new NewShowDto(datetime, prize, allowedBreeds);
+		final var newShowDto = new ShowDtoRequest(datetime, prize, allowedBreeds);
 
 		Assertions.assertThrows(
 			ConstraintViolationException.class,
@@ -127,15 +127,15 @@ public class ShowServiceTest {
 	@Transactional
 	void addParticipantTest() throws NotFoundException, AlreadyExistsException {
 		var datetime = new Timestamp(new Date().getTime() + 5000);
-		final var newShowDto = new NewShowDto(
+		final var newShowDto = new ShowDtoRequest(
 			datetime,
 			500L,
 			Set.of("husky", "taksa"));
 
 		var show = showService.createShow(ownerService.findByLogin("login"), newShowDto);
 
-		var participantDog = new NewDogDto("sharik",5, "taksa","login",new HashMap<>());
-		var user = new NewUserDto("sharik_login", "password");
+		var participantDog = new DogDto("sharik",5, "taksa","login",new HashMap<>());
+		var user = new UserDto("sharik_login", "password");
 		dogService.createNewDog(user, participantDog);
 
 

@@ -1,12 +1,10 @@
 package ru.itmo.hotdogs.model.dto;
 
 import java.util.Objects;
-import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewOwnerDto{
+public class OwnerDto {
 
 	@NotBlank
 	@Pattern(regexp = "^[a-zA-Z]+$")
@@ -36,7 +34,7 @@ public class NewOwnerDto{
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		NewOwnerDto that = (NewOwnerDto) o;
+		OwnerDto that = (OwnerDto) o;
 		return Objects.equals(name, that.name) && Objects.equals(surname,
 			that.surname) && Objects.equals(balance, that.balance)
 			&& Objects.equals(latitude, that.latitude) && Objects.equals(longitude,

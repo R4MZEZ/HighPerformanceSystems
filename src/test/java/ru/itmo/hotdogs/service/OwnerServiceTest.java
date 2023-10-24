@@ -25,10 +25,10 @@ import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.NotEnoughMoneyException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.NewDogDto;
-import ru.itmo.hotdogs.model.dto.NewOwnerDto;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.DogDto;
+import ru.itmo.hotdogs.model.dto.OwnerDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoRequest;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
@@ -82,11 +82,12 @@ public class OwnerServiceTest {
 	void validCreationTest(String login, String password, String name, String surname,
 		Float balance, Double latitude,
 		Double longitude, Boolean isOrganizer) {
-		NewUserDto newUserDto = new NewUserDto(login, password);
-		NewOwnerDto newOwnerDto = new NewOwnerDto(name, surname, balance, latitude, longitude, isOrganizer);
+		UserDto userDto = new UserDto(login, password);
+		OwnerDto ownerDto = new OwnerDto(name, surname, balance, latitude, longitude, isOrganizer);
 
 		Assertions.assertDoesNotThrow(
-			() -> Assertions.assertEquals(newOwnerDto.getName(), ownerService.createNewOwner(newUserDto, newOwnerDto).getName()));
+			() -> Assertions.assertEquals(
+				ownerDto.getName(), ownerService.createNewOwner(userDto, ownerDto).getName()));
 	}
 
 	@ParameterizedTest
@@ -98,24 +99,25 @@ public class OwnerServiceTest {
 		Float balance, Double latitude,
 		Double longitude, Boolean isOrganizer) {
 
-		NewUserDto newUserDto = new NewUserDto(login, password);
-		NewOwnerDto newOwnerDto = new NewOwnerDto(name, surname, balance, latitude, longitude, isOrganizer);
+		UserDto userDto = new UserDto(login, password);
+		OwnerDto ownerDto = new OwnerDto(name, surname, balance, latitude, longitude, isOrganizer);
 
 		Assertions.assertThrows(ConstraintViolationException.class,
-			() -> ownerService.createNewOwner(newUserDto, newOwnerDto));
+			() -> ownerService.createNewOwner(userDto, ownerDto));
 	}
 
 	@Test
 	void loginAlreadyExistsTest() {
-		NewOwnerDto newOwnerDto = new NewOwnerDto("Elton", "John", 1.5f, 1d, 1d, false);
-		NewUserDto newUserDto = new NewUserDto("login", "password");
+		OwnerDto ownerDto = new OwnerDto("Elton", "John", 1.5f, 1d, 1d, false);
+		UserDto userDto = new UserDto("login", "password");
 
 
 		Assertions.assertDoesNotThrow(
-			() -> Assertions.assertEquals(newOwnerDto.getName(), ownerService.createNewOwner(newUserDto, newOwnerDto).getName()));
+			() -> Assertions.assertEquals(
+				ownerDto.getName(), ownerService.createNewOwner(userDto, ownerDto).getName()));
 
 		Assertions.assertThrows(AlreadyExistsException.class,
-			() -> ownerService.createNewOwner(newUserDto, newOwnerDto));
+			() -> ownerService.createNewOwner(userDto, ownerDto));
 
 	}
 
@@ -123,14 +125,14 @@ public class OwnerServiceTest {
 
 	@Test
 	void findByLoginTest() throws AlreadyExistsException {
-		NewOwnerDto newOwnerDto = new NewOwnerDto("Elton", "John", 500f, 1d, 1d, false);
-		NewUserDto newUserDto = new NewUserDto("login", "password");
+		OwnerDto ownerDto = new OwnerDto("Elton", "John", 500f, 1d, 1d, false);
+		UserDto userDto = new UserDto("login", "password");
 
-		ownerService.createNewOwner(newUserDto, newOwnerDto);
+		ownerService.createNewOwner(userDto, ownerDto);
 
 		Assertions.assertDoesNotThrow(() -> {
 			OwnerEntity createdOwner = ownerService.findByLogin("login");
-			Assertions.assertEquals(newOwnerDto.getName(), createdOwner.getName());
+			Assertions.assertEquals(ownerDto.getName(), createdOwner.getName());
 		});
 
 
@@ -138,12 +140,12 @@ public class OwnerServiceTest {
 
 	@Test
 	void validCreateShowTest() throws NotFoundException, AlreadyExistsException {
-		NewShowDto newShowDto = new NewShowDto(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
+		ShowDtoRequest newShowDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
 			Set.of("husky", "taksa"));
-		NewOwnerDto newOwnerDto = new NewOwnerDto("Elton", "John", 500f, 1d, 1d, false);
-		NewUserDto newUserDto = new NewUserDto("login", "password");
+		OwnerDto ownerDto = new OwnerDto("Elton", "John", 500f, 1d, 1d, false);
+		UserDto userDto = new UserDto("login", "password");
 
-		ownerService.createNewOwner(newUserDto, newOwnerDto);
+		ownerService.createNewOwner(userDto, ownerDto);
 
 		Assertions.assertDoesNotThrow(() -> ownerService.createShow("login", newShowDto));
 
@@ -154,12 +156,12 @@ public class OwnerServiceTest {
 
 	@Test
 	void notEnoughMoneyTest() throws AlreadyExistsException {
-		NewShowDto newShowDto = new NewShowDto(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
+		ShowDtoRequest newShowDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
 			Set.of());
-		NewOwnerDto newOwnerDto = new NewOwnerDto("Elton", "John", 0f, 1d, 1d, false);
-		NewUserDto newUserDto = new NewUserDto("login", "password");
+		OwnerDto ownerDto = new OwnerDto("Elton", "John", 0f, 1d, 1d, false);
+		UserDto userDto = new UserDto("login", "password");
 
-		ownerService.createNewOwner(newUserDto, newOwnerDto);
+		ownerService.createNewOwner(userDto, ownerDto);
 
 		Assertions.assertThrows(NotEnoughMoneyException.class,
 			() -> ownerService.createShow("login", newShowDto));
@@ -168,17 +170,17 @@ public class OwnerServiceTest {
 	@Test
 	void validFinishShowTest()
 		throws AlreadyExistsException, NotEnoughMoneyException, NotFoundException, CheatingException, BreedNotAllowedException, ShowDateException {
-		NewShowDto showDto = new NewShowDto(Timestamp.valueOf("2023-11-01 10:00:00"), 500L, Set.of("husky", "taksa"));
-		NewOwnerDto organizer = new NewOwnerDto("Elton", "John", 500f, 1d, 1d, true);
-		NewUserDto user = new NewUserDto("elton_login", "password");
+		ShowDtoRequest showDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L, Set.of("husky", "taksa"));
+		OwnerDto organizer = new OwnerDto("Elton", "John", 500f, 1d, 1d, true);
+		UserDto user = new UserDto("elton_login", "password");
 
 		ownerService.createNewOwner(user, organizer);
 		ShowEntity show = ownerService.createShow("elton_login", showDto);
 
-		NewOwnerDto participantOwner = new NewOwnerDto("Ben", "John", 500f, 1d, 1d, false);
+		OwnerDto participantOwner = new OwnerDto("Ben", "John", 500f, 1d, 1d, false);
 		user.setLogin("ben_login");
 		ownerService.createNewOwner(user, participantOwner);
-		NewDogDto participantDog = new NewDogDto("sharik",5, "taksa","ben_login",new HashMap<>());
+		DogDto participantDog = new DogDto("sharik",5, "taksa","ben_login",new HashMap<>());
 		user.setLogin("sharik_login");
 		DogEntity participantEntity = dogService.createNewDog(user, participantDog);
 

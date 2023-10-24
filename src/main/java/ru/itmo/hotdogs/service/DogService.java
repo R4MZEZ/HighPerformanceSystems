@@ -23,10 +23,10 @@ import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.ExistingShowDto;
-import ru.itmo.hotdogs.model.dto.NewDogDto;
-import ru.itmo.hotdogs.model.dto.NewDogInterestDto;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
+import ru.itmo.hotdogs.model.dto.DogDto;
+import ru.itmo.hotdogs.model.dto.DogInterestDto;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
@@ -73,9 +73,9 @@ public class DogService {
 		);
 	}
 
-	public List<ExistingShowDto> findAppliedShows(String login) throws NotFoundException {
+	public List<ShowDtoResponse> findAppliedShows(String login) throws NotFoundException {
 		return findByLogin(login).getAppliedShows().stream().map(
-				show -> new ExistingShowDto(show.getDate(), show.getPrize(),
+				show -> new ShowDtoResponse(show.getDate(), show.getPrize(),
 					show.getAllowedBreeds().stream().map(
 						BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName()))
 			.toList();
@@ -104,27 +104,27 @@ public class DogService {
 		return showService.addParticipant(show, dog);
 	}
 
-	public DogEntity createNewDog(@Valid NewUserDto newUserDto, @Valid NewDogDto newDogDto)
+	public DogEntity createNewDog(@Valid UserDto userDto, @Valid DogDto dogDto)
 		throws AlreadyExistsException, NotFoundException, ConstraintViolationException {
 
-		Set<ConstraintViolation<NewDogDto>> violations = validator.validate(newDogDto);
-		if (!validator.validate(newDogDto).isEmpty()) {
+		Set<ConstraintViolation<DogDto>> violations = validator.validate(dogDto);
+		if (!validator.validate(dogDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
 
-		newUserDto.setRoles(Set.of("ROLE_DOG"));
-		UserEntity user = userService.createNewUser(newUserDto);
+		userDto.setRoles(Set.of("ROLE_DOG"));
+		UserEntity user = userService.createNewUser(userDto);
 
 		DogEntity dog = new DogEntity(user,
-			newDogDto.getName(),
-			newDogDto.getAge(),
-			breedService.findByName(newDogDto.getBreed()),
-			ownerService.findByLogin(newDogDto.getOwnerLogin()));
+			dogDto.getName(),
+			dogDto.getAge(),
+			breedService.findByName(dogDto.getBreed()),
+			ownerService.findByLogin(dogDto.getOwnerLogin()));
 
 
 		dogRepository.save(dog);
 //		List<DogsInterestsEntity> interests = new ArrayList<>();
-		for (Map.Entry<String, Integer> interest : newDogDto.getInterests().entrySet()) {
+		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
 			DogsInterestsEntity interestsEntity = new DogsInterestsEntity(dog,
 				interestService.findByName(interest.getKey()),
 				interest.getValue());
@@ -188,10 +188,10 @@ public class DogService {
 	}
 
 
-	public DogEntity addInterest(DogEntity dog, @Valid NewDogInterestDto interestDto)
+	public DogEntity addInterest(DogEntity dog, @Valid DogInterestDto interestDto)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException, ConstraintViolationException {
 
-		Set<ConstraintViolation<NewDogInterestDto>> violations = validator.validate(interestDto);
+		Set<ConstraintViolation<DogInterestDto>> violations = validator.validate(interestDto);
 		if (!validator.validate(interestDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}

@@ -19,9 +19,9 @@ import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotEnoughMoneyException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.NewOwnerDto;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
-import ru.itmo.hotdogs.model.dto.NewUserDto;
+import ru.itmo.hotdogs.model.dto.OwnerDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoRequest;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
@@ -57,17 +57,17 @@ public class OwnerService {
 		ownerRepository.save(owner);
 	}
 
-	public OwnerEntity createNewOwner(@Valid NewUserDto newUserDto, @Valid NewOwnerDto ownerUserDto)
+	public OwnerEntity createNewOwner(@Valid UserDto userDto, @Valid OwnerDto ownerUserDto)
 		throws AlreadyExistsException, ConstraintViolationException {
-		Set<ConstraintViolation<NewOwnerDto>> violations = validator.validate(ownerUserDto);
+		Set<ConstraintViolation<OwnerDto>> violations = validator.validate(ownerUserDto);
 		if (!validator.validate(ownerUserDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
 
 		Set<String> roles = ownerUserDto.getIsOrganizer() ? Set.of("ROLE_OWNER", "ROLE_ORGANIZER")
 			: Set.of("ROLE_OWNER");
-		newUserDto.setRoles(roles);
-		UserEntity user = userService.createNewUser(newUserDto);
+		userDto.setRoles(roles);
+		UserEntity user = userService.createNewUser(userDto);
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 		Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(),
@@ -93,7 +93,7 @@ public class OwnerService {
 	}
 
 	@Transactional
-	public ShowEntity createShow(String login, @Valid NewShowDto newShowDto)
+	public ShowEntity createShow(String login, @Valid ShowDtoRequest newShowDto)
 		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
 		OwnerEntity owner = findByLogin(login);
 

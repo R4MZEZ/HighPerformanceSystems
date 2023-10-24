@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
-import ru.itmo.hotdogs.model.dto.NewShowDto;
-import ru.itmo.hotdogs.model.dto.UserOwnerDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoRequest;
+import ru.itmo.hotdogs.model.dto.RegistrationOwnerDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.service.OwnerService;
@@ -40,9 +40,9 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> registerOwner(@RequestBody UserOwnerDto user) {
+	public ResponseEntity<?> registerOwner(@RequestBody RegistrationOwnerDto registrationOwnerDto) {
 		try{
-			ownerService.createNewOwner(user.getUserDto(), user.getOwnerDto());
+			ownerService.createNewOwner(registrationOwnerDto.getUserInfo(), registrationOwnerDto.getOwnerInfo());
 			return ResponseEntity.status(HttpStatus.CREATED).body("Владелец успешно создан.");
 		} catch (AlreadyExistsException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
@@ -50,7 +50,7 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/shows/create")
-	public ResponseEntity<?> createShow(Principal principal, @RequestBody NewShowDto newShowDto) {
+	public ResponseEntity<?> createShow(Principal principal, @RequestBody ShowDtoRequest newShowDto) {
 		try {
 			ownerService.createShow(principal.getName(), newShowDto);
 			return ResponseEntity.status(HttpStatus.CREATED).body("Выставка успешно создана");
