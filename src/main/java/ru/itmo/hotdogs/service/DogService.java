@@ -212,9 +212,9 @@ public class DogService {
 			interestDto.getLevel());
 
 		dogsInterestsService.save(interest_record);
-		List<DogsInterestsEntity> interests = dog.getInterests();
-		interests.add(interest_record);
-		dog.setInterests(interests);
+//		List<DogsInterestsEntity> interests = dog.getInterests();
+//		interests.add(interest_record);
+//		dog.setInterests(interests);
 		return dogRepository.save(dog);
 	}
 
