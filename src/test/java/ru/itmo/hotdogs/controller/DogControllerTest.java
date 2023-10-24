@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.JwtResponse;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
@@ -67,12 +68,16 @@ public class DogControllerTest {
 
 	@BeforeAll
 	void addAdmin() {
-		userRepository.save(new UserEntity("admin", new BCryptPasswordEncoder().encode("admin"),
-			Set.of(roleService.findByName("ROLE_ADMIN"))));
+		try {
+			userService.findByLogin("admin");
+		} catch (NotFoundException e) {
+			userRepository.save(new UserEntity("admin", new BCryptPasswordEncoder().encode("admin"),
+				Set.of(roleService.findByName("ROLE_ADMIN"))));
+		}
 	}
 
 	@AfterAll
-	void clearData(){
+	void clearData() {
 		dogService.deleteAll();
 		breedService.deleteAll();
 		interestService.deleteAll();
@@ -97,13 +102,17 @@ public class DogControllerTest {
 
 		jsonBody = """
 			{
-			    "userLogin": "katya111",
-			    "password": "passsword",
-			    "name": "Katya",
-			    "balance": 100,
-			    "latitude": 9,
-			    "longitude": 8,
-			    "isOrganizer": false
+				"userInfo":{
+					"login": "katya111",
+					"password": "passsword"
+				},
+				"ownerInfo":{
+					"name": "Katya",
+					"balance": 100,
+					"latitude": 9,
+					"longitude": 8,
+					"isOrganizer": false
+			    }
 			}""";
 		result = this.mockMvc.perform(
 				post("/owners/new")
@@ -127,13 +136,17 @@ public class DogControllerTest {
 
 		jsonBody = """
 			{
-			    "userLogin": "logggin",
-			    "password": "passsword",
-			    "name": "hardik",
-			    "age": 4,
-			    "breed": "taksa",
-			    "ownerLogin": "katya111",
-			    "interests": {}
+				"userInfo":{
+					"login": "logggin",
+					"password": "passsword"
+				},
+				"dogInfo":{
+					"name": "hardik",
+					"age": 4,
+					"breed": "taksa",
+					"ownerLogin": "katya111",
+					"interests": {}
+				}
 			}""";
 		this.mockMvc.perform(
 				post("/dogs/new")
@@ -263,13 +276,17 @@ public class DogControllerTest {
 
 		jsonBody = """
 			{
-			    "userLogin": "toha222",
-			    "password": "password",
-			    "name": "Anton",
-			    "balance": 1000,
-			    "latitude": 2,
-			    "longitude": 2,
-			    "isOrganizer": true
+				"userInfo":{
+					"login": "toha222",
+					"password": "password"
+				},
+				"ownerInfo":{
+					"name": "Anton",
+					"balance": 1000,
+					"latitude": 2,
+					"longitude": 2,
+					"isOrganizer": true
+				}
 			}""";
 		result = this.mockMvc.perform(
 				post("/owners/new")
@@ -281,16 +298,20 @@ public class DogControllerTest {
 
 		jsonBody = """
 			{
-			    "userLogin": "snoop_dog",
-			    "password": "password",
-			    "name": "Snoopy",
-			    "age": 2,
-			    "breed": "taksa",
-			    "ownerLogin": "toha222",
-			    "interests": {
-			    	"hunting": 3,
-			    	"walking": 8
-			    }
+				"userInfo":{
+					"login": "snoop_dog",
+					"password": "password"
+				},
+				"dogInfo":{
+					"name": "Snoopy",
+					"age": 2,
+					"breed": "taksa",
+					"ownerLogin": "toha222",
+					"interests": {
+						"hunting": 3,
+						"walking": 8
+					}
+				}
 			}""";
 		this.mockMvc.perform(
 				post("/dogs/new")
