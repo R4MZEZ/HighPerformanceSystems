@@ -20,7 +20,7 @@ public class AuthController {
 		try {
 			return ResponseEntity.ok(authService.createAuthToken(request));
 		}catch (BadCredentialsException e){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Логин и/или пароль неверные");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Логин или пароль неверные");
 		}
 	}
 
