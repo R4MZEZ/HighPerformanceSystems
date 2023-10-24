@@ -171,9 +171,9 @@ public class DogService {
 		dog.setCurRecommended(null);
 		dogRepository.save(dog);
 
-		DogsInteractionsEntity reverse_interacted = dogsInteractionsRepository.findBySenderAndReceiver(
+		DogsInteractionsEntity reverseInteracted = dogsInteractionsRepository.findBySenderAndReceiver(
 			recommended, dog);
-		if (isLike && reverse_interacted != null && reverse_interacted.getIs_liked()) {
+		if (isLike && reverseInteracted != null && reverseInteracted.getIs_liked()) {
 			Set<DogEntity> dogMatches = dog.getMatches();
 			dogMatches.add(recommended);
 			dog.setMatches(dogMatches);
