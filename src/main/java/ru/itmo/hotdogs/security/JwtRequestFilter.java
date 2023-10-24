@@ -28,13 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		if (authHeader != null && authHeader.startsWith("Bearer ")){
 			jwt = authHeader.substring(7);
-			try {
-				login = jwtTokenUtils.getUsername(jwt);
-			}catch (ExpiredJwtException e){
-				System.out.println("Токен протух");
-			}catch (SignatureException e){
-				System.out.println("Подпись палёная");
-			}
+			login = jwtTokenUtils.getUsername(jwt);
 		}
 
 		if (login != null){
