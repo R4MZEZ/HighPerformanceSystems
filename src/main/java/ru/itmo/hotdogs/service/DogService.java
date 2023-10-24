@@ -2,7 +2,6 @@ package ru.itmo.hotdogs.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,17 +36,15 @@ import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
-import ru.itmo.hotdogs.repository.DogsInteractionsRepository;
-import ru.itmo.hotdogs.repository.DogsInterestsRepository;
 
 @Service
 @RequiredArgsConstructor
 public class DogService {
 
 	private final DogRepository dogRepository;
-	private final DogsInteractionsRepository dogsInteractionsRepository;
+	private final DogsInteractionsService dogsInteractionsService;
+	private final DogsInterestsService dogsInterestsService;
 	private final InterestService interestService;
-	private final DogsInterestsRepository dogsInterestsRepository;
 	private final UserService userService;
 	private final ShowService showService;
 	private final BreedService breedService;
@@ -126,13 +123,13 @@ public class DogService {
 
 
 		dogRepository.save(dog);
-		List<DogsInterestsEntity> interests = new ArrayList<>();
+//		List<DogsInterestsEntity> interests = new ArrayList<>();
 		for (Map.Entry<String, Integer> interest : newDogDto.getInterests().entrySet()) {
 			DogsInterestsEntity interestsEntity = new DogsInterestsEntity(dog,
 				interestService.findByName(interest.getKey()),
 				interest.getValue());
-			interests.add(interestsEntity);
-			dogsInterestsRepository.save(interestsEntity);
+//			interests.add(interestsEntity);
+			dogsInterestsService.save(interestsEntity);
 		}
 
 //		dog.setInterests(interests);
@@ -166,12 +163,12 @@ public class DogService {
 		}
 		DogsInteractionsEntity interactionRecord = new DogsInteractionsEntity(dog, recommended,
 			isLike);
-		dogsInteractionsRepository.save(interactionRecord);
+		dogsInteractionsService.save(interactionRecord);
 
 		dog.setCurRecommended(null);
 		dogRepository.save(dog);
 
-		DogsInteractionsEntity reverseInteracted = dogsInteractionsRepository.findBySenderAndReceiver(
+		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
 			recommended, dog);
 		if (isLike && reverseInteracted != null && reverseInteracted.getIs_liked()) {
 			Set<DogEntity> dogMatches = dog.getMatches();
@@ -214,7 +211,7 @@ public class DogService {
 		DogsInterestsEntity interest_record = new DogsInterestsEntity(dog, interest,
 			interestDto.getLevel());
 
-		dogsInterestsRepository.save(interest_record);
+		dogsInterestsService.save(interest_record);
 		List<DogsInterestsEntity> interests = dog.getInterests();
 		interests.add(interest_record);
 		dog.setInterests(interests);
