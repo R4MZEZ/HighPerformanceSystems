@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,39 +8,36 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "dogs_interactions")
 @Getter
 @Setter
-@Table(name = "dogs_interactions")
+//@Table(name = "dogs_interactions")
 @NoArgsConstructor
-@AllArgsConstructor
 public class DogsInteractionsEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "sender_id")
 	private DogEntity sender;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "receiver_id")
 	private DogEntity receiver;
 
-	@Column(nullable = false)
-	private Boolean is_liked;
+	@Column(name = "is_liked", nullable = false)
+	private Boolean isLiked;
 
-	public DogsInteractionsEntity(DogEntity sender, DogEntity receiver, Boolean is_liked) {
+	public DogsInteractionsEntity(DogEntity sender, DogEntity receiver, Boolean isLiked) {
 		this.sender = sender;
 		this.receiver = receiver;
-		this.is_liked = is_liked;
+		this.isLiked = isLiked;
 	}
 }
 

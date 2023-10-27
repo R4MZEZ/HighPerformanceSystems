@@ -1,7 +1,9 @@
 package ru.itmo.hotdogs.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,8 +11,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -25,10 +29,10 @@ import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "dogs")
 @Builder
 @NoArgsConstructor
-@Table(name = "dogs")
+//@Table(name = "dogs")
 @AllArgsConstructor
 public class DogEntity {
 
@@ -61,7 +65,7 @@ public class DogEntity {
 	@JoinColumn(name = "cur_recommended")
 	private DogEntity curRecommended;
 
-	@ManyToMany
+	@OneToMany(cascade = CascadeType.MERGE)
 	@JoinTable(
 		name = "dogs_interests",
 		joinColumns = @JoinColumn(name = "dog_id"),
@@ -69,7 +73,7 @@ public class DogEntity {
 	)
 	private List<DogsInterestsEntity> interests;
 
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(
 		name = "dogs_matches",
 		joinColumns = @JoinColumn(name = "dog1_id"),
@@ -77,13 +81,14 @@ public class DogEntity {
 	)
 	private Set<DogEntity> matches;
 
-	@ManyToMany
-	@JoinTable(
-		name = "dogs_interactions",
-		joinColumns = @JoinColumn(name = "sender_id"),
-		inverseJoinColumns = @JoinColumn(name = "receiver_id")
-	)
-	private Set<DogsInteractionsEntity> interactions;
+	@OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//	@JoinTable(
+//		name = "dogs_interactions",
+//		joinColumns = @JoinColumn(name = "sender_id"),
+//		inverseJoinColumns = @JoinColumn(name = "receiver_id")
+//	)
+
+	private List<DogsInteractionsEntity> interactions;
 
 	@ManyToMany
 	@JoinTable(

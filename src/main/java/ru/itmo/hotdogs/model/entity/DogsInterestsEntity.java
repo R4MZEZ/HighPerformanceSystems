@@ -1,6 +1,6 @@
 package ru.itmo.hotdogs.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,17 +25,16 @@ public class DogsInterestsEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "dog_id")
-//	@JsonIgnore
 	private DogEntity dog;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "interest_id")
 	private InterestEntity interest;
 
 	@Range(min=1, max=10)
-	@Column
+	@Column(nullable = false)
 	private Integer level;
 
 	public DogsInterestsEntity(DogEntity dog, InterestEntity interest, Integer level) {

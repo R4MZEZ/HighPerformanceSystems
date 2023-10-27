@@ -200,23 +200,21 @@ public class DogService {
 
 		InterestEntity interest = interestService.findByName(interestDto.getInterestName());
 
-
-		if (dog.getInterests() != null) {
-			if (dog.getInterests().stream()
-				.anyMatch((x) -> x.getInterest().getId().equals(interest.getId()))) {
-				throw new AlreadyExistsException(
-					"У данной собаки уже существует такой интерес.");
-			}
-		}else
+		if (dog.getInterests() == null) {
 			dog.setInterests(new ArrayList<>());
+		}
+
+		if (dog.getInterests().stream()
+			.anyMatch((x) -> x.getInterest().getId().equals(interest.getId()))) {
+			throw new AlreadyExistsException(
+				"У данной собаки уже существует такой интерес.");
+		}
 
 		DogsInterestsEntity interest_record = new DogsInterestsEntity(dog, interest,
 			interestDto.getLevel());
 
+		dog.getInterests().add(interest_record);
 		dogsInterestsService.save(interest_record);
-//		List<DogsInterestsEntity> interests = dog.getInterests();
-//		interests.add(interest_record);
-//		dog.setInterests(interests);
 		return dogRepository.save(dog);
 	}
 
