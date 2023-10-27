@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -23,11 +24,11 @@ import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
-import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
+import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
@@ -121,7 +122,6 @@ public class DogService {
 			breedService.findByName(dogDto.getBreed()),
 			ownerService.findByLogin(dogDto.getOwnerLogin()));
 
-
 		dogRepository.save(dog);
 //		List<DogsInterestsEntity> interests = new ArrayList<>();
 		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
@@ -154,37 +154,39 @@ public class DogService {
 	/**
 	 * @return возвращает экземпляр RecommendedDogDto, если был достигнут мэтч, иначе - null
 	 */
-	public RecommendedDogDto rateRecommended(DogEntity dog, boolean isLike)
+	public Optional<RecommendedDogDto> rateRecommended(DogEntity dog, Boolean isLike)
 		throws NullRecommendationException {
 
 		DogEntity recommended = dog.getCurRecommended();
+		RecommendedDogDto matched = null;
+
 		if (recommended == null) {
 			throw new NullRecommendationException();
 		}
-		DogsInteractionsEntity interactionRecord = new DogsInteractionsEntity(dog, recommended,
-			isLike);
-		dogsInteractionsService.save(interactionRecord);
+		if (dog.getInteractions() == null) {
+			dog.setInteractions(new ArrayList<>());
+		}
 
+		DogsInteractionsEntity interaction = new DogsInteractionsEntity(dog, recommended, isLike);
+		dog.getInteractions().add(dogsInteractionsService.save(interaction));
+//		dogsInteractionsService.save(interaction);
 		dog.setCurRecommended(null);
-		dogRepository.save(dog);
+
 
 		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
 			recommended, dog);
-		if (isLike && reverseInteracted != null && reverseInteracted.getIs_liked()) {
-			Set<DogEntity> dogMatches = dog.getMatches();
-			dogMatches.add(recommended);
-			dog.setMatches(dogMatches);
-			dogRepository.save(dog);
-
-			return dogRepository.findDistance(
+		if (isLike && reverseInteracted != null && reverseInteracted.getIsLiked()) {
+			dog.getMatches().add(recommended);
+			matched = dogRepository.findDistance(
 				recommended.getId(),
 				recommended.getOwner().getLocation().getX(),
 				recommended.getOwner().getLocation().getY(),
 				dog.getOwner().getLocation().getX(),
 				dog.getOwner().getLocation().getY());
-		} else {
-			return null;
 		}
+
+		dogRepository.save(dog);
+		return Optional.ofNullable(matched);
 	}
 
 

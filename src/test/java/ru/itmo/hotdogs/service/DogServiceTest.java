@@ -4,6 +4,7 @@ package ru.itmo.hotdogs.service;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterAll;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
+import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
 import ru.itmo.hotdogs.model.dto.OwnerDto;
@@ -28,6 +30,7 @@ import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -89,11 +92,11 @@ public class DogServiceTest {
 		var interest = new DogInterestDto(interestName, interestLevel);
 
 		Assertions.assertDoesNotThrow(() -> {
-			dogService.addInterest(dog, interest);
-			Assertions.assertEquals(1, dog.getInterests().size());
+			DogEntity updated = dogService.addInterest(dog, interest);
+			Assertions.assertEquals(1, updated.getInterests().size());
 			Assertions.assertEquals(interestName,
-				dog.getInterests().get(0).getInterest().getName());
-			Assertions.assertEquals(interestLevel, dog.getInterests().get(0).getLevel());
+				updated.getInterests().get(0).getInterest().getName());
+			Assertions.assertEquals(interestLevel, updated.getInterests().get(0).getLevel());
 		});
 	}
 
@@ -202,67 +205,67 @@ public class DogServiceTest {
 	}
 
 
-//	@Test
-//	void rateRecommendedTest() throws AlreadyExistsException, NotFoundException {
-//		ownerService.createNewOwner(
-//			new NewUserDto("elton_login", "password"),
-//			new NewOwnerDto("Elton", "John", 100000f, 30.308057, 59.957478, false));
-//		var eltonDog = new NewDogDto("eltonik", 5, "taksa", "elton_login", new HashMap<>());
-//		var user = new NewUserDto("eltonik_login", "password");
-//		var eltonikEntity = dogService.createNewDog(user, eltonDog);
-//
-//		ownerService.createNewOwner(
-//			new NewUserDto("bob_login", "password"),
-//			new NewOwnerDto("Bob", "Marley", 0f, 30.319051, 59.956323, false));
-//		var bobDog = new NewDogDto("bobik", 5, "taksa", "bob_login", new HashMap<>());
-//		var user1 = new NewUserDto("bobik_login", "password");
-//		var bobikEntity = dogService.createNewDog(user1, bobDog);
-//
-//		dogService.findNearest(eltonikEntity);
-//		Assertions.assertDoesNotThrow(() -> {
-////			Assertions.assertNull(dogService.rateRecommended(eltonikEntity, true));
-//			DogEntity updated = dogService.rateRecommended(eltonikEntity, true);
-//			Assertions.assertEquals(1, updated.getInteractions().size());
-//			DogsInteractionsEntity interaction = updated.getInteractions().stream().toList().get(0);
-//			Assertions.assertEquals(updated, interaction.getSender());
-//			Assertions.assertEquals(bobikEntity, interaction.getReceiver());
-//			Assertions.assertTrue(interaction.getIs_liked());
-//		});
-//
-//
-//	}
+	@Test
+	void rateRecommendedTest() throws AlreadyExistsException, NotFoundException {
+		ownerService.createNewOwner(
+			new UserDto("elton_login", "password"),
+			new OwnerDto("Elton", "John", 100000f, 30.308057, 59.957478, false));
+		var eltonDog = new DogDto("eltonik", 5, "taksa", "elton_login", new HashMap<>());
+		var user = new UserDto("eltonik_login", "password");
+		var eltonikEntity = dogService.createNewDog(user, eltonDog);
 
-//	@Test
-//	void matchTest() throws AlreadyExistsException, NotFoundException, NullRecommendationException {
-//		ownerService.createNewOwner(
-//			new NewUserDto("elton_login", "password"),
-//			new NewOwnerDto("Elton", "John", 100000f, 30.308057, 59.957478, false));
-//		var eltonDog = new NewDogDto("eltonik", 5, "taksa", "elton_login", new HashMap<>());
-//		var user = new NewUserDto("eltonik_login", "password");
-//		var eltonikEntity = dogService.createNewDog(user, eltonDog);
-//
-//		ownerService.createNewOwner(
-//			new NewUserDto("bob_login", "password"),
-//			new NewOwnerDto("Bob", "Marley", 0f, 30.319051, 59.956323, false));
-//		var bobDog = new NewDogDto("bobik", 5, "taksa", "bob_login", new HashMap<>());
-//		var user1 = new NewUserDto("bobik_login", "password");
-//		var bobikEntity = dogService.createNewDog(user1, bobDog);
-//
-//		dogService.findNearest(eltonikEntity);
-//		dogService.rateRecommended(eltonikEntity, true);
-//
-//		dogService.findNearest(bobikEntity);
-//
-//		Assertions.assertDoesNotThrow(() -> {
-//			RecommendedDogDto matched = dogService.rateRecommended(bobikEntity, true);
-//			Assertions.assertEquals(eltonikEntity.getName(), matched.getName());
-//			Assertions.assertEquals(eltonikEntity.getAge(), matched.getAge());
-//			Assertions.assertTrue(Math.abs(625 - matched.getDistance()) < 10);
-//			Assertions.assertEquals(1, eltonikEntity.getMatches().size());
-//			DogEntity inverse_match = eltonikEntity.getMatches().stream().toList().get(0);
-//			Assertions.assertEquals(bobikEntity, inverse_match);
-//		});
-//
-//
-//	}
+		ownerService.createNewOwner(
+			new UserDto("bob_login", "password"),
+			new OwnerDto("Bob", "Marley", 0f, 30.319051, 59.956323, false));
+		var bobDog = new DogDto("bobik", 5, "taksa", "bob_login", new HashMap<>());
+		var user1 = new UserDto("bobik_login", "password");
+		var bobikEntity = dogService.createNewDog(user1, bobDog);
+
+		dogService.findNearest(eltonikEntity);
+		Assertions.assertDoesNotThrow(() -> {
+			Assertions.assertTrue(dogService.rateRecommended(eltonikEntity, true).isEmpty());
+			Assertions.assertEquals(1, eltonikEntity.getInteractions().size());
+			DogsInteractionsEntity interaction = eltonikEntity.getInteractions().stream().toList().get(0);
+			Assertions.assertEquals(eltonikEntity, interaction.getSender());
+			Assertions.assertEquals(bobikEntity, interaction.getReceiver());
+			Assertions.assertTrue(interaction.getIsLiked());
+		});
+
+
+	}
+
+	@Test
+	void matchTest() throws AlreadyExistsException, NotFoundException, NullRecommendationException {
+		ownerService.createNewOwner(
+			new UserDto("elton_login", "password"),
+			new OwnerDto("Elton", "John", 100000f, 30.308057, 59.957478, false));
+		var eltonDog = new DogDto("eltonik", 5, "taksa", "elton_login", new HashMap<>());
+		var user = new UserDto("eltonik_login", "password");
+		var eltonikEntity = dogService.createNewDog(user, eltonDog);
+
+		ownerService.createNewOwner(
+			new UserDto("bob_login", "password"),
+			new OwnerDto("Bob", "Marley", 0f, 30.319051, 59.956323, false));
+		var bobDog = new DogDto("bobik", 5, "taksa", "bob_login", new HashMap<>());
+		var user1 = new UserDto("bobik_login", "password");
+		var bobikEntity = dogService.createNewDog(user1, bobDog);
+
+		dogService.findNearest(eltonikEntity);
+		dogService.rateRecommended(eltonikEntity, true);
+
+		dogService.findNearest(bobikEntity);
+
+		Assertions.assertDoesNotThrow(() -> {
+			Optional<RecommendedDogDto> matched = dogService.rateRecommended(bobikEntity, true);
+			Assertions.assertTrue(matched.isPresent());
+			Assertions.assertEquals(eltonikEntity.getName(), matched.get().getName());
+			Assertions.assertEquals(eltonikEntity.getAge(), matched.get().getAge());
+			Assertions.assertTrue(Math.abs(625 - matched.get().getDistance()) < 10);
+			Assertions.assertEquals(1, eltonikEntity.getMatches().size());
+			DogEntity inverse_match = eltonikEntity.getMatches().stream().toList().get(0);
+			Assertions.assertEquals(bobikEntity, inverse_match);
+		});
+
+
+	}
 }

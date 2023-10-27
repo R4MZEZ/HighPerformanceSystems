@@ -2,6 +2,7 @@ package ru.itmo.hotdogs.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -61,13 +62,13 @@ public class DogController {
 		@RequestParam(defaultValue = "true") boolean is_like) {
 		try {
 			DogEntity dog = dogService.findByLogin(principal.getName());
-			RecommendedDogDto matchedDog = dogService.rateRecommended(dog, is_like);
-			if (matchedDog != null) {
+			Optional<RecommendedDogDto> matchedDog = dogService.rateRecommended(dog, is_like);
+			if (matchedDog.isPresent()) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
-						matchedDog.getName(),
-						matchedDog.getAge(),
-						matchedDog.getDistance() / 1000), HttpStatus.FOUND);
+						matchedDog.get().getName(),
+						matchedDog.get().getAge(),
+						matchedDog.get().getDistance() / 1000), HttpStatus.FOUND);
 			} else {
 				return ResponseEntity.ok(getNewRecommendation(principal));
 			}
