@@ -44,7 +44,3 @@ dependencies {
 	implementation 'org.locationtech.jts:jts-core:1.15.0'
 	implementation 'org.hibernate:hibernate-spatial:6.2.4.Final'
 }
-
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}

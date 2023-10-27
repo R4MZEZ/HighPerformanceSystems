@@ -14,7 +14,6 @@ services:
     depends_on:
       - postgresql_database
     environment:
-      TZ: Europe/Moscow
       POSTGRES_URL: jdbc:postgresql://postgresql_database:5432/postgres
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
