@@ -261,9 +261,9 @@ public class DogServiceTest {
 			Assertions.assertEquals(eltonikEntity.getName(), matched.get().getName());
 			Assertions.assertEquals(eltonikEntity.getAge(), matched.get().getAge());
 			Assertions.assertTrue(Math.abs(625 - matched.get().getDistance()) < 10);
-			Assertions.assertEquals(1, eltonikEntity.getMatches().size());
-			DogEntity inverse_match = eltonikEntity.getMatches().stream().toList().get(0);
-			Assertions.assertEquals(bobikEntity, inverse_match);
+			Assertions.assertEquals(1, bobikEntity.getMatches().size());
+			DogEntity inverse_match = bobikEntity.getMatches().stream().toList().get(0);
+			Assertions.assertEquals(eltonikEntity, inverse_match);
 		});
 
 
