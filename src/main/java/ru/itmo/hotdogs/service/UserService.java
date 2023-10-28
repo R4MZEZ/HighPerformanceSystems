@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -49,6 +50,8 @@ public class UserService implements UserDetailsService {
 	public void deleteAll(){
 		userRepository.deleteAll();
 	}
+
+	public Optional<UserEntity> deleteByLogin(String login){ return userRepository.deleteByLogin(login); }
 
 
 	public UserEntity findByLogin(String login) throws NotFoundException{

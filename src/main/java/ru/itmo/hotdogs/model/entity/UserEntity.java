@@ -38,6 +38,7 @@ public class UserEntity {
 	)
 	private Set<RoleEntity> roles;
 
+
 	public UserEntity(String login, String password, Set<RoleEntity> roles) {
 		this.login = login;
 		this.password = password;

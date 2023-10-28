@@ -2,6 +2,7 @@ package ru.itmo.hotdogs.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -176,6 +177,9 @@ public class DogService {
 		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
 			recommended, dog);
 		if (isLike && reverseInteracted != null && reverseInteracted.getIsLiked()) {
+			if (dog.getMatches() == null){
+				dog.setMatches(new HashSet<>());
+			}
 			dog.getMatches().add(recommended);
 			matched = dogRepository.findDistance(
 				recommended.getId(),
@@ -221,5 +225,19 @@ public class DogService {
 
 	public void deleteAll() {
 		dogRepository.deleteAll();
+	}
+
+	public void deleteRecommendationsViaBreed(BreedEntity breed){
+		List<DogEntity> dogs = dogRepository.findByBreed(breed);
+		for (DogEntity dog : dogs){
+			deleteFromRecommendations(dog);
+		}
+	}
+	public void deleteFromRecommendations(DogEntity recommendeddog){
+		List<DogEntity> dogs = dogRepository.findByCurRecommended(recommendeddog);
+		for (DogEntity dog : dogs){
+			dog.setCurRecommended(null);
+			dogRepository.save(dog);
+		}
 	}
 }

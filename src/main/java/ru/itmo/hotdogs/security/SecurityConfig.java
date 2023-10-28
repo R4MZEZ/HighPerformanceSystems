@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -69,6 +70,7 @@ public class SecurityConfig {
 				.requestMatchers("/breeds/new").hasRole("ADMIN")
 				.requestMatchers("/interests/new").hasRole("ADMIN")
 				.requestMatchers("/dogs").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
 				.anyRequest().permitAll())
 			.sessionManagement(
 				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

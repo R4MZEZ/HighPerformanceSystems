@@ -1,11 +1,13 @@
 package ru.itmo.hotdogs.service;
 
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,12 @@ public class BreedService {
 
 	private final BreedRepository breedRepository;
 	private final Validator validator;
+	private DogService dogService;
+
+	@Autowired
+	public void setDogService(DogService dogService) {
+		this.dogService = dogService;
+	}
 
 	public Page<BreedEntity> findAll(Pageable pageable) {
 		return breedRepository.findAll(pageable);
@@ -47,5 +55,11 @@ public class BreedService {
 
 	public void deleteAll() {
 		breedRepository.deleteAll();
+	}
+
+	public Optional<BreedEntity> deleteByName(String name) {
+		Optional<BreedEntity> breedOptional = breedRepository.findByName(name);
+		breedOptional.ifPresent(dogService::deleteRecommendationsViaBreed);
+		return breedRepository.deleteByName(name);
 	}
 }

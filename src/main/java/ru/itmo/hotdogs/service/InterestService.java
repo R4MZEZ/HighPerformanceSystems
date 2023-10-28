@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -25,6 +26,8 @@ public class InterestService {
 	}
 
 	public void deleteAll() { interestRepository.deleteAll(); }
+
+	public Optional<InterestEntity> deleteByName(String name){ return interestRepository.deleteByName(name); }
 
 	public InterestEntity save(@Valid InterestEntity interest) throws ConstraintViolationException{
 		Set<ConstraintViolation<InterestEntity>> violations = validator.validate(interest);

@@ -12,4 +12,8 @@ public interface BreedRepository extends JpaRepository<BreedEntity, Integer> {
 	Optional<BreedEntity> findByName(String name);
 
 	Page<BreedEntity> findAll(Pageable pageable);
+
+	Optional<BreedEntity> deleteByName(String name);
+
+
 }

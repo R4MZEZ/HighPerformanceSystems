@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class OwnerEntity {
 	@Column(nullable = false)
 	private Long id;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
@@ -55,7 +56,7 @@ public class OwnerEntity {
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "organizer")
 	private List<ShowEntity> shows;
 

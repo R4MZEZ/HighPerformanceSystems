@@ -9,4 +9,6 @@ import ru.itmo.hotdogs.model.entity.InterestEntity;
 public interface InterestRepository extends JpaRepository<InterestEntity, Integer> {
 	Optional<InterestEntity> findByName(String name);
 
+	Optional<InterestEntity> deleteByName(String name);
+
 }

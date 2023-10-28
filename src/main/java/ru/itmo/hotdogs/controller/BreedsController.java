@@ -1,12 +1,15 @@
 package ru.itmo.hotdogs.controller;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +28,16 @@ import ru.itmo.hotdogs.utils.ControllerConfig;
 public class BreedsController {
 
 	private final BreedService breedService;
+
+	@Transactional
+	@DeleteMapping
+	public ResponseEntity<?> deleteBreed(@RequestParam String name){
+		Optional<BreedEntity> result = breedService.deleteByName(name);
+		if (result.isPresent())
+			return ResponseEntity.ok("Порода успешно удалена");
+		else
+			return ResponseEntity.badRequest().body("Порода не найдена");
+	}
 
 	@GetMapping
 	public ResponseEntity<List<BreedEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
