@@ -13,8 +13,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -32,7 +30,6 @@ import org.hibernate.validator.constraints.Range;
 @Entity(name = "dogs")
 @Builder
 @NoArgsConstructor
-//@Table(name = "dogs")
 @AllArgsConstructor
 public class DogEntity {
 

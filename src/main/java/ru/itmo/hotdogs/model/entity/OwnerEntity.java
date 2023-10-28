@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.constraints.Min;
@@ -22,8 +21,7 @@ import org.locationtech.jts.geom.Point;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "owners")
+@Entity(name = "owners")
 @NoArgsConstructor
 public class OwnerEntity {
 

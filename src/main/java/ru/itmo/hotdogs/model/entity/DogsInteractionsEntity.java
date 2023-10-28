@@ -15,7 +15,6 @@ import lombok.Setter;
 @Entity(name = "dogs_interactions")
 @Getter
 @Setter
-//@Table(name = "dogs_interactions")
 @NoArgsConstructor
 public class DogsInteractionsEntity {
 

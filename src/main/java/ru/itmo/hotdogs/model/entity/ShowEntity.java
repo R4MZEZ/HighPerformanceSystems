@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,10 +18,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "shows")
 @Getter
 @Setter
-@Table(name = "shows")
 @NoArgsConstructor
 public class ShowEntity {
 
