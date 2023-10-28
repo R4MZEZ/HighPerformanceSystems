@@ -56,7 +56,7 @@ public class OwnerEntity {
 	private Point location;
 
 	@OneToMany
-	@JoinColumn(name = "organizer", nullable = true)
+	@JoinColumn(name = "organizer")
 	private List<ShowEntity> shows;
 
 	public OwnerEntity(UserEntity user, String name, String surname, Float balance,

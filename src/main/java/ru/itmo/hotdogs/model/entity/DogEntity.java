@@ -62,12 +62,7 @@ public class DogEntity {
 	@JoinColumn(name = "cur_recommended")
 	private DogEntity curRecommended;
 
-	@OneToMany(cascade = CascadeType.MERGE)
-	@JoinTable(
-		name = "dogs_interests",
-		joinColumns = @JoinColumn(name = "dog_id"),
-		inverseJoinColumns = @JoinColumn(name = "interest_id")
-	)
+	@OneToMany(mappedBy = "dog", cascade = CascadeType.ALL)
 	private List<DogsInterestsEntity> interests;
 
 	@ManyToMany(cascade = CascadeType.MERGE)
@@ -79,12 +74,6 @@ public class DogEntity {
 	private Set<DogEntity> matches;
 
 	@OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//	@JoinTable(
-//		name = "dogs_interactions",
-//		joinColumns = @JoinColumn(name = "sender_id"),
-//		inverseJoinColumns = @JoinColumn(name = "receiver_id")
-//	)
-
 	private List<DogsInteractionsEntity> interactions;
 
 	@ManyToMany
