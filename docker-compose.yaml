@@ -17,6 +17,9 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgresql_database:5432/postgres
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_LIFETIME: ${JWT_LIFETIME}
+
 
   postgresql_database:
     image: postgis/postgis:15-3.4
