@@ -48,8 +48,8 @@ public class DogController {
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> registerNewDog(@RequestBody RegistrationDogDto registrationDogDto) {
 		try {
-			return ResponseEntity.status(HttpStatus.CREATED)
-				.body(dogService.createNewDog(registrationDogDto.getUserInfo(), registrationDogDto.getDogInfo()));
+			dogService.createNewDog(registrationDogDto.getUserInfo(), registrationDogDto.getDogInfo());
+			return ResponseEntity.status(HttpStatus.CREATED).body("Собака успешно создана");
 		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {

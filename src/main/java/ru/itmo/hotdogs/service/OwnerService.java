@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -34,11 +35,17 @@ public class OwnerService {
 
 
 	private final OwnerRepository ownerRepository;
-	private final ShowService showService;
-	private final UserService userService;
 	private final Validator validator;
+	private ShowService showService;
 	private DogService dogService;
+	private UserService userService;
 
+	@Autowired
+	public void setShowService(ShowService showService) {
+		this.showService = showService;
+	}
+	@Autowired
+	public void setUserService(UserService userService) {this.userService = userService;}
 	@Autowired
 	public void setDogService(DogService dogService) {
 		this.dogService = dogService;
@@ -85,17 +92,20 @@ public class OwnerService {
 		return ownerRepository.findAll(pageable);
 	}
 
-	public OwnerEntity findByLogin(String login) throws NotFoundException {
-		UserEntity user = userService.findByLogin(login);
-		return ownerRepository.findByUser(user).orElseThrow(
-			() -> new NotFoundException("Владельца с таким логином не существует")
-		);
+	public Optional<OwnerEntity> findByLogin(String login){
+		try {
+			UserEntity user = userService.findByLogin(login);
+			return ownerRepository.findByUser(user);
+		} catch (NotFoundException e) {
+			return Optional.empty();
+		}
+
 	}
 
 	@Transactional
 	public ShowEntity createShow(String login, @Valid ShowDtoRequest newShowDto)
 		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
-		OwnerEntity owner = findByLogin(login);
+		OwnerEntity owner = findByLogin(login).orElseThrow(() -> new NotFoundException("Владельца с таким логином не существует"));
 
 		if (owner.getBalance() < newShowDto.getPrize()) {
 			throw new NotEnoughMoneyException();
@@ -112,7 +122,8 @@ public class OwnerService {
 	@Transactional
 	public DogEntity finishShow(String login, long showId, long winnerId)
 		throws NotFoundException, AccessDeniedException, ShowDateException {
-		OwnerEntity organizer = findByLogin(login);
+		OwnerEntity organizer = findByLogin(login).orElseThrow(() -> new NotFoundException("Владельца с таким логином не существует"));
+
 		ShowEntity show = showService.findById(showId);
 
 		if (!show.getOrganizer().getId().equals(organizer.getId())) {

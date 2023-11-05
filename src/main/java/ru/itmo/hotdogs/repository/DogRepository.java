@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.repository;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,8 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
-import ru.itmo.hotdogs.model.entity.ShowEntity;
+import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 
 @Repository
@@ -27,4 +29,10 @@ public interface DogRepository extends JpaRepository<DogEntity, Long> {
 	Optional<DogEntity> findByUser(UserEntity userEntity);
 
 	Page<DogEntity> findAll(Pageable pageable);
+
+	List<DogEntity> findByBreed(BreedEntity breed);
+
+	List<DogEntity> findByOwner(OwnerEntity owner);
+
+	List<DogEntity> findByCurRecommended(DogEntity dog);
 }

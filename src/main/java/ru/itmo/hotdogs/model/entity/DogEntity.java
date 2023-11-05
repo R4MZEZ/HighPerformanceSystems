@@ -37,7 +37,7 @@ public class DogEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
@@ -50,7 +50,7 @@ public class DogEntity {
 	@Range(min = 0, max = 30)
 	private Integer age;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "breed", nullable = false)
 	private BreedEntity breed;
 

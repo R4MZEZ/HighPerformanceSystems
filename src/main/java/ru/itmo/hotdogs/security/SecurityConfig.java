@@ -70,7 +70,7 @@ public class SecurityConfig {
 				.requestMatchers("/breeds/new").hasRole("ADMIN")
 				.requestMatchers("/interests/new").hasRole("ADMIN")
 				.requestMatchers("/dogs").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
+				.requestMatchers("/users").hasRole("ADMIN")
 				.anyRequest().permitAll())
 			.sessionManagement(
 				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

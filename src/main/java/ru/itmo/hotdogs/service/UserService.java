@@ -20,20 +20,30 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.UserDto;
+import ru.itmo.hotdogs.model.entity.DogEntity;
+import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-	private UserRepository userRepository;
+
+	private OwnerService ownerService;
+	private DogService dogService;
+	private final UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private RoleService roleService;
 	private final Validator validator;
 
 	@Autowired
-	public void setUserRepository(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	public void setOwnerService(OwnerService ownerService) {
+		this.ownerService = ownerService;
+	}
+
+	@Autowired
+	public void setDogService(DogService dogService) {
+		this.dogService = dogService;
 	}
 
 	@Autowired
@@ -51,7 +61,13 @@ public class UserService implements UserDetailsService {
 		userRepository.deleteAll();
 	}
 
-	public Optional<UserEntity> deleteByLogin(String login){ return userRepository.deleteByLogin(login); }
+	public Optional<UserEntity> deleteByLogin(String login){
+		Optional<OwnerEntity> ownerOptional = ownerService.findByLogin(login);
+		Optional<DogEntity> dogOptional = dogService.findOptionalByLogin(login);
+		ownerOptional.ifPresent(dogService::deleteRecommendationsViaOwner);
+		dogOptional.ifPresent(dogService::deleteFromRecommendations);
+		return userRepository.deleteByLogin(login);
+	}
 
 
 	public UserEntity findByLogin(String login) throws NotFoundException{

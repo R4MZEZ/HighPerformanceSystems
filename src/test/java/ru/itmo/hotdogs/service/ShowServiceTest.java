@@ -88,7 +88,7 @@ public class ShowServiceTest {
 			500L,
 			Set.of("husky", "taksa"));
 
-		final var ownerEntity = ownerService.findByLogin("login");
+		final var ownerEntity = ownerService.findByLogin("login").get();
 
 		Assertions.assertDoesNotThrow(() -> {
 			var show = showService.createShow(ownerEntity, newShowDto);
@@ -102,9 +102,8 @@ public class ShowServiceTest {
 
 	@ParameterizedTest
 	@MethodSource("generateData")
-	void invalidCreateShowTest(Timestamp datetime, Long prize, Set<String> allowedBreeds)
-		throws NotFoundException {
-		final var ownerEntity = ownerService.findByLogin("login");
+	void invalidCreateShowTest(Timestamp datetime, Long prize, Set<String> allowedBreeds) {
+		final var ownerEntity = ownerService.findByLogin("login").get();
 		final var newShowDto = new ShowDtoRequest(datetime, prize, allowedBreeds);
 
 		Assertions.assertThrows(
@@ -132,7 +131,7 @@ public class ShowServiceTest {
 			500L,
 			Set.of("husky", "taksa"));
 
-		var show = showService.createShow(ownerService.findByLogin("login"), newShowDto);
+		var show = showService.createShow(ownerService.findByLogin("login").get(), newShowDto);
 
 		var participantDog = new DogDto("sharik",5, "taksa","login",new HashMap<>());
 		var user = new UserDto("sharik_login", "password");

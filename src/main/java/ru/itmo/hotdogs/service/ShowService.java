@@ -7,6 +7,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
@@ -23,7 +24,12 @@ public class ShowService {
 
 	private final ShowRepository showRepository;
 	private final Validator validator;
-	private final BreedService breedService;
+	private BreedService breedService;
+
+	@Autowired
+	public void setBreedService(BreedService breedService) {
+		this.breedService = breedService;
+	}
 
 	public ShowEntity save(ShowEntity show) {
 		return showRepository.save(show);

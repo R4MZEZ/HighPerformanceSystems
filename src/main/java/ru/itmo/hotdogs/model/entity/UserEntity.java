@@ -1,5 +1,6 @@
 package ru.itmo.hotdogs.model.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,11 @@ public class UserEntity {
 	)
 	private Set<RoleEntity> roles;
 
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private DogEntity dog;
+
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private OwnerEntity owner;
 
 	public UserEntity(String login, String password, Set<RoleEntity> roles) {
 		this.login = login;

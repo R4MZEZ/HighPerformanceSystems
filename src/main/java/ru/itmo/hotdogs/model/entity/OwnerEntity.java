@@ -31,7 +31,7 @@ public class OwnerEntity {
 	@Column(nullable = false)
 	private Long id;
 
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity user;
 
@@ -56,9 +56,12 @@ public class OwnerEntity {
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "organizer")
+	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
+//	@JoinColumn(name = "organizer")
 	private List<ShowEntity> shows;
+
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	private List<DogEntity> dogs;
 
 	public OwnerEntity(UserEntity user, String name, String surname, Float balance,
 		Point location) {

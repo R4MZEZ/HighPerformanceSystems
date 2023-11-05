@@ -35,6 +35,7 @@ import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
+import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
@@ -47,12 +48,13 @@ public class DogService {
 	private final DogsInteractionsService dogsInteractionsService;
 	private final DogsInterestsService dogsInterestsService;
 	private final InterestService interestService;
-	private final UserService userService;
 	private final ShowService showService;
 	private final BreedService breedService;
 	private final Validator validator;
 	private OwnerService ownerService;
-
+	private UserService userService;
+	@Autowired
+	public void setUserService(UserService userService) {this.userService = userService;}
 	@Autowired
 	public void setOwnerService(OwnerService ownerService) {
 		this.ownerService = ownerService;
@@ -67,6 +69,15 @@ public class DogService {
 		return dogRepository.findByUser(user).orElseThrow(
 			() -> new NotFoundException("Собаки с таким логином не существует")
 		);
+	}
+
+	public Optional<DogEntity> findOptionalByLogin(String login) {
+		try {
+			UserEntity user = userService.findByLogin(login);
+			return dogRepository.findByUser(user);
+		} catch (NotFoundException e) {
+			return Optional.empty();
+		}
 	}
 
 	public DogEntity findById(long id) throws NotFoundException {
@@ -121,7 +132,8 @@ public class DogService {
 			dogDto.getName(),
 			dogDto.getAge(),
 			breedService.findByName(dogDto.getBreed()),
-			ownerService.findByLogin(dogDto.getOwnerLogin()));
+			ownerService.findByLogin(dogDto.getOwnerLogin()).orElseThrow(
+				() -> new NotFoundException("Владельца с таким логином не существует")));
 
 		dogRepository.save(dog);
 //		List<DogsInterestsEntity> interests = new ArrayList<>();
@@ -173,11 +185,10 @@ public class DogService {
 //		dogsInteractionsService.save(interaction);
 		dog.setCurRecommended(null);
 
-
 		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
 			recommended, dog);
 		if (isLike && reverseInteracted != null && reverseInteracted.getIsLiked()) {
-			if (dog.getMatches() == null){
+			if (dog.getMatches() == null) {
 				dog.setMatches(new HashSet<>());
 			}
 			dog.getMatches().add(recommended);
@@ -227,15 +238,23 @@ public class DogService {
 		dogRepository.deleteAll();
 	}
 
-	public void deleteRecommendationsViaBreed(BreedEntity breed){
+	public void deleteRecommendationsViaBreed(BreedEntity breed) {
 		List<DogEntity> dogs = dogRepository.findByBreed(breed);
-		for (DogEntity dog : dogs){
+		for (DogEntity dog : dogs) {
 			deleteFromRecommendations(dog);
 		}
 	}
-	public void deleteFromRecommendations(DogEntity recommendeddog){
+
+	public void deleteRecommendationsViaOwner(OwnerEntity owner) {
+		List<DogEntity> dogs = dogRepository.findByOwner(owner);
+		for (DogEntity dog : dogs) {
+			deleteFromRecommendations(dog);
+		}
+	}
+
+	public void deleteFromRecommendations(DogEntity recommendeddog) {
 		List<DogEntity> dogs = dogRepository.findByCurRecommended(recommendeddog);
-		for (DogEntity dog : dogs){
+		for (DogEntity dog : dogs) {
 			dog.setCurRecommended(null);
 			dogRepository.save(dog);
 		}

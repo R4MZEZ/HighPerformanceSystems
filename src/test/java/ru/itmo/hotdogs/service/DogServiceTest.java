@@ -144,11 +144,11 @@ public class DogServiceTest {
 			new UserDto("elton_login", "password"),
 			new OwnerDto("Elton", "John", 100000f, 1d, 1d, true));
 
-		var datetime = Timestamp.valueOf("2023-11-01 10:00:00");
+		var datetime = Timestamp.valueOf("2024-11-01 10:00:00");
 		var newShowDto = new ShowDtoRequest(datetime, 500L, Set.of("husky", "taksa"));
 
 		var organizerEntity = ownerService.findByLogin("elton_login");
-		var show = showService.createShow(organizerEntity, newShowDto);
+		var show = showService.createShow(organizerEntity.get(), newShowDto);
 
 		ownerService.createNewOwner(
 			new UserDto("bob_login", "password"),

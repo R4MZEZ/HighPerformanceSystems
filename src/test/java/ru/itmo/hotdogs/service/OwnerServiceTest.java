@@ -131,7 +131,7 @@ public class OwnerServiceTest {
 		ownerService.createNewOwner(userDto, ownerDto);
 
 		Assertions.assertDoesNotThrow(() -> {
-			OwnerEntity createdOwner = ownerService.findByLogin("login");
+			OwnerEntity createdOwner = ownerService.findByLogin("login").get();
 			Assertions.assertEquals(ownerDto.getName(), createdOwner.getName());
 		});
 
@@ -140,7 +140,7 @@ public class OwnerServiceTest {
 
 	@Test
 	void validCreateShowTest() throws NotFoundException, AlreadyExistsException {
-		ShowDtoRequest newShowDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
+		ShowDtoRequest newShowDto = new ShowDtoRequest(Timestamp.valueOf("2024-11-01 10:00:00"), 500L,
 			Set.of("husky", "taksa"));
 		OwnerDto ownerDto = new OwnerDto("Elton", "John", 500f, 1d, 1d, false);
 		UserDto userDto = new UserDto("login", "password");
@@ -149,7 +149,7 @@ public class OwnerServiceTest {
 
 		Assertions.assertDoesNotThrow(() -> ownerService.createShow("login", newShowDto));
 
-		OwnerEntity owner = ownerService.findByLogin("login");
+		OwnerEntity owner = ownerService.findByLogin("login").get();
 		Assertions.assertEquals(0, owner.getBalance());
 		Assertions.assertEquals(500f, owner.getReservedBalance());
 	}
@@ -170,7 +170,7 @@ public class OwnerServiceTest {
 	@Test
 	void validFinishShowTest()
 		throws AlreadyExistsException, NotEnoughMoneyException, NotFoundException, CheatingException, BreedNotAllowedException, ShowDateException {
-		ShowDtoRequest showDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L, Set.of("husky", "taksa"));
+		ShowDtoRequest showDto = new ShowDtoRequest(Timestamp.valueOf("2024-11-01 10:00:00"), 500L, Set.of("husky", "taksa"));
 		OwnerDto organizer = new OwnerDto("Elton", "John", 500f, 1d, 1d, true);
 		UserDto user = new UserDto("elton_login", "password");
 
