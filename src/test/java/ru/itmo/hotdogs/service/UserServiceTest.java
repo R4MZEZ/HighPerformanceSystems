@@ -23,7 +23,6 @@ import ru.itmo.hotdogs.model.entity.UserEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-@ActiveProfiles("test")
 public class UserServiceTest {
 
 	@Autowired

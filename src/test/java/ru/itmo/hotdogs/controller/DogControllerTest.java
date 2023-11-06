@@ -36,10 +36,8 @@ import ru.itmo.hotdogs.service.OwnerService;
 import ru.itmo.hotdogs.service.RoleService;
 import ru.itmo.hotdogs.service.UserService;
 
-//@WebMvcTest(DogController.class)
 @SpringBootTest
 @Testcontainers
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)

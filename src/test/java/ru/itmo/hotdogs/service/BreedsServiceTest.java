@@ -20,7 +20,6 @@ import ru.itmo.hotdogs.model.entity.BreedEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-@ActiveProfiles("test")
 class BreedsServiceTest {
 
 	@Autowired

@@ -34,7 +34,6 @@ import ru.itmo.hotdogs.model.entity.BreedEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-@ActiveProfiles("test")
 @TestInstance(Lifecycle.PER_CLASS)
 public class ShowServiceTest {
 

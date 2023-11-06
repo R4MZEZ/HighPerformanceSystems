@@ -14,7 +14,6 @@ import ru.itmo.hotdogs.model.entity.RoleEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-@ActiveProfiles("test")
 public class RoleServiceTest {
 
 	@Autowired

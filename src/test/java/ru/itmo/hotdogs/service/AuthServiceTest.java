@@ -20,7 +20,6 @@ import ru.itmo.hotdogs.security.JwtTokenUtils;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-//@ActiveProfiles("test")
 public class AuthServiceTest {
 
 	@Autowired

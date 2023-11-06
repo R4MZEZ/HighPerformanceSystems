@@ -18,7 +18,6 @@ import ru.itmo.hotdogs.model.entity.InterestEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
-@ActiveProfiles("test")
 class InterestServiceTest {
 
 	@Autowired
