@@ -2,6 +2,7 @@ package ru.itmo.hotdogs.controller;
 
 import java.security.Principal;
 import java.util.List;
+import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +45,7 @@ public class OwnerController {
 		try{
 			ownerService.createNewOwner(registrationOwnerDto.getUserInfo(), registrationOwnerDto.getOwnerInfo());
 			return ResponseEntity.status(HttpStatus.CREATED).body("Владелец успешно создан.");
-		} catch (AlreadyExistsException e) {
+		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}

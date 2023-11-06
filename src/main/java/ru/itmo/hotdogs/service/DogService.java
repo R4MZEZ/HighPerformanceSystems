@@ -118,34 +118,35 @@ public class DogService {
 	}
 
 	public DogEntity createNewDog(@Valid UserDto userDto, @Valid DogDto dogDto)
-		throws AlreadyExistsException, NotFoundException, ConstraintViolationException {
+		throws AlreadyExistsException, NotFoundException, ConstraintViolationException, IllegalArgumentException {
 
 		Set<ConstraintViolation<DogDto>> violations = validator.validate(dogDto);
-		if (!validator.validate(dogDto).isEmpty()) {
+		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(violations);
+		}
+		BreedEntity breed = breedService.findByName(dogDto.getBreed());
+		OwnerEntity owner = ownerService.findByLogin(dogDto.getOwnerLogin()).orElseThrow(
+			() -> new NotFoundException("Владельца с таким логином не существует"));
+
+		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
+				interestService.findByName(interest.getKey());
 		}
 
 		userDto.setRoles(Set.of("ROLE_DOG"));
 		UserEntity user = userService.createNewUser(userDto);
 
-		DogEntity dog = new DogEntity(user,
-			dogDto.getName(),
-			dogDto.getAge(),
-			breedService.findByName(dogDto.getBreed()),
-			ownerService.findByLogin(dogDto.getOwnerLogin()).orElseThrow(
-				() -> new NotFoundException("Владельца с таким логином не существует")));
+		DogEntity dog = new DogEntity(user, dogDto.getName(), dogDto.getAge(), breed, owner);
+
 
 		dogRepository.save(dog);
-//		List<DogsInterestsEntity> interests = new ArrayList<>();
+
 		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
 			DogsInterestsEntity interestsEntity = new DogsInterestsEntity(dog,
 				interestService.findByName(interest.getKey()),
 				interest.getValue());
-//			interests.add(interestsEntity);
 			dogsInterestsService.save(interestsEntity);
 		}
 
-//		dog.setInterests(interests);
 		return dogRepository.save(dog);
 	}
 

@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.model.dto;
 import java.util.Objects;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +21,14 @@ public class OwnerDto {
 	String name;
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	String surname;
+	@NotNull
 	@Min(0)
 	Float balance;
+	@NotNull
 	Double latitude;
+	@NotNull
 	Double longitude;
+	@NotNull
 	Boolean isOrganizer;
 
 	@Override

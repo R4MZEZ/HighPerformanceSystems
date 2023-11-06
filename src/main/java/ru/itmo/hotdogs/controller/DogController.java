@@ -54,6 +54,8 @@ public class DogController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (IllegalArgumentException e){
+			return ResponseEntity.badRequest().body("Некорректный формат описания объекта");
 		}
 	}
 
