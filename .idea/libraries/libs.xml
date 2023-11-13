@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/hotdogs-service/build/libs/hotdogs-0.0.1-plain.jar!/" />
+      <root url="jar://$PROJECT_DIR$/hotdogs-service/build/libs/hotdogs-0.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

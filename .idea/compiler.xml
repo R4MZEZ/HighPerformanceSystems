@@ -7,9 +7,19 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="hotdogs.main" />
+        <module name="hotdogs-client.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="1.6">
+      <module name="demo" target="17" />
+      <module name="demo.main" target="17" />
+      <module name="demo.test" target="17" />
+      <module name="hotdogs-service" target="17" />
+      <module name="hotdogs-service.main" target="17" />
+      <module name="hotdogs-service.test" target="17" />
+      <module name="ru.itmo.hotdogs" target="17" />
+      <module name="ru.itmo.hotdogs.main" target="17" />
+      <module name="ru.itmo.hotdogs.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

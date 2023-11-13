@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs.test.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotdogs-client/src/main/main.iml" filepath="$PROJECT_DIR$/hotdogs-client/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hotdogs-client/src/test/test.iml" filepath="$PROJECT_DIR$/hotdogs-client/src/test/test.iml" />
     </modules>
   </component>
 </project>
