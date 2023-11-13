@@ -61,10 +61,10 @@ public class DogController {
 
 	@PostMapping(path = "/rate")
 	public ResponseEntity<?> likeRecommended(Principal principal,
-		@RequestParam(defaultValue = "true") boolean is_like) {
+		@RequestParam(defaultValue = "true") boolean isLike) {
 		try {
 			DogEntity dog = dogService.findByLogin(principal.getName());
-			Optional<RecommendedDogDto> matchedDog = dogService.rateRecommended(dog, is_like);
+			Optional<RecommendedDogDto> matchedDog = dogService.rateRecommended(dog, isLike);
 			if (matchedDog.isPresent()) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
