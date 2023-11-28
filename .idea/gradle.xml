@@ -7,6 +7,11 @@
         <compositeConfiguration>
           <compositeBuild compositeDefinitionSource="SCRIPT">
             <builds>
+              <build path="$PROJECT_DIR$/api-gateway" name="api-gateway">
+                <projects>
+                  <project path="$PROJECT_DIR$/api-gateway" />
+                </projects>
+              </build>
               <build path="$PROJECT_DIR$/eureka-server" name="eureka-server">
                 <projects>
                   <project path="$PROJECT_DIR$/eureka-server" />
@@ -15,6 +20,11 @@
               <build path="$PROJECT_DIR$/hotdogs-client" name="hotdogs-client">
                 <projects>
                   <project path="$PROJECT_DIR$/hotdogs-client" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/user-service" name="user-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/user-service" />
                 </projects>
               </build>
             </builds>
@@ -26,17 +36,19 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/api-gateway" />
             <option value="$PROJECT_DIR$/eureka-server" />
             <option value="$PROJECT_DIR$/hotdogs-client" />
+            <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/demo" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/api-gateway" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/demo" />
+            <option value="$PROJECT_DIR$/api-gateway" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -55,6 +67,15 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/hotdogs-client" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/user-service" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>

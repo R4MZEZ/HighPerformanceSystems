@@ -2,3 +2,5 @@ rootProject.name = 'hotdogs'
 
 includeBuild 'hotdogs-client'
 includeBuild 'eureka-server'
+includeBuild 'user-service'
+includeBuild 'api-gateway'

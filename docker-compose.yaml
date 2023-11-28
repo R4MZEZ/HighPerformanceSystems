@@ -30,7 +30,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_LIFETIME: ${JWT_LIFETIME}
-      EUREKA_URL: http://eureka-server:8761/eureka
+      EUREKA_URL: ${EUREKA_URL}
 
   postgresql_database:
     image: postgis/postgis:15-3.4

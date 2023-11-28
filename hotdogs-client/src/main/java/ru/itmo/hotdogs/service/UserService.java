@@ -9,11 +9,11 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//import org.springframework.security.core.authority.SimpleGrantedAuthority;
+//import org.springframework.security.core.userdetails.User;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +27,13 @@ import ru.itmo.hotdogs.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+//public class UserService implements UserDetailsService {
+public class UserService{
 
 	private OwnerService ownerService;
 	private DogService dogService;
 	private final UserRepository userRepository;
-	private PasswordEncoder passwordEncoder;
+//	private PasswordEncoder passwordEncoder;
 	private RoleService roleService;
 	private final Validator validator;
 
@@ -46,11 +47,11 @@ public class UserService implements UserDetailsService {
 		this.dogService = dogService;
 	}
 
-	@Autowired
-	public void setPasswordEncoder(
-		PasswordEncoder passwordEncoder) {
-		this.passwordEncoder = passwordEncoder;
-	}
+//	@Autowired
+//	public void setPasswordEncoder(
+//		PasswordEncoder passwordEncoder) {
+//		this.passwordEncoder = passwordEncoder;
+//	}
 
 	@Autowired
 	public void setRoleService(RoleService roleService) {
@@ -77,17 +78,17 @@ public class UserService implements UserDetailsService {
 	}
 
 
-	@Override
-	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserEntity user = userRepository.findByLogin(username).orElseThrow(
-			() -> new UsernameNotFoundException(
-				String.format("Пользователь с логином '%s' не существует.", username)));
-
-		return new User(user.getLogin(), user.getPassword(),
-			user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
-				.collect(Collectors.toList()));
-	}
+//	@Override
+//	@Transactional
+//	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//		UserEntity user = userRepository.findByLogin(username).orElseThrow(
+//			() -> new UsernameNotFoundException(
+//				String.format("Пользователь с логином '%s' не существует.", username)));
+//
+//		return new User(user.getLogin(), user.getPassword(),
+//			user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
+//				.collect(Collectors.toList()));
+//	}
 
 	public UserEntity createNewUser(@Valid UserDto userDto) throws AlreadyExistsException {
 		Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
@@ -100,7 +101,7 @@ public class UserService implements UserDetailsService {
 		}catch (NotFoundException ex){
 			UserEntity user = new UserEntity();
 			user.setLogin(userDto.getLogin());
-			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+//			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 			user.setRoles(userDto.getRoles().stream().map(roleService::findByName).collect(Collectors.toSet()));
 			return userRepository.save(user);
 		}

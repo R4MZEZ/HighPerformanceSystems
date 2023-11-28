@@ -11,6 +11,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
+      <module name="auth-service.main" target="17" />
+      <module name="auth-service.test" target="17" />
       <module name="demo" target="17" />
       <module name="demo.main" target="17" />
       <module name="demo.test" target="17" />
