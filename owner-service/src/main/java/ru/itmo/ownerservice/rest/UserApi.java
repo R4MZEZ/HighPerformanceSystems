@@ -12,7 +12,9 @@ import ru.itmo.ownerservice.feign.FeignConfig;
 import ru.itmo.ownerservice.model.dto.UserDto;
 import ru.itmo.ownerservice.model.entity.UserEntity;
 
-   public interface UserApi {
+@FeignClient(name = "user", url = "localhost:8081/users", configuration = FeignConfig.class)
+public interface UserApi {
+
 	@PostMapping(path = "/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	UserEntity createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
 
