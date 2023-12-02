@@ -1,6 +1,5 @@
 package ru.itmo.hotdogs.controller;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,23 +27,26 @@ import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
-import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.dto.RegistrationDogDto;
+import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.service.DogService;
 import ru.itmo.hotdogs.utils.ControllerConfig;
 import ru.itmo.hotdogs.utils.DtoConverter;
+import ru.itmo.hotdogs.utils.JwtUtils;
 
 @RequiredArgsConstructor
-@RequestMapping(path = "/dogs")
+@RequestMapping
 @RestController
 public class DogController {
 
 	private final DogService dogService;
+	private final JwtUtils jwtUtils;
+
 
 	@GetMapping("/test")
 	public String test(){
@@ -64,10 +68,10 @@ public class DogController {
 	}
 
 	@PostMapping(path = "/rate")
-	public ResponseEntity<?> likeRecommended(Principal principal,
+	public ResponseEntity<?> likeRecommended(ServerHttpRequest request,
 		@RequestParam(defaultValue = "true") boolean isLike) {
 		try {
-			DogEntity dog = dogService.findByLogin(principal.getName());
+			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			Optional<RecommendedDogDto> matchedDog = dogService.rateRecommended(dog, isLike);
 			if (matchedDog.isPresent()) {
 				return new ResponseEntity<>(
@@ -76,7 +80,7 @@ public class DogController {
 						matchedDog.get().getAge(),
 						matchedDog.get().getDistance() / 1000), HttpStatus.FOUND);
 			} else {
-				return ResponseEntity.ok(getNewRecommendation(principal));
+				return ResponseEntity.ok(getNewRecommendation(request));
 			}
 		} catch (NullRecommendationException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -86,9 +90,9 @@ public class DogController {
 	}
 
 	@GetMapping("/recommend")
-	public ResponseEntity<?> getNewRecommendation(Principal principal) {
+	public ResponseEntity<?> getNewRecommendation(ServerHttpRequest request) {
 		try {
-			DogEntity dog = dogService.findByLogin(principal.getName());
+			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			return ResponseEntity.ok(dogService.findNearest(dog));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -96,10 +100,10 @@ public class DogController {
 	}
 
 	@PatchMapping("/add-interest")
-	public ResponseEntity<?> addInterest(Principal principal,
+	public ResponseEntity<?> addInterest(ServerHttpRequest request,
 		@RequestBody DogInterestDto interestDto) {
 		try {
-			DogEntity dog = dogService.findByLogin(principal.getName());
+			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			dogService.addInterest(dog, interestDto);
 			return ResponseEntity.ok("Интерес успешно добавлен собаке.");
 		} catch (AlreadyExistsException | IllegalLevelException | ConstraintViolationException e) {
@@ -110,10 +114,11 @@ public class DogController {
 	}
 
 	@GetMapping("/shows")
-	public ResponseEntity<?> appliedShows(Principal principal,
+	public ResponseEntity<?> appliedShows(ServerHttpRequest request,
 		@RequestParam(defaultValue = "0") int page) {
 		try {
-			List<ShowDtoResponse> result = dogService.findAppliedShows(principal.getName());
+			List<ShowDtoResponse> result = dogService.findAppliedShows(
+				jwtUtils.getUsernameFromRequest(request));
 			int fromIndex =
 				result.size() > page * ControllerConfig.PAGE_SIZE
 					? page * ControllerConfig.PAGE_SIZE
@@ -126,9 +131,9 @@ public class DogController {
 	}
 
 	@PostMapping("/shows/{showId}/apply")
-	public ResponseEntity<?> applyToShow(Principal principal, @PathVariable Long showId) {
+	public ResponseEntity<?> applyToShow(ServerHttpRequest request, @PathVariable Long showId) {
 		try {
-			DogEntity dog = dogService.findByLogin(principal.getName());
+			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			dogService.applyToShow(dog, showId);
 			return ResponseEntity.ok("Вы стали участником выставки!");
 		} catch (CheatingException | AlreadyExistsException | ShowDateException e) {
@@ -158,14 +163,20 @@ public class DogController {
 					DogsInterestsEntity::getLevel)))).toList());
 	}
 
+	@Transactional
 	@GetMapping("/me")
-	public ResponseEntity<?> getInfo(Principal principal) {
+	public ResponseEntity<?> getInfo(ServerHttpRequest request) {
 		try {
-			DogEntity dog = dogService.findByLogin(principal.getName());
+			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			return ResponseEntity.ok(DtoConverter.dogEntityToDto(dog));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
+	}
+
+	@GetMapping("/find/{id}")
+	public DogEntity findById(@PathVariable Long id) throws NotFoundException {
+		return dogService.findById(id);
 	}
 
 }

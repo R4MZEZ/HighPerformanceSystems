@@ -14,11 +14,11 @@ import ru.itmo.userservice.service.AuthService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("login")
+@RequestMapping(path = "/auth")
 public class AuthController {
 	private final AuthService authService;
-	@PostMapping("/auth")
-	public ResponseEntity<?> authorize(@RequestBody JwtRequest request){
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody JwtRequest request){
 		try {
 			return ResponseEntity.ok(authService.createAuthToken(request));
 		}catch (BadCredentialsException e){

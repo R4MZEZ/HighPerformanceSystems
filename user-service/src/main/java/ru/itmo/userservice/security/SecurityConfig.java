@@ -29,6 +29,21 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http
+			.authorizeHttpRequests(authorize -> authorize
+				.anyRequest().permitAll())
+			.sessionManagement(
+				session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.exceptionHandling(
+				exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(
+					HttpStatus.UNAUTHORIZED)))
+			.csrf(AbstractHttpConfigurer::disable)
+			.cors(AbstractHttpConfigurer::disable);
+
+		return http.build();
+	}
+	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}

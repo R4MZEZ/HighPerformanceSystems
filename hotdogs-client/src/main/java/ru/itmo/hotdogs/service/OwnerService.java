@@ -28,6 +28,7 @@ import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.OwnerRepository;
+import ru.itmo.hotdogs.rest.UserApi;
 
 @Service
 @RequiredArgsConstructor
@@ -36,16 +37,14 @@ public class OwnerService {
 
 	private final OwnerRepository ownerRepository;
 	private final Validator validator;
+	private final UserApi userApi;
 	private ShowService showService;
 	private DogService dogService;
-	private UserService userService;
 
 	@Autowired
 	public void setShowService(ShowService showService) {
 		this.showService = showService;
 	}
-	@Autowired
-	public void setUserService(UserService userService) {this.userService = userService;}
 	@Autowired
 	public void setDogService(DogService dogService) {
 		this.dogService = dogService;
@@ -74,7 +73,7 @@ public class OwnerService {
 		Set<String> roles = ownerUserDto.getIsOrganizer() ? Set.of("ROLE_OWNER", "ROLE_ORGANIZER")
 			: Set.of("ROLE_OWNER");
 		userDto.setRoles(roles);
-		UserEntity user = userService.createNewUser(userDto);
+		UserEntity user = userApi.createNewUser(userDto);
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 		Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(),
@@ -94,7 +93,7 @@ public class OwnerService {
 
 	public Optional<OwnerEntity> findByLogin(String login){
 		try {
-			UserEntity user = userService.findByLogin(login);
+			UserEntity user = userApi.findByLogin(login);
 			return ownerRepository.findByUser(user);
 		} catch (NotFoundException e) {
 			return Optional.empty();

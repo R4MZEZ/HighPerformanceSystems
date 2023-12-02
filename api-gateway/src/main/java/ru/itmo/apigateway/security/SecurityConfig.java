@@ -36,6 +36,7 @@ public class SecurityConfig {
 	public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
 		http
 			.authorizeExchange(exchange -> exchange
+
 				.pathMatchers("/owners/shows/**").hasRole("ORGANIZER")
 				.pathMatchers("/owners/new").hasRole("ADMIN")
 				.pathMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
@@ -43,11 +44,9 @@ public class SecurityConfig {
 				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.pathMatchers("/dogs/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/test").hasRole("ADMIN")
-				.pathMatchers("/breeds/new").hasRole("ADMIN")
-				.pathMatchers("/interests/new").hasRole("ADMIN")
+				.pathMatchers("/dogs/breeds/new").hasRole("ADMIN")
+				.pathMatchers("/dogs/interests/new").hasRole("ADMIN")
 				.pathMatchers("/dogs").hasRole("ADMIN")
-				.pathMatchers("/login/auth").permitAll()
-				.pathMatchers("/users").hasRole("ADMIN")
 				.anyExchange().permitAll())
 			.exceptionHandling(
 				exception -> exception

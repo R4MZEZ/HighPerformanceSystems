@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
+import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.service.BreedService;
 import ru.itmo.hotdogs.utils.ControllerConfig;
@@ -60,4 +61,8 @@ public class BreedsController {
 
 	}
 
+	@GetMapping("find/{name}")
+	public BreedEntity findByName(@RequestParam String name) throws NotFoundException {
+		return breedService.findByName(name);
+	}
 }

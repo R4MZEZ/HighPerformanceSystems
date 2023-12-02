@@ -39,6 +39,7 @@ import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
+import ru.itmo.hotdogs.rest.UserApi;
 
 @Service
 @RequiredArgsConstructor
@@ -52,9 +53,8 @@ public class DogService {
 	private final BreedService breedService;
 	private final Validator validator;
 	private OwnerService ownerService;
-	private UserService userService;
-	@Autowired
-	public void setUserService(UserService userService) {this.userService = userService;}
+	private final UserApi userApi;
+
 	@Autowired
 	public void setOwnerService(OwnerService ownerService) {
 		this.ownerService = ownerService;
@@ -64,8 +64,9 @@ public class DogService {
 		return dogRepository.findAll(pageable);
 	}
 
+
 	public DogEntity findByLogin(String login) throws NotFoundException {
-		UserEntity user = userService.findByLogin(login);
+		UserEntity user = userApi.findByLogin(login);
 		return dogRepository.findByUser(user).orElseThrow(
 			() -> new NotFoundException("Собаки с таким логином не существует")
 		);
@@ -73,8 +74,9 @@ public class DogService {
 
 	public Optional<DogEntity> findOptionalByLogin(String login) {
 		try {
-			UserEntity user = userService.findByLogin(login);
-			return dogRepository.findByUser(user);
+		UserEntity user = userApi.findByLogin(login);
+		return dogRepository.findByUser(user);
+
 		} catch (NotFoundException e) {
 			return Optional.empty();
 		}
@@ -129,14 +131,13 @@ public class DogService {
 			() -> new NotFoundException("Владельца с таким логином не существует"));
 
 		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
-				interestService.findByName(interest.getKey());
+			interestService.findByName(interest.getKey());
 		}
 
 		userDto.setRoles(Set.of("ROLE_DOG"));
-		UserEntity user = userService.createNewUser(userDto);
+		UserEntity user = userApi.createNewUser(userDto);
 
 		DogEntity dog = new DogEntity(user, dogDto.getName(), dogDto.getAge(), breed, owner);
-
 
 		dogRepository.save(dog);
 

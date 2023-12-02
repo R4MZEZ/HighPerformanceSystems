@@ -75,7 +75,7 @@ public class UserService implements UserDetailsService {
 				.collect(Collectors.toList()));
 	}
 
-	public UserEntity createNewUser(@Valid UserDto userDto) throws AlreadyExistsException {
+	public UserEntity createNewUser(@Valid UserDto userDto) throws AlreadyExistsException, ConstraintViolationException {
 		Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
 		if (!validator.validate(userDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);

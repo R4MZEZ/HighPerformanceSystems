@@ -18,6 +18,13 @@ public class GatewayConfig {
 
 			.route("user-service", r -> r.path("/users/**")
 				.uri("lb://euser"))
+
+			.route("auth-service", r -> r.path("/auth/login")
+				.uri("lb://euser"))
+
+			.route("owner-service", r -> r.path("/owners/**")
+				.uri("lb://eowner"))
+
 			.build();
 	}
 }
