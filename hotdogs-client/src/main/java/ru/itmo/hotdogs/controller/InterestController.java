@@ -18,7 +18,7 @@ import ru.itmo.hotdogs.service.InterestService;
 
 
 @RequiredArgsConstructor
-@RequestMapping(path = "/interests")
+@RequestMapping(path = "/dogs/interests")
 @RestController
 public class InterestController {
 
@@ -31,7 +31,7 @@ public class InterestController {
 
 	@PostMapping("/new")
 	public ResponseEntity<?> addInterest(@RequestBody InterestEntity interest) {
-		interestService.save(interest);
+		interestService.createInterest(interest);
 		return ResponseEntity.status(HttpStatus.CREATED).body("Интерес успешно создан");
 	}
 

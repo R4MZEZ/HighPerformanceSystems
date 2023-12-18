@@ -20,27 +20,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
 import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
+import ru.itmo.hotdogs.exceptions.ServiceUnavalibleException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
+import ru.itmo.hotdogs.model.dto.RecommendedDog;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.dto.RegistrationDogDto;
+import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
+import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
+import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.service.DogService;
 import ru.itmo.hotdogs.utils.ControllerConfig;
 import ru.itmo.hotdogs.utils.DtoConverter;
 import ru.itmo.hotdogs.utils.JwtUtils;
 
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/dogs")
 @RestController
 public class DogController {
 
@@ -64,6 +70,8 @@ public class DogController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (IllegalArgumentException e){
 			return ResponseEntity.badRequest().body("Некорректный формат описания объекта");
+		} catch (ServiceUnavalibleException | IllegalStateException e){
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
 		}
 	}
 
@@ -72,7 +80,7 @@ public class DogController {
 		@RequestParam(defaultValue = "true") boolean isLike) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
-			Optional<RecommendedDogDto> matchedDog = dogService.rateRecommended(dog, isLike);
+			Optional<RecommendedDog> matchedDog = dogService.rateRecommended(dog, isLike);
 			if (matchedDog.isPresent()) {
 				return new ResponseEntity<>(
 					"It's a match! With \n%s, %d\n%.1f km away.".formatted(
@@ -134,14 +142,14 @@ public class DogController {
 	public ResponseEntity<?> applyToShow(ServerHttpRequest request, @PathVariable Long showId) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
-			dogService.applyToShow(dog, showId);
+			ResponseDto<?> response = dogService.applyToShow(dog, showId);
+			if (response.code() != HttpStatus.OK)
+				return ResponseEntity.status(response.code()).body(response.error().getMessage());
 			return ResponseEntity.ok("Вы стали участником выставки!");
-		} catch (CheatingException | AlreadyExistsException | ShowDateException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		} catch (ServiceUnavalibleException | IllegalStateException e){
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
 		} catch (NotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		} catch (BreedNotAllowedException e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		}
 	}
 
@@ -173,10 +181,21 @@ public class DogController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
+//	@Transactional
+//	@GetMapping("/me")
+//	public Mono<ResponseEntity<DogDto>> getInfo(ServerHttpRequest request) throws NotFoundException {
+//		return dogService.findByLoginReactive(jwtUtils.getUsernameFromRequest(request))
+//			.map(dogEntity -> ResponseEntity.ok().body(DtoConverter.dogEntityToDto(dogEntity)))
+//			.defaultIfEmpty(ResponseEntity.notFound().build());
+//	}
 
 	@GetMapping("/find/{id}")
-	public DogEntity findById(@PathVariable Long id) throws NotFoundException {
-		return dogService.findById(id);
+	public ResponseDto<DogEntity> findById(@PathVariable Long id) {
+		try {
+			return new ResponseDto<>(dogService.findById(id), null, HttpStatus.OK);
+		} catch (NotFoundException e){
+			return new ResponseDto<>(null, e, HttpStatus.NOT_FOUND);
+		}
 	}
 
 }
