@@ -37,15 +37,20 @@ public class SecurityConfig {
 		http
 			.authorizeExchange(exchange -> exchange
 
+				.pathMatchers("/dogs/breeds/find/**").permitAll()
+				.pathMatchers("/dogs/find/**").permitAll()
+				.pathMatchers("/owners/shows/*/addParticipant").permitAll()
+				.pathMatchers("/owners/find/**").permitAll()
+
 				.pathMatchers("/owners/shows/**").hasRole("ORGANIZER")
 				.pathMatchers("/owners/new").hasRole("ADMIN")
 				.pathMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
 				.pathMatchers("/owners").hasRole("ADMIN")
-				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.pathMatchers("/dogs/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/test").hasRole("ADMIN")
 				.pathMatchers("/dogs/breeds/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/interests/new").hasRole("ADMIN")
+				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.pathMatchers("/dogs").hasRole("ADMIN")
 				.anyExchange().permitAll())
 			.exceptionHandling(
