@@ -10,17 +10,20 @@ import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itmo.ownerservice.exceptions.AccessDeniedException;
 import ru.itmo.ownerservice.exceptions.AlreadyExistsException;
+import ru.itmo.ownerservice.exceptions.BreedNotAllowedException;
+import ru.itmo.ownerservice.exceptions.CheatingException;
 import ru.itmo.ownerservice.exceptions.NotEnoughMoneyException;
 import ru.itmo.ownerservice.exceptions.NotFoundException;
 import ru.itmo.ownerservice.exceptions.ShowDateException;
 import ru.itmo.ownerservice.model.dto.OwnerDto;
+import ru.itmo.ownerservice.model.dto.ResponseDto;
 import ru.itmo.ownerservice.model.dto.ShowDtoRequest;
 import ru.itmo.ownerservice.model.dto.UserDto;
 import ru.itmo.ownerservice.model.entity.DogEntity;
@@ -40,12 +43,8 @@ public class OwnerService {
 	private final Validator validator;
 	private final UserApi userApi;
 	private final DogsApi dogsApi;
-	private ShowService showService;
+	private final ShowService showService;
 
-	@Autowired
-	public void setShowService(ShowService showService) {
-		this.showService = showService;
-	}
 	public void deleteAll() {
 		ownerRepository.deleteAll();
 	}
@@ -69,12 +68,16 @@ public class OwnerService {
 		Set<String> roles = ownerUserDto.getIsOrganizer() ? Set.of("ROLE_OWNER", "ROLE_ORGANIZER")
 			: Set.of("ROLE_OWNER");
 		userDto.setRoles(roles);
-		UserEntity user = userApi.createNewUser(userDto);
+
+		ResponseDto<UserEntity> response = userApi.createNewUser(userDto);
+		if (!response.code().is2xxSuccessful()){
+			throw new AlreadyExistsException(response.error().getMessage());
+		}
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 		Coordinate coordinate = new Coordinate(ownerUserDto.getLatitude(),
 			ownerUserDto.getLongitude());
-		OwnerEntity owner = new OwnerEntity(user,
+		OwnerEntity owner = new OwnerEntity(response.body(),
 			ownerUserDto.getName(),
 			ownerUserDto.getSurname(),
 			ownerUserDto.getBalance(),
@@ -89,7 +92,7 @@ public class OwnerService {
 
 	public Optional<OwnerEntity> findByLogin(String login){
 		try {
-			UserEntity user = userApi.findByLogin(login);
+			UserEntity user = userApi.findByLogin(login).body();
 			return ownerRepository.findByUser(user);
 		} catch (NotFoundException e) {
 			return Optional.empty();
@@ -116,7 +119,7 @@ public class OwnerService {
 
 	@Transactional
 	public DogEntity finishShow(String login, long showId, long winnerId)
-		throws NotFoundException, AccessDeniedException, ShowDateException {
+		throws NotFoundException, AccessDeniedException, ShowDateException, AlreadyExistsException {
 		OwnerEntity organizer = findByLogin(login).orElseThrow(() -> new NotFoundException("Владельца с таким логином не существует"));
 
 		ShowEntity show = showService.findById(showId);
@@ -125,9 +128,16 @@ public class OwnerService {
 			throw new AccessDeniedException("Вы не можете завершить не свою выставку.");
 		}
 
-		DogEntity winner = dogsApi.findById(winnerId);
+		if (show.getWinner() != null) {
+			throw new AlreadyExistsException("Выставка уже завершена");
+		}
 
-		if (!show.getParticipants().contains(winner)) {
+		ResponseDto<DogEntity> winner = dogsApi.findById(winnerId);
+
+		if (winner.code() == HttpStatus.NOT_FOUND)
+			throw new NotFoundException("Собаки с таким ID не существует");
+
+		if (!show.getParticipants().contains(winner.body())) {
 			throw new NotFoundException("Данной собаки нет в списке участников.");
 		}
 
@@ -135,18 +145,25 @@ public class OwnerService {
 			throw new ShowDateException("Вы не можете завершить выставку до ее начала.");
 		}
 
-		OwnerEntity owner = winner.getOwner();
+		OwnerEntity owner = ownerRepository.findById(winner.body().getOwner().getId()).orElseThrow(
+			() -> new NotFoundException("Хозяин собаки не найден"));
 
-		show.setWinner(winner);
+		show.setWinner(winner.body());
 
 		organizer.setReservedBalance(organizer.getReservedBalance() - show.getPrize());
 		owner.setBalance(owner.getBalance() + show.getPrize());
 
-		showService.save(show);
+		showService.saveShow(show);
 		save(organizer);
 		save(owner);
 
-		return winner;
+		return winner.body();
+	}
+
+	public ShowEntity addParticipant(Long showId, DogEntity dog)
+		throws NotFoundException, CheatingException, AlreadyExistsException, BreedNotAllowedException, ShowDateException {
+		ShowEntity show = showService.findById(showId);
+		return showService.addParticipant(show, dog);
 	}
 
 }
