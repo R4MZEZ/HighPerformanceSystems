@@ -5,9 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/api-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/api-gateway.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/hotdogs-client/src/main/main.iml" filepath="$PROJECT_DIR$/hotdogs-client/src/main/main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/owner-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/owner-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/hotdogs-client/src/test/test.iml" filepath="$PROJECT_DIR$/hotdogs-client/src/test/test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.main.iml" />
     </modules>
   </component>
