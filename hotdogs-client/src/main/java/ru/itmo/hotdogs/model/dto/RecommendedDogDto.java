@@ -1,25 +1,25 @@
 package ru.itmo.hotdogs.model.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 
 /**
  * DTO for {@link DogEntity}
  */
-//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-//public record UserDto(String name, Integer age, BreedEntity breed, OwnerEntity owner,
-//                      List<UsersInterestsEntity> userInterests, Set<UserEntity> userMatches,
-//                      Set<UserEntity> userLikes) {
-//
-//}
-public interface RecommendedDogDto {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RecommendedDogDto implements RecommendedDog{
 
-	Long getId();
+	Long id;
 
-	String getName();
+	String name;
 
-	Integer getAge();
+	Integer age;
 
-	Double getDistance();
+	Double distance;
 
 }
