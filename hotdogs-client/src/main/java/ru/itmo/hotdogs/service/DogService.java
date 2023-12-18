@@ -1,7 +1,6 @@
 package ru.itmo.hotdogs.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,21 +12,24 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
 import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
+import ru.itmo.hotdogs.exceptions.ServiceUnavalibleException;
 import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
+import ru.itmo.hotdogs.model.dto.RecommendedDog;
 import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
+import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
 import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
@@ -39,6 +41,7 @@ import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
+import ru.itmo.hotdogs.rest.OwnerApi;
 import ru.itmo.hotdogs.rest.UserApi;
 
 @Service
@@ -48,17 +51,13 @@ public class DogService {
 	private final DogRepository dogRepository;
 	private final DogsInteractionsService dogsInteractionsService;
 	private final DogsInterestsService dogsInterestsService;
-	private final InterestService interestService;
-	private final ShowService showService;
-	private final BreedService breedService;
-	private final Validator validator;
-	private OwnerService ownerService;
-	private final UserApi userApi;
 
-	@Autowired
-	public void setOwnerService(OwnerService ownerService) {
-		this.ownerService = ownerService;
-	}
+	private final InterestService interestService;
+	private final BreedService breedService;
+
+	private final Validator validator;
+	private final OwnerApi ownerApi;
+	private final UserApi userApi;
 
 	public Page<DogEntity> findAll(Pageable pageable) {
 		return dogRepository.findAll(pageable);
@@ -66,21 +65,33 @@ public class DogService {
 
 
 	public DogEntity findByLogin(String login) throws NotFoundException {
-		UserEntity user = userApi.findByLogin(login);
-		return dogRepository.findByUser(user).orElseThrow(
+		ResponseDto<UserEntity> response = userApi.findByLogin(login);
+		if (!response.code().is2xxSuccessful())
+			throw new NotFoundException(response.error().getMessage());
+		return dogRepository.findByUser(response.body()).orElseThrow(
 			() -> new NotFoundException("Собаки с таким логином не существует")
 		);
 	}
 
-	public Optional<DogEntity> findOptionalByLogin(String login) {
-		try {
-		UserEntity user = userApi.findByLogin(login);
-		return dogRepository.findByUser(user);
+//	public Mono<DogEntity> findByLoginReactive(String login) throws NotFoundException {
+//		return userApi.findByLogin(login)
+//			.flatMap(user -> {
+//				Optional<DogEntity> optionalDog = dogRepository.findByUser(user);
+//				return optionalDog.<Mono<? extends DogEntity>>map(Mono::just).orElseGet(
+//					() -> Mono.error(
+//						new NotFoundException("Собаки с таким логином не существует")));
+//			});
+//	}
 
-		} catch (NotFoundException e) {
-			return Optional.empty();
-		}
-	}
+//	public Optional<DogEntity> findOptionalByLogin(String login) {
+//		try {
+//			UserEntity user = userApi.findByLogin(login);
+//			return dogRepository.findByUser(user);
+//
+//		} catch (NotFoundException e) {
+//			return Optional.empty();
+//		}
+//	}
 
 	public DogEntity findById(long id) throws NotFoundException {
 		return dogRepository.findById(id).orElseThrow(
@@ -96,48 +107,33 @@ public class DogService {
 			.toList();
 	}
 
-	@Transactional
-	public ShowEntity applyToShow(DogEntity dog, Long showId)
-		throws NotFoundException, BreedNotAllowedException, ShowDateException, AlreadyExistsException, CheatingException {
-		ShowEntity show = showService.findById(showId);
-		if (new Date().after(show.getDate())) {
-			throw new ShowDateException("Выставка уже прошла");
-		}
-
-		if (!show.getAllowedBreeds().contains(dog.getBreed())) {
-			throw new BreedNotAllowedException();
-		}
-
-		if (show.getParticipants().contains(dog)) {
-			throw new AlreadyExistsException("Вы уже участвуете в этой выставке");
-		}
-
-		if (show.getOrganizer().getId().equals(dog.getOwner().getId())) {
-			throw new CheatingException();
-		}
-
-		return showService.addParticipant(show, dog);
+	public ResponseDto<?> applyToShow(DogEntity dog, Long showId)
+		throws IllegalStateException, ServiceUnavalibleException {
+		return ownerApi.addParticipant(showId, dog);
 	}
 
+
 	public DogEntity createNewDog(@Valid UserDto userDto, @Valid DogDto dogDto)
-		throws AlreadyExistsException, NotFoundException, ConstraintViolationException, IllegalArgumentException {
+		throws AlreadyExistsException, NotFoundException, ConstraintViolationException, IllegalArgumentException, ServiceUnavalibleException, IllegalStateException {
 
 		Set<ConstraintViolation<DogDto>> violations = validator.validate(dogDto);
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(violations);
 		}
 		BreedEntity breed = breedService.findByName(dogDto.getBreed());
-		OwnerEntity owner = ownerService.findByLogin(dogDto.getOwnerLogin()).orElseThrow(
-			() -> new NotFoundException("Владельца с таким логином не существует"));
+		OwnerEntity owner = ownerApi.findByLogin(dogDto.getOwnerLogin());
 
 		for (Map.Entry<String, Integer> interest : dogDto.getInterests().entrySet()) {
 			interestService.findByName(interest.getKey());
 		}
 
 		userDto.setRoles(Set.of("ROLE_DOG"));
-		UserEntity user = userApi.createNewUser(userDto);
+		ResponseDto<UserEntity> response = userApi.createNewUser(userDto);
+		if (!response.code().is2xxSuccessful()){
+			throw new AlreadyExistsException(response.error().getMessage());
+		}
 
-		DogEntity dog = new DogEntity(user, dogDto.getName(), dogDto.getAge(), breed, owner);
+		DogEntity dog = new DogEntity(response.body(), dogDto.getName(), dogDto.getAge(), breed, owner);
 
 		dogRepository.save(dog);
 
@@ -152,8 +148,8 @@ public class DogService {
 	}
 
 
-	public RecommendedDogDto findNearest(DogEntity dog) throws NotFoundException {
-		RecommendedDogDto recommendedDog = dogRepository.findNearest(
+	public RecommendedDog findNearest(DogEntity dog) throws NotFoundException {
+		RecommendedDog recommendedDog = dogRepository.findNearest(
 			dog.getOwner().getLocation().getX(),
 			dog.getOwner().getLocation().getY(),
 			dog.getId());
@@ -166,14 +162,11 @@ public class DogService {
 
 	}
 
-	/**
-	 * @return возвращает экземпляр RecommendedDogDto, если был достигнут мэтч, иначе - null
-	 */
-	public Optional<RecommendedDogDto> rateRecommended(DogEntity dog, Boolean isLike)
+	public Optional<RecommendedDog> rateRecommended(DogEntity dog, Boolean isLike)
 		throws NullRecommendationException {
 
 		DogEntity recommended = dog.getCurRecommended();
-		RecommendedDogDto matched = null;
+		RecommendedDog matched = null;
 
 		if (recommended == null) {
 			throw new NullRecommendationException();
@@ -183,8 +176,9 @@ public class DogService {
 		}
 
 		DogsInteractionsEntity interaction = new DogsInteractionsEntity(dog, recommended, isLike);
-		dog.getInteractions().add(dogsInteractionsService.save(interaction));
-//		dogsInteractionsService.save(interaction);
+		dogsInteractionsService.save(interaction);
+		dog.getInteractions().add(interaction);
+//		dogsInteractionsService.createInterest(interaction);
 		dog.setCurRecommended(null);
 
 		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
@@ -222,7 +216,7 @@ public class DogService {
 		}
 
 		if (dog.getInterests().stream()
-			.anyMatch((x) -> x.getInterest().getId().equals(interest.getId()))) {
+			.anyMatch((x) -> x.getInterest().getName().equals(interest.getName()))) {
 			throw new AlreadyExistsException(
 				"У данной собаки уже существует такой интерес.");
 		}
