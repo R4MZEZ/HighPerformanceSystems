@@ -1,13 +1,10 @@
 package ru.itmo.hotdogs.model.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
@@ -30,8 +27,8 @@ public class BreedEntity {
 	@Pattern(regexp = "^[a-zA-Z]+$")
 	private String name;
 
-	@OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
-	private List<DogEntity> dogs;
+//	@OneToMany(mappedBy = "breed", cascade = CascadeType.ALL)
+//	private List<DogEntity> dogs;
 
 	public BreedEntity(String name) {
 		this.name = name;

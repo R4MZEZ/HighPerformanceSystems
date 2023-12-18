@@ -1,9 +1,12 @@
 package ru.itmo.hotdogs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,15 +55,17 @@ public class OwnerEntity {
 	@Min(0)
 	private Float reservedBalance;
 
-	@JsonIgnore
+//	@JsonIgnore
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
-	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //	@JoinColumn(name = "organizer")
+	@JsonIgnoreProperties(value = "organizer", allowSetters = true)
 	private List<ShowEntity> shows;
 
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonIgnoreProperties(value = "owner", allowSetters = true)
 	private List<DogEntity> dogs;
 
 	public OwnerEntity(UserEntity user, String name, String surname, Float balance,

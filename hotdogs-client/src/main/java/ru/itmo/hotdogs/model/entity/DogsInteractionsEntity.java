@@ -1,5 +1,8 @@
 package ru.itmo.hotdogs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,16 +27,19 @@ public class DogsInteractionsEntity {
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "sender_id")
+	@JsonIgnoreProperties(value = "interactions", allowSetters = true)
 	private DogEntity sender;
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "receiver_id")
+	@JsonIgnoreProperties(value = "interactions", allowSetters = true)
 	private DogEntity receiver;
 
 	@Column(name = "is_liked", nullable = false)
 	private Boolean isLiked;
 
-	public DogsInteractionsEntity(DogEntity sender, DogEntity receiver, Boolean isLiked) {
+	public DogsInteractionsEntity(
+		DogEntity sender, DogEntity receiver, Boolean isLiked) {
 		this.sender = sender;
 		this.receiver = receiver;
 		this.isLiked = isLiked;

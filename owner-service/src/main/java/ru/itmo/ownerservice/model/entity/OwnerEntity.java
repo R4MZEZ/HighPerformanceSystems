@@ -1,9 +1,11 @@
 package ru.itmo.ownerservice.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -56,11 +58,13 @@ public class OwnerEntity {
 	@Column(columnDefinition = "geography", nullable = false)
 	private Point location;
 
-	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //	@JoinColumn(name = "organizer")
+	@JsonIgnoreProperties(value = "organizer", allowSetters = true)
 	private List<ShowEntity> shows;
 
-	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonIgnoreProperties(value = "owner", allowSetters = true)
 	private List<DogEntity> dogs;
 
 	public OwnerEntity(UserEntity user, String name, String surname, Float balance,
@@ -97,10 +101,7 @@ public class OwnerEntity {
 		if (!balance.equals(owner.balance)) {
 			return false;
 		}
-		if (!reservedBalance.equals(owner.reservedBalance)) {
-			return false;
-		}
-		return location.equals(owner.location);
+		return reservedBalance.equals(owner.reservedBalance);
 	}
 
 	@Override

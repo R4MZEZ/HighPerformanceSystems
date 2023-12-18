@@ -1,5 +1,8 @@
 package ru.itmo.hotdogs.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,6 +59,7 @@ public class DogEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "owner", nullable = false)
+	@JsonIgnoreProperties(value = "dogs", allowSetters = true)
 	private OwnerEntity owner;
 
 	@ManyToOne
@@ -63,10 +67,11 @@ public class DogEntity {
 	private DogEntity curRecommended;
 
 
-	@OneToMany(mappedBy = "dog", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "dog", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JsonIgnoreProperties(value = "dog", allowSetters = true)
 	private List<DogsInterestsEntity> interests;
 
-	@ManyToMany(cascade = CascadeType.MERGE)
+	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	@JoinTable(
 		name = "dogs_matches",
 		joinColumns = @JoinColumn(name = "dog1_id"),
@@ -74,15 +79,17 @@ public class DogEntity {
 	)
 	private Set<DogEntity> matches;
 
-	@OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JsonIgnoreProperties(value = "receiver", allowSetters = true)
 	private List<DogsInteractionsEntity> interactions;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 		name = "shows_participants",
 		joinColumns = @JoinColumn(name = "dog_id"),
 		inverseJoinColumns = @JoinColumn(name = "show_id")
 	)
+	@JsonIgnoreProperties(value = {"participants", "winner"}, allowSetters = true)
 	private List<ShowEntity> appliedShows;
 
 	public DogEntity(UserEntity user, String name, Integer age, BreedEntity breed,
@@ -123,10 +130,7 @@ public class DogEntity {
 	@Override
 	public int hashCode() {
 		int result = id.hashCode();
-		result = 31 * result + name.hashCode();
 		result = 31 * result + (age != null ? age.hashCode() : 0);
-		result = 31 * result + breed.hashCode();
-		result = 31 * result + owner.hashCode();
 		return result;
 	}
 }

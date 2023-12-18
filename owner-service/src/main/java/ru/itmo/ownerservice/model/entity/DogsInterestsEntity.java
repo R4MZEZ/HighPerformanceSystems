@@ -1,5 +1,6 @@
 package ru.itmo.ownerservice.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +26,7 @@ public class DogsInterestsEntity {
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "dog_id")
+	@JsonIgnoreProperties("interests")
 	private DogEntity dog;
 
 	@ManyToOne(cascade = CascadeType.MERGE)
