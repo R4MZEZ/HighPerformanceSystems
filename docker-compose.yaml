@@ -9,18 +9,37 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
-#  demo:
-#    build: demo
-#    container_name: demo
-#    environment:
-#      EUREKA_URL: http://eureka-server:8761/eureka
+    environment:
+        EUREKA_URL: ${EUREKA_URL}
+  gateway:
+      build: api-gateway
+      restart: always
+      container_name: api-gateway
+      ports:
+        - "8081:8081"
+      depends_on:
+          - eureka-server
+      environment:
+          JWT_SECRET: ${JWT_SECRET}
+          EUREKA_URL: ${EUREKA_URL}
 
-  java_application:
+  config:
+      build: config-server
+      restart: always
+      container_name: config-server
+      ports:
+          - "8888:8888"
+      depends_on:
+          - eureka-server
+      environment:
+          EUREKA_URL: ${EUREKA_URL}
+
+  hotdogs:
     build: hotdogs-client
     restart: always
-    container_name: hotdogs-client
-    ports:
-      - "8080:8080"
+    container_name: dog-service
+#    ports:
+#      - "8080:8080"
     depends_on:
       - postgresql_database
       - eureka-server
@@ -28,9 +47,42 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgresql_database:5432/postgres
       POSTGRES_USERNAME: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_LIFETIME: ${JWT_LIFETIME}
       EUREKA_URL: ${EUREKA_URL}
+      CONFIG_SERVER_URL: http://config:8888
+#      CONFIG_SERVER_URL: ${CONFIG_URL}
+      JWT_SECRET: ${JWT_SECRET}
+
+  owner_service:
+      build: owner-service
+      restart: always
+      container_name: owner-service
+      depends_on:
+          - postgresql_database
+          - eureka-server
+      environment:
+          POSTGRES_URL: jdbc:postgresql://postgresql_database:5432/postgres
+          POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+          JWT_SECRET: ${JWT_SECRET}
+          EUREKA_URL: ${EUREKA_URL}
+          CONFIG_SERVER_URL: http://config:8888
+#          CONFIG_SERVER_URL: ${CONFIG_URL}
+
+  user_service:
+      build: user-service
+      restart: always
+      container_name: user-service
+      depends_on:
+          - postgresql_database
+          - eureka-server
+      environment:
+          POSTGRES_URL: r2dbc:postgresql://postgres:postgres@host.docker.internal:5432/postgres
+          POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+          JWT_SECRET: ${JWT_SECRET}
+          JWT_LIFETIME: ${JWT_LIFETIME}
+          EUREKA_URL: ${EUREKA_URL}
+          CONFIG_SERVER_URL: http://config:8888
 
   postgresql_database:
     image: postgis/postgis:15-3.4

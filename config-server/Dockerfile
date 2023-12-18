@@ -13,6 +13,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN ./gradlew build -x test -i --stacktrace
+RUN ./gradlew build -i --stacktrace
 
-ENTRYPOINT ["java", "-jar", "/app/build/libs/hotdogs-client-0.0.1.jar"]
+ENTRYPOINT ["java", "-jar", "/app/build/libs/config-server-0.0.1.jar"]
