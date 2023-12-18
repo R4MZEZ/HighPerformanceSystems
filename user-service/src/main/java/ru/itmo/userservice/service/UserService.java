@@ -1,5 +1,6 @@
 package ru.itmo.userservice.service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
@@ -7,41 +8,41 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import ru.itmo.userservice.exceptions.NotFoundException;
 import ru.itmo.userservice.model.dto.UserDto;
 import ru.itmo.userservice.model.entity.UserEntity;
-import ru.itmo.userservice.exceptions.AlreadyExistsException;
-import ru.itmo.userservice.exceptions.NotFoundException;
 import ru.itmo.userservice.repository.UserRepository;
 
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService implements ReactiveUserDetailsService {
 
 	private final UserRepository userRepository;
-	private PasswordEncoder passwordEncoder;
-	private RoleService roleService;
+	private final PasswordEncoder passwordEncoder;
+	private final RoleService roleService;
 	private final Validator validator;
 
-	@Autowired
-	public void setPasswordEncoder(
-		PasswordEncoder passwordEncoder) {
-		this.passwordEncoder = passwordEncoder;
-	}
+//	@Autowired
+//	public void setPasswordEncoder(
+//		PasswordEncoder passwordEncoder) {
+//		this.passwordEncoder = passwordEncoder;
+//	}
 
-	@Autowired
-	public void setRoleService(RoleService roleService) {
-		this.roleService = roleService;
-	}
+//	@Autowired
+//	public void setRoleService(RoleService roleService) {
+//		this.roleService = roleService;
+//	}
 
 	public void deleteAll(){
 		userRepository.deleteAll();
@@ -56,39 +57,50 @@ public class UserService implements UserDetailsService {
 //	}
 
 
-	public UserEntity findByLogin(String login) throws NotFoundException{
-		return userRepository.findByLogin(login).orElseThrow(
-			() -> new NotFoundException("Пользователь с таким логином не существует")
-		);
+	public Mono<UserEntity> findByLogin(String login) {
+		return userRepository.findByLogin(login);
 	}
 
 
 	@Override
-	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserEntity user = userRepository.findByLogin(username).orElseThrow(
-			() -> new UsernameNotFoundException(
-				String.format("Пользователь с логином '%s' не существует.", username)));
-
-		return new User(user.getLogin(), user.getPassword(),
-			user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
-				.collect(Collectors.toList()));
+	public Mono<UserDetails> findByUsername(String username) {
+		return userRepository.findByLogin(username)
+			.switchIfEmpty(Mono.error(new UsernameNotFoundException("User Not Found")))
+			.flatMap(user -> roleService.findUserRolesByLogin(user.getLogin())
+				.collect(Collectors.toSet())
+				.map(roles -> {
+					user.setRoles(roles);
+					List<SimpleGrantedAuthority> authorities = roles.stream()
+						.map(role -> new SimpleGrantedAuthority(role.getName()))
+						.collect(Collectors.toList());
+					return new User(user.getLogin(), user.getPassword(), authorities);
+				}));
 	}
 
-	public UserEntity createNewUser(@Valid UserDto userDto) throws AlreadyExistsException, ConstraintViolationException {
+
+	public Mono<UserEntity> createNewUser(@Valid UserDto userDto) {
 		Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
-		if (!validator.validate(userDto).isEmpty()) {
-			throw new ConstraintViolationException(violations);
+		if (!violations.isEmpty()) {
+			return Mono.error(new ConstraintViolationException(violations));
 		}
-		try{
-			findByLogin(userDto.getLogin());
-			throw new AlreadyExistsException("Пользователь с указанным именем уже существует");
-		}catch (NotFoundException ex){
-			UserEntity user = new UserEntity();
-			user.setLogin(userDto.getLogin());
-			user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-			user.setRoles(userDto.getRoles().stream().map(roleService::findByName).collect(Collectors.toSet()));
-			return userRepository.save(user);
-		}
+
+		return findByLogin(userDto.getLogin())
+			.flatMap(existingUser -> Mono.just(new UserEntity()))
+			.switchIfEmpty(createUser(userDto));
 	}
+	private Mono<UserEntity> createUser(UserDto userDto) {
+		UserEntity user = new UserEntity();
+		user.setLogin(userDto.getLogin());
+		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+		return Flux.fromIterable(userDto.getRoles())
+			.flatMap(roleName -> roleService.findByName(roleName)
+				.switchIfEmpty(Mono.error(new NotFoundException("Role not found: " + roleName))))
+			.collect(Collectors.toSet())
+			.flatMap(roles -> {
+				user.setRoles(roles);
+				return userRepository.save(user);
+			});
+	}
+
 }
