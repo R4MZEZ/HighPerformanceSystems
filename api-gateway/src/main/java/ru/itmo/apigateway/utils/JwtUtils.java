@@ -3,6 +3,7 @@ package ru.itmo.apigateway.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,8 +42,11 @@ public class JwtUtils {
 	}
 
 	public boolean isExpired(String token) {
-		return getAllClaimsFromToken(token).getExpiration().before(new Date());
-
+		try {
+			return getAllClaimsFromToken(token).getExpiration().before(new Date());
+		}catch (MalformedJwtException e){
+			throw new JwtExpiredException();
+		}
 	}
 
 	public Mono<UserDto> check(String accessToken) {

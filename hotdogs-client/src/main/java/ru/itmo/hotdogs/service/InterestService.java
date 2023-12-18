@@ -29,7 +29,7 @@ public class InterestService {
 
 	public Optional<InterestEntity> deleteByName(String name){ return interestRepository.deleteByName(name); }
 
-	public InterestEntity save(@Valid InterestEntity interest) throws ConstraintViolationException{
+	public InterestEntity createInterest(@Valid InterestEntity interest) throws ConstraintViolationException{
 		Set<ConstraintViolation<InterestEntity>> violations = validator.validate(interest);
 		if (!validator.validate(interest).isEmpty()) {
 			throw new ConstraintViolationException(violations);
