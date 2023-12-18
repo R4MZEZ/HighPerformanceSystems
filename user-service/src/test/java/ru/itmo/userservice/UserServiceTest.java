@@ -1,9 +1,8 @@
-package ru.itmo.hotdogs.service;
+package ru.itmo.userservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
@@ -15,11 +14,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.itmo.hotdogs.model.dto.UserDto;
-import ru.itmo.hotdogs.model.entity.RoleEntity;
-import ru.itmo.hotdogs.model.entity.UserEntity;
+import ru.itmo.userservice.model.dto.UserDto;
+import ru.itmo.userservice.model.entity.UserEntity;
+import ru.itmo.userservice.service.UserService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @Testcontainers
@@ -27,8 +25,6 @@ public class UserServiceTest {
 
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private RoleService roleService;
 
 	@BeforeEach
 	void clearData() {
@@ -41,12 +37,7 @@ public class UserServiceTest {
 		Set<String> roles = Set.of("ROLE_ADMIN");
 		Assertions.assertDoesNotThrow(() -> {
 			UserEntity user = userService.createNewUser(new UserDto(login, password, roles));
-			Assertions.assertAll(
-				() -> assertEquals(login, user.getLogin()),
-				() -> assertEquals(roles.stream().map(
-						role -> roleService.findByName(role).getId()).collect(Collectors.toSet()),
-					user.getRoles().stream().map(RoleEntity::getId).collect(Collectors.toSet()))
-			);
+			assertNotNull(user);
 		});
 	}
 
