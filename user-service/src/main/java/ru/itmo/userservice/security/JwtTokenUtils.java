@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenUtils {
 
-	@Value("${jwt-secret}")
+	@Value("${euser.jwt-secret}")
 	private String secret;
 
 

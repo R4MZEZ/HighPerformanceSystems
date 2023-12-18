@@ -7,6 +7,8 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import ru.itmo.userservice.model.entity.RoleEntity;
 import ru.itmo.userservice.repository.RoleRepository;
 
@@ -17,11 +19,15 @@ public class RoleService {
 
 	private final Validator validator;
 
-	public RoleEntity findByName(String name){
-		return roleRepository.findByName(name).orElseThrow();
+	public Mono<RoleEntity> findByName(String name){
+		return roleRepository.findByName(name);
 	}
 
-	public RoleEntity createRole(@Valid RoleEntity role) throws ConstraintViolationException{
+	public Flux<RoleEntity> findUserRolesByLogin(String login){
+		return roleRepository.findUserRolesByLogin(login);
+	}
+
+	public Mono<RoleEntity> createRole(@Valid RoleEntity role) throws ConstraintViolationException{
 		Set<ConstraintViolation<RoleEntity>> violations = validator.validate(role);
 		if (!validator.validate(role).isEmpty()) {
 			throw new ConstraintViolationException(violations);
