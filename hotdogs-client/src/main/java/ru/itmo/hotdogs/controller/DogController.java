@@ -176,13 +176,6 @@ public class DogController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
-//	@Transactional
-//	@GetMapping("/me")
-//	public Mono<ResponseEntity<DogDto>> getInfo(ServerHttpRequest request) throws NotFoundException {
-//		return dogService.findByLoginReactive(jwtUtils.getUsernameFromRequest(request))
-//			.map(dogEntity -> ResponseEntity.ok().body(DtoConverter.dogEntityToDto(dogEntity)))
-//			.defaultIfEmpty(ResponseEntity.notFound().build());
-//	}
 
 	@GetMapping("/find/{id}")
 	public ResponseDto<DogEntity> findById(@PathVariable Long id) {

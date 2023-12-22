@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
@@ -44,6 +45,7 @@ public class ShowEntity {
 	@ManyToOne
 	@JoinColumn(name = "organizer", nullable = false)
 	@JsonIgnoreProperties(value = "shows", allowSetters = true)
+	@JsonIgnore
 	private OwnerEntity organizer;
 
 	@ManyToOne

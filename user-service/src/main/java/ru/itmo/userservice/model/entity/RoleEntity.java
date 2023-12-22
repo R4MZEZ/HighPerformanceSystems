@@ -38,10 +38,4 @@ public class RoleEntity {
 		return name.equals(that.name);
 	}
 
-	@Override
-	public int hashCode() {
-		int result = id.hashCode();
-		result = 31 * result + name.hashCode();
-		return result;
-	}
 }

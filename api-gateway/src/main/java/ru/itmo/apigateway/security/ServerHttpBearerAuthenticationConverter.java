@@ -34,11 +34,6 @@ public class ServerHttpBearerAuthenticationConverter implements
 
 	@Override
 	public Mono<Authentication> convert(ServerWebExchange exchange) {
-//		String bearer = extract(exchange).block();
-//
-//		UserDto userDto = jwtUtils.check(bearer.substring(BEARER.length()));
-//		exchange.getRequest().mutate().header("Username", userDto.getLogin()).build();
-//		return jwtUtils.getAuthorities(userDto);
 
 		return Mono.justOrEmpty(exchange)
 			.flatMap(ServerHttpBearerAuthenticationConverter::extract)
