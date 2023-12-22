@@ -1,17 +1,13 @@
 package ru.itmo.userservice.controller;
 
-import java.util.concurrent.ExecutionException;
-import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 import ru.itmo.userservice.exceptions.AlreadyExistsException;
 import ru.itmo.userservice.exceptions.NotFoundException;
 import ru.itmo.userservice.model.dto.ResponseDto;
@@ -40,7 +36,7 @@ public class UserController {
 	@PostMapping("/new")
 	public ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto) {
 		UserEntity user = userService.createNewUser(userDto).block();
-		if (user== null || user.getId() == null)
+		if (user == null || user.getId() == null)
 			return new ResponseDto<>(null, new AlreadyExistsException("Пользователь с таким логином уже существует"), HttpStatus.BAD_REQUEST);
 		else return new ResponseDto<>(user, null, HttpStatus.OK);
 	}

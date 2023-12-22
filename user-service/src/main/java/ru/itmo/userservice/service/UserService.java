@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Role;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.itmo.userservice.exceptions.NotFoundException;
 import ru.itmo.userservice.model.dto.UserDto;
+import ru.itmo.userservice.model.entity.RoleEntity;
 import ru.itmo.userservice.model.entity.UserEntity;
 import ru.itmo.userservice.repository.UserRepository;
 
@@ -44,7 +46,7 @@ public class UserService implements ReactiveUserDetailsService {
 //		this.roleService = roleService;
 //	}
 
-	public void deleteAll(){
+	public void deleteAll() {
 		userRepository.deleteAll();
 	}
 
@@ -69,7 +71,8 @@ public class UserService implements ReactiveUserDetailsService {
 			.flatMap(user -> roleService.findUserRolesByLogin(user.getLogin())
 				.collect(Collectors.toSet())
 				.map(roles -> {
-					user.setRoles(roles);
+					user.setRoles(
+						roles.stream().map(RoleEntity::getId).collect(Collectors.toSet()));
 					List<SimpleGrantedAuthority> authorities = roles.stream()
 						.map(role -> new SimpleGrantedAuthority(role.getName()))
 						.collect(Collectors.toList());
@@ -84,23 +87,45 @@ public class UserService implements ReactiveUserDetailsService {
 			return Mono.error(new ConstraintViolationException(violations));
 		}
 
-		return findByLogin(userDto.getLogin())
-			.flatMap(existingUser -> Mono.just(new UserEntity()))
-			.switchIfEmpty(createUser(userDto));
+		Mono<UserEntity> existingUser = findByLogin(userDto.getLogin());
+
+		if (existingUser == null) {
+			return Mono.just(new UserEntity());
+		} else {
+			Mono<UserEntity> createdUser = createUser(userDto);
+			Flux.fromIterable(userDto.getRoles())
+				.flatMap(roleService::findByName)
+				.collect(Collectors.toSet())
+				.flatMap(roles -> {
+					roles.forEach(role -> findByLogin(userDto.getLogin()).flatMap(
+						savedUser -> addRole(savedUser.getId(), role.getId())).block());
+					return null;
+				}).block();
+			return createdUser;
+		}
+
 	}
+
 	private Mono<UserEntity> createUser(UserDto userDto) {
 		UserEntity user = new UserEntity();
 		user.setLogin(userDto.getLogin());
 		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-		return Flux.fromIterable(userDto.getRoles())
-			.flatMap(roleName -> roleService.findByName(roleName)
-				.switchIfEmpty(Mono.error(new NotFoundException("Role not found: " + roleName))))
-			.collect(Collectors.toSet())
-			.flatMap(roles -> {
-				user.setRoles(roles);
-				return userRepository.save(user);
-			});
+		return userRepository.save(user.getLogin(), user.getPassword());
+//		return Flux.fromIterable(userDto.getRoles())
+//			.flatMap(roleService::findByName)
+//			.collect(Collectors.toSet())
+//			.flatMap(roles -> {
+//				user.setRoles(roles.stream().map(RoleEntity::getId).collect(Collectors.toSet()));
+//				return userRepository.save(user.getLogin(), user.getPassword())
+//					.flatMap(savedUser -> addRoleWrapper(savedUser.getId(), user.getRoles().stream().iterator().next())
+//						.then(Mono.just(savedUser)));
+//			});
 	}
+
+	private Mono<UserEntity> addRole(Long userId, Long roleId) {
+		return userRepository.addRole(userId, roleId);
+	}
+
 
 }
