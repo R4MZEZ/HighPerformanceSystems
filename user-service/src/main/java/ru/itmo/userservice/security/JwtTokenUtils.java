@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RefreshScope
 public class JwtTokenUtils {
 
-	@Value("${euser.jwt-secret}")
+	@Value("${jwt-secret}")
 	private String secret;
 
 
