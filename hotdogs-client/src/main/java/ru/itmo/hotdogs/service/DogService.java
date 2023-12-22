@@ -103,7 +103,7 @@ public class DogService {
 		return findByLogin(login).getAppliedShows().stream().map(
 				show -> new ShowDtoResponse(show.getDate(), show.getPrize(),
 					show.getAllowedBreeds().stream().map(
-						BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName()))
+						BreedEntity::toString).collect(Collectors.toSet()), show.getWinner().getName() == null ? null : show.getWinner().getName()))
 			.toList();
 	}
 
