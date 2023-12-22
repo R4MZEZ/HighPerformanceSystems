@@ -50,7 +50,8 @@ public class SecurityConfig {
 				.pathMatchers("/dogs/test").hasRole("ADMIN")
 				.pathMatchers("/dogs/breeds/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/interests/new").hasRole("ADMIN")
-				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
+				.pathMatchers("/dogs/me").hasRole("DOG")
+//				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.pathMatchers("/dogs").hasRole("ADMIN")
 				.anyExchange().permitAll())
 			.exceptionHandling(
