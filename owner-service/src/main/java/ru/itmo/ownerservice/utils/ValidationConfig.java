@@ -1,4 +1,4 @@
-package ru.itmo.ownerservice;
+package ru.itmo.ownerservice.utils;
 
 import javax.validation.Validation;
 import javax.validation.Validator;

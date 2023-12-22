@@ -1,6 +1,5 @@
 package ru.itmo.ownerservice.controller;
 
-import java.security.Principal;
 import java.util.List;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.itmo.ownerservice.JwtUtils;
+import ru.itmo.ownerservice.utils.JwtUtils;
 import ru.itmo.ownerservice.exceptions.AccessDeniedException;
 import ru.itmo.ownerservice.exceptions.AlreadyExistsException;
 import ru.itmo.ownerservice.exceptions.BreedNotAllowedException;
@@ -32,7 +31,6 @@ import ru.itmo.ownerservice.model.dto.ResponseDto;
 import ru.itmo.ownerservice.model.dto.ShowDtoRequest;
 import ru.itmo.ownerservice.model.entity.DogEntity;
 import ru.itmo.ownerservice.model.entity.OwnerEntity;
-import ru.itmo.ownerservice.model.entity.ShowEntity;
 import ru.itmo.ownerservice.service.OwnerService;
 
 
@@ -44,7 +42,7 @@ public class OwnerController {
 	private final OwnerService ownerService;
 	private final JwtUtils jwtUtils;
 
-	@Value("${eowner.page-size}")
+	@Value("${page-size}")
 	private Integer PAGE_SIZE;
 
 

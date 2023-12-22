@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,28 +21,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
-import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
-import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ServiceUnavalibleException;
-import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDog;
-import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.dto.RegistrationDogDto;
 import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
-import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
-import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.service.DogService;
-import ru.itmo.hotdogs.utils.ControllerConfig;
 import ru.itmo.hotdogs.utils.DtoConverter;
 import ru.itmo.hotdogs.utils.JwtUtils;
 
@@ -53,6 +46,8 @@ public class DogController {
 	private final DogService dogService;
 	private final JwtUtils jwtUtils;
 
+	@Value("${page-size}")
+	Integer pageSize;
 
 	@GetMapping("/test")
 	public String test(){
@@ -128,10 +123,10 @@ public class DogController {
 			List<ShowDtoResponse> result = dogService.findAppliedShows(
 				jwtUtils.getUsernameFromRequest(request));
 			int fromIndex =
-				result.size() > page * ControllerConfig.PAGE_SIZE
-					? page * ControllerConfig.PAGE_SIZE
+				result.size() > page * pageSize
+					? page * pageSize
 					: 0;
-			int toIndex = Math.min(result.size(), (page + 1) * ControllerConfig.PAGE_SIZE);
+			int toIndex = Math.min(result.size(), (page + 1) * pageSize);
 			return ResponseEntity.ok(result.subList(fromIndex, toIndex));
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -155,7 +150,7 @@ public class DogController {
 
 	@GetMapping
 	public ResponseEntity<List<DogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE,
+		PageRequest pageRequest = PageRequest.of(page, pageSize,
 			Sort.by(Sort.Order.asc("id")));
 		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
 

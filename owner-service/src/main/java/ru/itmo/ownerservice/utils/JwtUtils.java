@@ -1,4 +1,4 @@
-package ru.itmo.ownerservice;
+package ru.itmo.ownerservice.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

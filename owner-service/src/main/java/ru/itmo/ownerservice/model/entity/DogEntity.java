@@ -1,5 +1,6 @@
 package ru.itmo.ownerservice.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -62,6 +63,7 @@ public class DogEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "cur_recommended")
+	@JsonIgnore
 	private DogEntity curRecommended;
 
 

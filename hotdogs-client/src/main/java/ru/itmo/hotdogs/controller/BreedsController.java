@@ -3,6 +3,7 @@ package ru.itmo.hotdogs.controller;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,7 +23,6 @@ import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.entity.BreedEntity;
 import ru.itmo.hotdogs.service.BreedService;
-import ru.itmo.hotdogs.utils.ControllerConfig;
 
 
 @RequiredArgsConstructor
@@ -31,6 +31,9 @@ import ru.itmo.hotdogs.utils.ControllerConfig;
 public class BreedsController {
 
 	private final BreedService breedService;
+
+	@Value("${page-size}")
+	Integer pageSize;
 
 	@Transactional
 	@DeleteMapping
@@ -45,7 +48,7 @@ public class BreedsController {
 
 	@GetMapping
 	public ResponseEntity<List<BreedEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
-		PageRequest pageRequest = PageRequest.of(page, ControllerConfig.PAGE_SIZE,
+		PageRequest pageRequest = PageRequest.of(page, pageSize,
 			Sort.by(Sort.Order.asc("id")));
 		Page<BreedEntity> entityPage = breedService.findAll(pageRequest);
 
