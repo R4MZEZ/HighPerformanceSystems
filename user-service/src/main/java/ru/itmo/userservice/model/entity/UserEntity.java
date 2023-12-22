@@ -4,19 +4,21 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@Table("users")
 public class UserEntity {
 
 	private Long id;
 	private String login;
 	private String password;
-	private Set<RoleEntity> roles;
-	public UserEntity(String login, String password, Set<RoleEntity> roles) {
-		this.login = login;
-		this.password = password;
-		this.roles = roles;
-	}
+	private Set<Long> roles;
+//	public UserEntity(String login, String password, Set<Integer> roles) {
+//		this.login = login;
+//		this.password = password;
+//		this.roles = roles;
+//	}
 }
