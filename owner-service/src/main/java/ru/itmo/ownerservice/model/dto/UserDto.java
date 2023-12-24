@@ -18,7 +18,7 @@ public class UserDto {
 	String password;
 
 	@NotEmpty
-	Set<String> roles;
+	Set<Integer> roles;
 
 	public UserDto(String login, String password) {
 		this.login = login;

@@ -19,6 +19,6 @@ public class UserDto implements Serializable {
 	String password;
 
 	@NotEmpty
-	Set<String> roles;
+	Set<Integer> roles;
 
 }

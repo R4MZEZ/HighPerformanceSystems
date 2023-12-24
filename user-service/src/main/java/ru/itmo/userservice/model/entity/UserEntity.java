@@ -17,10 +17,8 @@ public class UserEntity {
 	private Long id;
 	private String login;
 	private String password;
-	private Set<Long> roles;
-//	public UserEntity(String login, String password, Set<Integer> roles) {
-//		this.login = login;
-//		this.password = password;
-//		this.roles = roles;
-//	}
+
+	public UserEntity(Long id) {
+		this.id = id;
+	}
 }

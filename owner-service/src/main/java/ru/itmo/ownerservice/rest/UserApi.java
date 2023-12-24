@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactor.core.publisher.Mono;
 import ru.itmo.ownerservice.exceptions.AlreadyExistsException;
 import ru.itmo.ownerservice.exceptions.NotFoundException;
 import ru.itmo.ownerservice.feign.FeignConfig;
@@ -23,6 +24,10 @@ public interface UserApi {
 	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
 
 	@GetMapping(path = "/find", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseDto<UserEntity> findByLogin(@RequestParam String login) throws NotFoundException;
+	ResponseDto<UserEntity> findByLogin(@RequestParam String login);
+
+	@PostMapping("/addRole")
+	Mono<ResponseDto<UserEntity>> addRole(@RequestParam Long userId, @RequestParam Integer roleId);
+
 
 }

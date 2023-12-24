@@ -14,11 +14,11 @@ public interface UserRepository extends ReactiveCrudRepository<UserEntity, Long>
 	Mono<UserEntity> findByLogin(@Param("login") String login);
 
 	@Query("insert into users_roles(user_id, role_id) values (:user_id, :role_id)")
-	Mono<UserEntity> addRole(@Param("user_id") Long userId, @Param("role_id") Long roleId);
+	Mono<UserEntity> addRole(@Param("user_id") Long userId, @Param("role_id") Integer roleId);
 
-	@Query("insert into users(login, password) VALUES (:login, :password)")
-	Mono<UserEntity> save(@Param("login") String login, @Param("password") String password);
+//	@Query("insert into users(login, password) VALUES (:login, :password)")
+//	Mono<UserEntity> save(@Param("login") String login, @Param("password") String password);
 
-	Mono<UserEntity> deleteByLogin(String login);
+//	Mono<UserEntity> deleteByLogin(String login);
 
 }

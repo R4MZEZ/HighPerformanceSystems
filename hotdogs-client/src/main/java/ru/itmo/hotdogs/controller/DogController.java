@@ -49,11 +49,6 @@ public class DogController {
 	@Value("${page-size}")
 	Integer pageSize;
 
-	@GetMapping("/test")
-	public String test(){
-		return "test";
-	}
-
 	@PostMapping(path = "/new")
 	public ResponseEntity<?> registerNewDog(@RequestBody RegistrationDogDto registrationDogDto) {
 		try {
@@ -83,7 +78,7 @@ public class DogController {
 						matchedDog.get().getAge(),
 						matchedDog.get().getDistance() / 1000), HttpStatus.FOUND);
 			} else {
-				return ResponseEntity.ok(getNewRecommendation(request));
+				return getNewRecommendation(request);
 			}
 		} catch (NullRecommendationException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

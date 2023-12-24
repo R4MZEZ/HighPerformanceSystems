@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
 import org.springframework.security.config.web.server.ServerHttpSecurity.CorsSpec;
 import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,24 +36,18 @@ public class SecurityConfig {
 	@Bean
 	public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
 		http
-			.authorizeExchange(exchange -> exchange
-
-				.pathMatchers("/dogs/breeds/find/**").permitAll()
-				.pathMatchers("/dogs/find/**").permitAll()
-				.pathMatchers("/owners/shows/*/addParticipant").permitAll()
-				.pathMatchers("/owners/find/**").permitAll()
-
+			.authorizeExchange(exchange -> authorizeExchangeSpec(exchange)
+				.pathMatchers("/auth/login").permitAll()
 				.pathMatchers("/owners/shows/**").hasRole("ORGANIZER")
 				.pathMatchers("/owners/new").hasRole("ADMIN")
 				.pathMatchers("/owners/**").hasAnyRole("OWNER", "ADMIN")
 				.pathMatchers("/owners").hasRole("ADMIN")
 				.pathMatchers("/dogs/new").hasRole("ADMIN")
-				.pathMatchers("/dogs/test").hasRole("ADMIN")
 				.pathMatchers("/dogs/breeds/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/interests/new").hasRole("ADMIN")
 				.pathMatchers("/dogs/me").hasRole("DOG")
-//				.pathMatchers("/dogs/**").hasAnyRole("DOG", "ADMIN")
 				.pathMatchers("/dogs").hasRole("ADMIN")
+				.pathMatchers("/dogs/**").hasRole("DOG")
 				.anyExchange().permitAll())
 			.exceptionHandling(
 				exception -> exception
@@ -75,5 +70,11 @@ public class SecurityConfig {
 		return bearerAuthenticationFilter;
 	}
 
+	private AuthorizeExchangeSpec authorizeExchangeSpec(AuthorizeExchangeSpec exchange){
+		return exchange.pathMatchers("/dogs/breeds/find/**").permitAll()
+			.pathMatchers("/dogs/find/**").permitAll()
+			.pathMatchers("/owners/shows/*/addParticipant").permitAll()
+			.pathMatchers("/owners/find/**").permitAll();
+	}
 
 }

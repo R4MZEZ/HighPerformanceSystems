@@ -1,5 +1,6 @@
 package ru.itmo.ownerservice.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,6 +47,7 @@ public class ShowEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "winner")
+	@JsonIgnore
 	private DogEntity winner;
 
 	@ManyToMany(fetch = FetchType.EAGER)

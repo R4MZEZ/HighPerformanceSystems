@@ -14,21 +14,15 @@ import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
-import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
-import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.NullRecommendationException;
 import ru.itmo.hotdogs.exceptions.ServiceUnavalibleException;
-import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.model.dto.DogDto;
 import ru.itmo.hotdogs.model.dto.DogInterestDto;
 import ru.itmo.hotdogs.model.dto.RecommendedDog;
-import ru.itmo.hotdogs.model.dto.RecommendedDogDto;
 import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.dto.ShowDtoResponse;
 import ru.itmo.hotdogs.model.dto.UserDto;
@@ -38,7 +32,6 @@ import ru.itmo.hotdogs.model.entity.DogsInteractionsEntity;
 import ru.itmo.hotdogs.model.entity.DogsInterestsEntity;
 import ru.itmo.hotdogs.model.entity.InterestEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
-import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 import ru.itmo.hotdogs.repository.DogRepository;
 import ru.itmo.hotdogs.rest.OwnerApi;
@@ -73,25 +66,6 @@ public class DogService {
 		);
 	}
 
-//	public Mono<DogEntity> findByLoginReactive(String login) throws NotFoundException {
-//		return userApi.findByLogin(login)
-//			.flatMap(user -> {
-//				Optional<DogEntity> optionalDog = dogRepository.findByUser(user);
-//				return optionalDog.<Mono<? extends DogEntity>>map(Mono::just).orElseGet(
-//					() -> Mono.error(
-//						new NotFoundException("Собаки с таким логином не существует")));
-//			});
-//	}
-
-//	public Optional<DogEntity> findOptionalByLogin(String login) {
-//		try {
-//			UserEntity user = userApi.findByLogin(login);
-//			return dogRepository.findByUser(user);
-//
-//		} catch (NotFoundException e) {
-//			return Optional.empty();
-//		}
-//	}
 
 	public DogEntity findById(long id) throws NotFoundException {
 		return dogRepository.findById(id).orElseThrow(
@@ -113,7 +87,7 @@ public class DogService {
 	}
 
 
-	public DogEntity createNewDog(@Valid UserDto userDto, @Valid DogDto dogDto)
+	public void createNewDog(@Valid UserDto userDto, @Valid DogDto dogDto)
 		throws AlreadyExistsException, NotFoundException, ConstraintViolationException, IllegalArgumentException, ServiceUnavalibleException, IllegalStateException {
 
 		Set<ConstraintViolation<DogDto>> violations = validator.validate(dogDto);
@@ -127,10 +101,14 @@ public class DogService {
 			interestService.findByName(interest.getKey());
 		}
 
-		userDto.setRoles(Set.of("ROLE_DOG"));
+		userDto.setRoles(Set.of(1));
 		ResponseDto<UserEntity> response = userApi.createNewUser(userDto);
 		if (!response.code().is2xxSuccessful()){
 			throw new AlreadyExistsException(response.error().getMessage());
+		}
+		response = userApi.findByLogin(userDto.getLogin());
+		for (Integer roleId : userDto.getRoles()){
+			userApi.addRole(response.body().getId(), roleId);
 		}
 
 		DogEntity dog = new DogEntity(response.body(), dogDto.getName(), dogDto.getAge(), breed, owner);
@@ -144,7 +122,7 @@ public class DogService {
 			dogsInterestsService.save(interestsEntity);
 		}
 
-		return dogRepository.save(dog);
+		dogRepository.save(dog);
 	}
 
 
@@ -201,7 +179,7 @@ public class DogService {
 	}
 
 
-	public DogEntity addInterest(DogEntity dog, @Valid DogInterestDto interestDto)
+	public void addInterest(DogEntity dog, @Valid DogInterestDto interestDto)
 		throws AlreadyExistsException, NotFoundException, IllegalLevelException, ConstraintViolationException {
 
 		Set<ConstraintViolation<DogInterestDto>> violations = validator.validate(interestDto);
@@ -226,7 +204,7 @@ public class DogService {
 
 		dog.getInterests().add(interest_record);
 		dogsInterestsService.save(interest_record);
-		return dogRepository.save(dog);
+		dogRepository.save(dog);
 	}
 
 

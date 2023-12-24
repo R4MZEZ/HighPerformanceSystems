@@ -65,13 +65,17 @@ public class OwnerService {
 			throw new ConstraintViolationException(violations);
 		}
 
-		Set<String> roles = ownerUserDto.getIsOrganizer() ? Set.of("ROLE_OWNER", "ROLE_ORGANIZER")
-			: Set.of("ROLE_OWNER");
+		Set<Integer> roles = ownerUserDto.getIsOrganizer() ? Set.of(2, 4)
+			: Set.of(2);
 		userDto.setRoles(roles);
 
 		ResponseDto<UserEntity> response = userApi.createNewUser(userDto);
 		if (!response.code().is2xxSuccessful()){
 			throw new AlreadyExistsException(response.error().getMessage());
+		}
+		response = userApi.findByLogin(userDto.getLogin());
+		for (Integer roleId : userDto.getRoles()){
+			userApi.addRole(response.body().getId(), roleId);
 		}
 
 		GeometryFactory geometryFactory = new GeometryFactory();
@@ -91,13 +95,11 @@ public class OwnerService {
 	}
 
 	public Optional<OwnerEntity> findByLogin(String login){
-		try {
-			UserEntity user = userApi.findByLogin(login).body();
-			return ownerRepository.findByUser(user);
-		} catch (NotFoundException e) {
-			return Optional.empty();
-		}
-
+			ResponseDto<UserEntity> userResponse = userApi.findByLogin(login);
+			if (userResponse.code().is2xxSuccessful())
+				return ownerRepository.findByUser(userResponse.body());
+			else
+				return Optional.empty();
 	}
 
 	@Transactional

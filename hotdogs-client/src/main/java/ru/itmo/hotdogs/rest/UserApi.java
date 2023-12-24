@@ -21,9 +21,12 @@ import ru.itmo.hotdogs.model.entity.UserEntity;
 	configuration = FeignConfig.class)
 public interface UserApi {
 	@PostMapping(path = "/users/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
+	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto);
 
 	@GetMapping(path = "/users/find", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseDto<UserEntity> findByLogin(@RequestParam String login) throws NotFoundException;
+	ResponseDto<UserEntity> findByLogin(@RequestParam String login);
+
+	@PostMapping("/users/addRole")
+	Mono<ResponseDto<UserEntity>> addRole(@RequestParam Long userId, @RequestParam Integer roleId);
 
 }
