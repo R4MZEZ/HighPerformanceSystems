@@ -24,20 +24,20 @@ import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
 //import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
 
 @FeignClient(
-	name = "owner-service",
+	name = "OwnerApi",
 	url = "localhost:8081",
-	configuration = FeignConfig.class,
-	fallback = OwnerApiFallback.class
+	configuration = FeignConfig.class
+	,fallback = OwnerApiFallback.class
 )
 public interface OwnerApi {
 
 	@GetMapping(path = "/owners/find/{login}", produces = MediaType.APPLICATION_JSON)
-	@Bulkhead(name = "x", fallbackMethod = "findByLogin")
+//	@Bulkhead(name = "x", fallbackMethod = "findByLogin")
 	OwnerEntity findByLogin(@PathVariable String login)
 		throws NotFoundException, ServiceUnavalibleException;
 
 	@PostMapping(path = "/owners/shows/{showId}/addParticipant", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-	@Bulkhead(name = "y", fallbackMethod = "addParticipant")
+//	@Bulkhead(name = "y", fallbackMethod = "addParticipant")
 	ResponseDto<?> addParticipant(@PathVariable Long showId, @RequestBody DogEntity dog) throws ServiceUnavalibleException;
 
 	@Component

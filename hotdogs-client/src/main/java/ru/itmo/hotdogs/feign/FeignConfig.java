@@ -11,6 +11,7 @@ import feign.jackson.JacksonEncoder;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder.Resilience4JCircuitBreakerConfiguration;
@@ -25,21 +26,6 @@ public class FeignConfig {
 //	public ErrorDecoder errorDecoder(){
 //		return new CustomErrorDecoder();
 //	}
-
-	@Bean
-	public Customizer<Resilience4JCircuitBreakerFactory> circuitBreakerFactoryCustomizer() {
-		CircuitBreakerConfig circuitBreakerConfig =
-			CircuitBreakerConfig.custom()
-				.ignoreException(FeignException.ServiceUnavailable.class::isInstance)
-				.waitDurationInOpenState(Duration.ofSeconds(20))
-				.build();
-		TimeLimiterConfig timeLimiterConfig = TimeLimiterConfig.custom().
-			timeoutDuration(Duration.ofSeconds(20)).build();
-		return factory -> factory
-			.configureDefault(id -> new Resilience4JConfigBuilder(id)
-				.circuitBreakerConfig(circuitBreakerConfig)
-				.timeLimiterConfig(timeLimiterConfig).build());
-	}
 
 	@Bean
 	public Decoder decoder(ObjectMapper objectMapper) {
