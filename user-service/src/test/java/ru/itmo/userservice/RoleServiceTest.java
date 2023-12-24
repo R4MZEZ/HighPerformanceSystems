@@ -2,6 +2,7 @@ package ru.itmo.userservice;
 
 
 import javax.validation.ConstraintViolationException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,14 @@ public class RoleServiceTest {
 	@Autowired
 	private RoleService roleService;
 
-//	@Test
-//	void validFindByNameTest(){
-//		String name = "ROLE_GOD";
-//		RoleEntity role = roleService.createRole(new RoleEntity(name)).block();
-//		Assertions.assertDoesNotThrow(() -> roleService.findByName(name));
-//		Assertions.assertEquals(name, role.getName());
-//	}
+	@Disabled
+	@Test
+	void validFindByNameTest(){
+		String name = "ROLE_GOD";
+		RoleEntity role = roleService.createRole(new RoleEntity(name)).block();
+		Assertions.assertDoesNotThrow(() -> roleService.findByName(name));
+		Assertions.assertEquals(name, role.getName());
+	}
 
 	@Test
 	void invalidRoleNameTest(){
