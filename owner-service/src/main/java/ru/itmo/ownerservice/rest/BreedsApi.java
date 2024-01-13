@@ -10,11 +10,13 @@ import ru.itmo.ownerservice.feign.FeignConfig;
 import ru.itmo.ownerservice.model.dto.ResponseDto;
 import ru.itmo.ownerservice.model.entity.BreedEntity;
 
-@FeignClient(name = "breed",
+//@FeignClient(name = "breed",
 //	url = "hotdogs-client/dogs/breeds",
-	url = "localhost:8081/dogs/breeds",
+////	url = "localhost:8081/dogs/breeds",
+//	configuration = FeignConfig.class)
+@FeignClient(name = "hotdogs-client",
 	configuration = FeignConfig.class)
 public interface BreedsApi {
-	@GetMapping("/find/{name}")
+	@GetMapping("/dogs/breeds/find/{name}")
 	ResponseDto<BreedEntity> findBreedByName(@PathVariable String name) throws NotFoundException;
 }

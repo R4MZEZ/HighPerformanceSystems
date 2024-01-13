@@ -14,19 +14,21 @@ import ru.itmo.ownerservice.model.dto.ResponseDto;
 import ru.itmo.ownerservice.model.dto.UserDto;
 import ru.itmo.ownerservice.model.entity.UserEntity;
 
-@FeignClient(name = "user",
+//@FeignClient(name = "user",
 //	url = "user-service/users",
-	url = "localhost:8081/users",
+////	url = "localhost:8081/users",
+//	configuration = FeignConfig.class)
+@FeignClient(name = "user-service",
 	configuration = FeignConfig.class)
 public interface UserApi {
 
-	@PostMapping(path = "/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/users/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
 
-	@GetMapping(path = "/find", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/users/find", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseDto<UserEntity> findByLogin(@RequestParam String login);
 
-	@PostMapping("/addRole")
+	@PostMapping("/users/addRole")
 	Mono<ResponseDto<UserEntity>> addRole(@RequestParam Long userId, @RequestParam Integer roleId);
 
 

@@ -1,31 +1,29 @@
 package ru.itmo.hotdogs.rest;
 
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import jakarta.ws.rs.core.MediaType;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
-import ru.itmo.hotdogs.exceptions.BreedNotAllowedException;
-import ru.itmo.hotdogs.exceptions.CheatingException;
 import ru.itmo.hotdogs.exceptions.NotFoundException;
 import ru.itmo.hotdogs.exceptions.ServiceUnavalibleException;
-import ru.itmo.hotdogs.exceptions.ShowDateException;
 import ru.itmo.hotdogs.feign.FeignConfig;
 import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.entity.DogEntity;
 import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
-//import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
 
+//@FeignClient(
+//	name = "OwnerApi",
+//	url = "localhost:8081",
+//	configuration = FeignConfig.class
+//	,fallback = OwnerApiFallback.class
+//)
 @FeignClient(
-	name = "OwnerApi",
-	url = "localhost:8081",
+	name = "owner-service",
 	configuration = FeignConfig.class
 	,fallback = OwnerApiFallback.class
 )
