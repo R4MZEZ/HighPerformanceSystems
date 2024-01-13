@@ -23,6 +23,7 @@ springdoc:
             - url: /owners/v3/api-docs
               name: Owner/Organizer Service
 
+
 spring:
     application:
         name: egateway

@@ -4,15 +4,24 @@
 #ENTRYPOINT ["java","-jar","/gateway.jar"]
 #EXPOSE 8080
 
-FROM openjdk:17-jdk-slim-buster AS builder
+#FROM openjdk:17-jdk-slim-buster AS builder
+#
+#RUN apt-get update -y
+#RUN apt-get install -y binutils
+#
+#WORKDIR /app
+#
+#COPY . .
+#
+#RUN ./gradlew build -i --stacktrace
+#
+#ENTRYPOINT ["java", "-jar", "/app/build/libs/api-gateway-0.0.1.jar"]
 
-RUN apt-get update -y
-RUN apt-get install -y binutils
+FROM gradle:8.2-jdk17-alpine AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build -x test --no-daemon
 
-WORKDIR /app
-
-COPY . .
-
-RUN ./gradlew build -i --stacktrace
-
-ENTRYPOINT ["java", "-jar", "/app/build/libs/api-gateway-0.0.1.jar"]
+FROM amazoncorretto:17-alpine-jdk
+COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
+ENTRYPOINT ["java", "-jar","/app.jar"]
