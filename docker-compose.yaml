@@ -11,7 +11,7 @@ services:
       - "8761:8761"
     environment:
         EUREKA_URL: ${EUREKA_URL}
-  gateway:
+  api-gateway:
       build: api-gateway
       restart: always
       container_name: api-gateway
