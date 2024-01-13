@@ -14,9 +14,9 @@ import ru.itmo.ownerservice.model.entity.BreedEntity;
 //	url = "hotdogs-client/dogs/breeds",
 ////	url = "localhost:8081/dogs/breeds",
 //	configuration = FeignConfig.class)
-@FeignClient(name = "hotdogs-client",
-	configuration = FeignConfig.class)
-public interface BreedsApi {
-	@GetMapping("/dogs/breeds/find/{name}")
-	ResponseDto<BreedEntity> findBreedByName(@PathVariable String name) throws NotFoundException;
-}
+//@FeignClient(name = "hotdogs-client",
+//	configuration = FeignConfig.class)
+//public interface BreedsApi {
+//	@GetMapping("/dogs/breeds/find/{name}")
+//	ResponseDto<BreedEntity> findBreedByName(@PathVariable String name) throws NotFoundException;
+//}

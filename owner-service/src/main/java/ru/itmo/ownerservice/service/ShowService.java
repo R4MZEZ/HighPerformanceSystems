@@ -24,7 +24,7 @@ import ru.itmo.ownerservice.model.entity.DogEntity;
 import ru.itmo.ownerservice.model.entity.OwnerEntity;
 import ru.itmo.ownerservice.model.entity.ShowEntity;
 import ru.itmo.ownerservice.repository.ShowRepository;
-import ru.itmo.ownerservice.rest.BreedsApi;
+import ru.itmo.ownerservice.rest.DogsApi;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class ShowService {
 
 	private final ShowRepository showRepository;
 	private final Validator validator;
-	private final BreedsApi breedsApi;
+	private final DogsApi dogsApi;
 	public ShowEntity saveShow(ShowEntity show) {
 		return show == null ? null : showRepository.save(show);
 	}
@@ -80,7 +80,7 @@ public class ShowService {
 
 		Set<BreedEntity> allowedBreeds = new HashSet<>();
 		for (String breedName : newShowDto.getAllowed_breeds()) {
-			ResponseDto<BreedEntity> breedResponse = breedsApi.findBreedByName(breedName);
+			ResponseDto<BreedEntity> breedResponse = dogsApi.findBreedByName(breedName);
 			if (breedResponse.code() == HttpStatus.NOT_FOUND)
 				throw new NotFoundException(breedResponse.error().getMessage());
 			allowedBreeds.add(breedResponse.body());

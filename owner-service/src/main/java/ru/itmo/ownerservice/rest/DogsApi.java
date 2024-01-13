@@ -22,4 +22,6 @@ public interface DogsApi {
 	@GetMapping(path = "/dogs/find/{id}", produces = MediaType.APPLICATION_JSON)
 	ResponseDto<DogEntity> findById(@PathVariable Long id) throws NotFoundException;
 
+	@GetMapping("/dogs/breeds/find/{name}")
+	ResponseDto<BreedEntity> findBreedByName(@PathVariable String name) throws NotFoundException;
 }
