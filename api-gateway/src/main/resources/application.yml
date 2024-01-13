@@ -4,9 +4,10 @@ eureka:
     client:
         service-url:
 #            defaultZone: http://localhost:8761/eureka
-            defaultZone: ${EUREKA_URL}
+#            defaultZone: ${EUREKA_URL}
+            defaultZone: http://eureka-server:8761/eureka
 jwt:
-    secret: ${JWT_SECRET}
+    secret: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
 
 springdoc:
     api-docs:
