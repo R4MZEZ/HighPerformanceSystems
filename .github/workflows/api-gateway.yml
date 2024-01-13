@@ -24,7 +24,7 @@ jobs:
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: docker.io/ip13/${{ env.SERVICE_NAME }}
+                  images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.SERVICE_NAME }}
             - name: Build and Push to Docker Hub
               uses: docker/build-push-action@v5
               with:
@@ -40,7 +40,7 @@ jobs:
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
                   script: |
                       cd ${{ secrets.PROJECT_DIR }}
-                      ls -la
+                      ls -la api-gateway/build/libs
                       git pull
                       docker container stop $(docker ps -a --format '{{.Names}}' | grep ^${{ env.SERVICE_NAME }})
                       docker container rm $(docker ps -a --filter name=${{ env.SERVICE_NAME }}* -aq)
