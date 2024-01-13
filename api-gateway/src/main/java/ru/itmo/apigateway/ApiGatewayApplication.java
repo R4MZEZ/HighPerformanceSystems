@@ -27,5 +27,4 @@ public class ApiGatewayApplication {
 	public Encoder encoder(ObjectMapper objectMapper) {
 		return new JacksonEncoder(objectMapper);
 	}
-
 }

@@ -1,5 +1,10 @@
 package ru.itmo.hotdogs.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,6 +46,7 @@ import ru.itmo.hotdogs.utils.JwtUtils;
 @RequiredArgsConstructor
 @RequestMapping("/dogs")
 @RestController
+@Tag(name = "Собачья будка", description = "Управляет делами собак и их взаимоотношениями")
 public class DogController {
 
 	private final DogService dogService;
@@ -50,24 +56,40 @@ public class DogController {
 	Integer pageSize;
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> registerNewDog(@RequestBody RegistrationDogDto registrationDogDto) {
+	@Operation(summary = "Создание новой собаки")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Ошибка в введенных данных"),
+		@ApiResponse(responseCode = "404", description = "Владелец не найден"),
+		@ApiResponse(responseCode = "503", description = "Какой-то сервис недоступен"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
+	public ResponseEntity<?> registerNewDog(
+		@RequestBody @Parameter(description = "Данные новой собаки") RegistrationDogDto registrationDogDto) {
 		try {
-			dogService.createNewDog(registrationDogDto.getUserInfo(), registrationDogDto.getDogInfo());
+			dogService.createNewDog(registrationDogDto.getUserInfo(),
+				registrationDogDto.getDogInfo());
 			return ResponseEntity.status(HttpStatus.CREATED).body("Собака успешно создана");
 		} catch (AlreadyExistsException | ConstraintViolationException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		} catch (IllegalArgumentException e){
+		} catch (IllegalArgumentException e) {
 			return ResponseEntity.badRequest().body("Некорректный формат описания объекта");
-		} catch (ServiceUnavalibleException | IllegalStateException e){
+		} catch (ServiceUnavalibleException | IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
 		}
 	}
 
 	@PostMapping(path = "/rate")
+	@Operation(summary = "Оценка рекомендованной собаки (Свайп)", description = "Когда в профиле есть рекомендованная собака, ее можно лайкнуть/дизлайкнуть")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "302", description = "Достигнуто совпадение"),
+		@ApiResponse(responseCode = "400", description = "Невозможно поставить оценку"),
+		@ApiResponse(responseCode = "404", description = "Какой-то ресурс не найден"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> likeRecommended(ServerHttpRequest request,
-		@RequestParam(defaultValue = "true") boolean isLike) {
+		@RequestParam(defaultValue = "true") @Parameter(description = "Оценка - лайк или дизлайк") boolean isLike) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			Optional<RecommendedDog> matchedDog = dogService.rateRecommended(dog, isLike);
@@ -88,6 +110,11 @@ public class DogController {
 	}
 
 	@GetMapping("/recommend")
+	@Operation(summary = "Получение рекомендации", description = "Выдает существующую рекомендацию (при наличии) или выдает новую")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Какой-то ресурс не найден"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> getNewRecommendation(ServerHttpRequest request) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
@@ -97,9 +124,15 @@ public class DogController {
 		}
 	}
 
-	@PatchMapping("/add-interest")
+	@PatchMapping("/interests/add")
+	@Operation(summary = "Добавление интереса собаке", description = "Выдает существующей собаке существующий интерес")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Ошибка в введенных данных"),
+		@ApiResponse(responseCode = "404", description = "Какой-то ресурс не найден"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> addInterest(ServerHttpRequest request,
-		@RequestBody DogInterestDto interestDto) {
+		@RequestBody @Parameter(description = "Информация для добавления интереса") DogInterestDto interestDto) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			dogService.addInterest(dog, interestDto);
@@ -112,8 +145,13 @@ public class DogController {
 	}
 
 	@GetMapping("/shows")
+	@Operation(summary = "Получение выставок, на которые подана заявка", description = "Выдает список всех выставок (завершенных и актуальных) в участниках которой числится данная собака")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Какой-то ресурс не найден"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> appliedShows(ServerHttpRequest request,
-		@RequestParam(defaultValue = "0") int page) {
+		@RequestParam(defaultValue = "0") @Parameter(description = "Номер страницы для пагинации") int page) {
 		try {
 			List<ShowDtoResponse> result = dogService.findAppliedShows(
 				jwtUtils.getUsernameFromRequest(request));
@@ -129,14 +167,20 @@ public class DogController {
 	}
 
 	@PostMapping("/shows/{showId}/apply")
+	@Operation(summary = "Подача заявки на выставку")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "503", description = "Какой-то сервис не доступен"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> applyToShow(ServerHttpRequest request, @PathVariable Long showId) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
 			ResponseDto<?> response = dogService.applyToShow(dog, showId);
-			if (response.code() != HttpStatus.OK)
+			if (response.code() != HttpStatus.OK) {
 				return ResponseEntity.status(response.code()).body(response.error().getMessage());
+			}
 			return ResponseEntity.ok("Вы стали участником выставки!");
-		} catch (ServiceUnavalibleException | IllegalStateException e){
+		} catch (ServiceUnavalibleException | IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
 		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -144,7 +188,11 @@ public class DogController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<DogDto>> findAll(@RequestParam(defaultValue = "0") int page) {
+	@Operation(summary = "Получение списка собак", description = "Выдает список всех существующих собак")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
+	public ResponseEntity<List<DogDto>> findAll(@RequestParam(defaultValue = "0") @Parameter(description = "Номер страницы для пагинации") int page) {
 		PageRequest pageRequest = PageRequest.of(page, pageSize,
 			Sort.by(Sort.Order.asc("id")));
 		Page<DogEntity> entityPage = dogService.findAll(pageRequest);
@@ -163,6 +211,11 @@ public class DogController {
 
 	@Transactional
 	@GetMapping("/me")
+	@Operation(summary = "Получение информации о текущей собаке", description = "Выдает информацию об аутентифицированной в данный момент собаке")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Какой-то ресурс не найден"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> getInfo(ServerHttpRequest request) {
 		try {
 			DogEntity dog = dogService.findByLogin(jwtUtils.getUsernameFromRequest(request));
@@ -173,10 +226,15 @@ public class DogController {
 	}
 
 	@GetMapping("/find/{id}")
+	@Operation(summary = "Получение собаки по идентификатору")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Собака не найдена"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseDto<DogEntity> findById(@PathVariable Long id) {
 		try {
 			return new ResponseDto<>(dogService.findById(id), null, HttpStatus.OK);
-		} catch (NotFoundException e){
+		} catch (NotFoundException e) {
 			return new ResponseDto<>(null, e, HttpStatus.NOT_FOUND);
 		}
 	}

@@ -1,5 +1,10 @@
 package ru.itmo.ownerservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +42,7 @@ import ru.itmo.ownerservice.service.OwnerService;
 @RequiredArgsConstructor
 @RequestMapping(path = "/owners")
 @RestController
+@Tag(name = "Кабинет владельца", description = "для управления владельцем и выставками")
 public class OwnerController {
 
 	private final OwnerService ownerService;
@@ -48,7 +54,12 @@ public class OwnerController {
 
 	@Transactional
 	@GetMapping
-	public ResponseEntity<List<OwnerEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
+	@Operation(summary = "Получить всех владельцев")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "403", description = "Нет прав")})
+	public ResponseEntity<List<OwnerEntity>> findAll(
+		@RequestParam(defaultValue = "0") @Parameter(description = "Номер страницы для пагинации") int page) {
 		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Order.asc("id")));
 		Page<OwnerEntity> entityPage = ownerService.findAll(pageRequest);
 
@@ -56,13 +67,25 @@ public class OwnerController {
 	}
 
 	@GetMapping("/find/{login}")
+	@Operation(summary = "Получить владельца по логину",
+		description = "Получение владельца по логину его аккаунта")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Хозяин с таким логином не найден"),
+		@ApiResponse(responseCode = "403", description = "Нет прав")})
 	public OwnerEntity findByLogin(@PathVariable String login) throws NotFoundException {
 		return ownerService.findByLogin(login)
 			.orElseThrow(() -> new NotFoundException("Хозяин с таким логином не найден"));
 	}
 
 	@PostMapping(path = "/new")
-	public ResponseEntity<?> registerOwner(@RequestBody RegistrationOwnerDto registrationOwnerDto) {
+	@Operation(summary = "Регистрация нового владельца",
+		description = "Регистрация нового владельца супервайзером")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Некорректно введены данные"),
+		@ApiResponse(responseCode = "403", description = "Нет прав")})
+	public ResponseEntity<?> registerOwner(@RequestBody @Parameter(description = "Данные для регистрации") RegistrationOwnerDto registrationOwnerDto) {
 		try {
 			ownerService.createNewOwner(registrationOwnerDto.getUserInfo(),
 				registrationOwnerDto.getOwnerInfo());
@@ -73,8 +96,13 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/shows/create")
+	@Operation(summary = "Создание новой выставки")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Некорректно введены данные"),
+		@ApiResponse(responseCode = "403", description = "Нет прав")})
 	public ResponseEntity<?> createShow(ServerHttpRequest request,
-		@RequestBody ShowDtoRequest newShowDto) {
+		@RequestBody @Parameter(description = "Описание новой выставки") ShowDtoRequest newShowDto) {
 		try {
 			ownerService.createShow(jwtUtils.getUsernameFromRequest(request), newShowDto);
 			return ResponseEntity.status(HttpStatus.CREATED).body("Выставка успешно создана");
@@ -84,8 +112,14 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/shows/{showId}/finish")
-	public ResponseEntity<?> finishShow(ServerHttpRequest request, @PathVariable Long showId,
-		@RequestParam Long winnerId) {
+	@Operation(summary = "Завершение выставки",
+		description = "Завершить выставку с назначение победителя и начислением приза")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Ошибка пользователя"),
+		@ApiResponse(responseCode = "403", description = "Нет прав")})
+	public ResponseEntity<?> finishShow(ServerHttpRequest request, @PathVariable @Parameter(description = "Идентификатор выставки") Long showId,
+		@RequestParam @Parameter(description = "Идентификатор победителя") Long winnerId) {
 		try {
 			DogEntity winner = ownerService.finishShow(jwtUtils.getUsernameFromRequest(request),
 				showId, winnerId);
@@ -98,7 +132,14 @@ public class OwnerController {
 	}
 
 	@PostMapping(path = "/shows/{showId}/addParticipant")
-	public ResponseDto<?> addParticipant(@PathVariable Long showId, @RequestBody DogEntity dog){
+	@Operation(summary = "Добавление участника выставки",
+		description = "Добавление нового участника в существующую выставку")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Нарушение каких-то правил выставки"),
+		@ApiResponse(responseCode = "404", description = "Выставка не найдена"),
+		@ApiResponse(responseCode = "403", description = "Порода не разрешена")})
+	public ResponseDto<?> addParticipant(@PathVariable @Parameter(description = "Идентификатор выставки") Long showId, @RequestBody @Parameter(description = "Новый участник") DogEntity dog) {
 		try {
 			ownerService.addParticipant(showId, dog);
 			return new ResponseDto<>(null, null, HttpStatus.OK);

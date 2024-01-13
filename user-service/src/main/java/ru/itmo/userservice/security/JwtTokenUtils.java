@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RefreshScope
 public class JwtTokenUtils {
 
-	@Value("${jwt-secret}")
+	@Value("${secret}")
 	private String secret;
 
 
@@ -60,5 +60,9 @@ public class JwtTokenUtils {
 	public boolean isExpired(String token) {
 		return getAllClaimsFromToken(token).getExpiration().before(new Date());
 
+	}
+
+	public String getSecret(){
+		return secret;
 	}
 }

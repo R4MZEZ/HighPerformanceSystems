@@ -37,6 +37,8 @@ public class SecurityConfig {
 	public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
 		http
 			.authorizeExchange(exchange -> authorizeExchangeSpec(exchange)
+				.pathMatchers("/dogs/v3/api-docs").permitAll()
+				.pathMatchers("/owners/v3/api-docs").permitAll()
 				.pathMatchers("/auth/login").permitAll()
 				.pathMatchers("/owners/shows/**").hasRole("ORGANIZER")
 				.pathMatchers("/owners/new").hasRole("ADMIN")

@@ -1,6 +1,7 @@
 package ru.itmo.hotdogs.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
@@ -28,6 +29,7 @@ public class DogsInteractionsEntity {
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "sender_id")
 	@JsonIgnoreProperties(value = "interactions", allowSetters = true)
+	@JsonIgnore
 	private DogEntity sender;
 
 	@ManyToOne(cascade = CascadeType.MERGE)

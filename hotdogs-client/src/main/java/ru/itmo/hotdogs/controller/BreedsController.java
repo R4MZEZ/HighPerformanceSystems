@@ -1,5 +1,10 @@
 package ru.itmo.hotdogs.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,7 @@ import ru.itmo.hotdogs.service.BreedService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/dogs/breeds")
+@Tag(name = "Реестр пород")
 public class BreedsController {
 
 	private final BreedService breedService;
@@ -37,17 +43,26 @@ public class BreedsController {
 
 	@Transactional
 	@DeleteMapping
+	@Operation(summary = "Удаление существующей породы")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Порода не найдена"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseEntity<?> deleteBreed(@RequestParam String name) {
 		Optional<BreedEntity> result = breedService.deleteByName(name);
 		if (result.isPresent()) {
 			return ResponseEntity.ok("Порода успешно удалена");
 		} else {
-			return ResponseEntity.badRequest().body("Порода не найдена");
+			return ResponseEntity.status(404).body("Порода не найдена");
 		}
 	}
 
 	@GetMapping
-	public ResponseEntity<List<BreedEntity>> findAll(@RequestParam(defaultValue = "0") int page) {
+	@Operation(summary = "Получение всех пород", description = "Вывести список всех пород")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
+	public ResponseEntity<List<BreedEntity>> findAll(@RequestParam(defaultValue = "0") @Parameter(description = "Номер страницы для пагинации") int page) {
 		PageRequest pageRequest = PageRequest.of(page, pageSize,
 			Sort.by(Sort.Order.asc("id")));
 		Page<BreedEntity> entityPage = breedService.findAll(pageRequest);
@@ -58,7 +73,12 @@ public class BreedsController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<?> addBreed(@RequestBody BreedEntity breed) {
+	@Operation(summary = "Создание новой породы")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Успешно"),
+		@ApiResponse(responseCode = "400", description = "Порода уже существует"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
+	public ResponseEntity<?> addBreed(@RequestBody @Parameter(description = "Описание новой породы") BreedEntity breed) {
 		try {
 			breedService.createBreed(breed);
 			return ResponseEntity.status(HttpStatus.CREATED).body("Порода успешно создана");
@@ -69,6 +89,11 @@ public class BreedsController {
 	}
 
 	@GetMapping("/find/{name}")
+	@Operation(summary = "Получение породы по названию")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Успешно"),
+		@ApiResponse(responseCode = "404", description = "Порода не найдена"),
+		@ApiResponse(responseCode = "403", description = "Недостаточно прав")})
 	public ResponseDto<BreedEntity> findBreedByName(@PathVariable String name) {
 		try {
 			return new ResponseDto<>(breedService.findByName(name), null, HttpStatus.OK);

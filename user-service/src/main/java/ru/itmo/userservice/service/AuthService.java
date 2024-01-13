@@ -44,4 +44,8 @@ public class AuthService {
 			});
 	}
 
+	public String getSecret(){
+		return jwtTokenUtils.getSecret();
+	}
+
 }
