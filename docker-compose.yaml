@@ -49,7 +49,7 @@ services:
         POSTGRES_PASSWORD: postgres
         JWT_SECRET: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
         EUREKA_URL: http://eureka-server:8761/eureka
-        CONFIG_SERVER_URL: http://config:8888
+        CONFIG_SERVER_URL: http://config-server:8888
     #          CONFIG_SERVER_URL: ${CONFIG_URL}
 
   owner-service:
@@ -65,7 +65,7 @@ services:
           POSTGRES_PASSWORD: postgres
           JWT_SECRET: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
           EUREKA_URL: http://eureka-server:8761/eureka
-          CONFIG_SERVER_URL: http://config:8888
+          CONFIG_SERVER_URL: http://config-server:8888
     #          CONFIG_SERVER_URL: ${CONFIG_URL}
   file-service:
       build: file-service
@@ -80,7 +80,7 @@ services:
           POSTGRES_PASSWORD: postgres
           JWT_SECRET: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
           EUREKA_URL: http://eureka-server:8761/eureka
-          CONFIG_SERVER_URL: http://config:8888
+          CONFIG_SERVER_URL: http://config-server:8888
 #          CONFIG_SERVER_URL: ${CONFIG_URL}
 
   user-service:
@@ -98,7 +98,7 @@ services:
           JWT_SECRET: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
           JWT_LIFETIME: PT30M
           EUREKA_URL: http://eureka-server:8761/eureka
-          CONFIG_SERVER_URL: http://config:8888
+          CONFIG_SERVER_URL: http://config-server:8888
 
   postgresql_database:
     image: postgis/postgis:15-3.4
