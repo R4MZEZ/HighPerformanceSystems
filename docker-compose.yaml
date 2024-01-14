@@ -76,8 +76,8 @@ services:
           - postgresql_database
           - eureka-server
       environment:
-#          POSTGRES_URL: r2dbc:postgresql://postgres:postgres@host.docker.internal:5432/postgres
-          POSTGRES_URL: r2dbc:postgresql://postgresql_database:5432/postgres
+          POSTGRES_URL: r2dbc:postgresql://postgres:postgres@host.docker.internal:5432/postgres
+#          POSTGRES_URL: r2dbc:postgresql://postgresql_database:5432/postgres
           POSTGRES_USERNAME: ${POSTGRES_USERNAME}
           POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
           JWT_SECRET: ${JWT_SECRET}

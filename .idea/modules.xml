@@ -2,14 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/api-gateway/api-gateway.iml" filepath="$PROJECT_DIR$/api-gateway/api-gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/file-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/file-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs-client.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/api-gateway/hotdogs.api-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/api-gateway/hotdogs.api-gateway.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hotdogs-client/hotdogs.hotdogs-client.main.iml" filepath="$PROJECT_DIR$/.idea/modules/hotdogs-client/hotdogs.hotdogs-client.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/owner-service/hotdogs.owner-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/owner-service/hotdogs.owner-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service/hotdogs.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service/hotdogs.user-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/owner-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/owner-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ru.itmo.api-gateway.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ru.itmo.api-gateway.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service.main.iml" />
     </modules>
   </component>
 </project>

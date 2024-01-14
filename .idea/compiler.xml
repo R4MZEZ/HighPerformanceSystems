@@ -8,24 +8,42 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="hotdogs-client.main" />
-        <module name="user-service.main" />
-        <module name="owner-service.main" />
-        <module name="ru.itmo.api-gateway.main" />
+        <module name="hotdogs.user-service.main" />
+        <module name="hotdogs.api-gateway.main" />
+        <module name="hotdogs.hotdogs-client.main" />
+        <module name="hotdogs.owner-service.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.6">
+      <module name="api-gateway" target="17" />
       <module name="auth-service.main" target="17" />
       <module name="auth-service.test" target="17" />
+      <module name="config-server" target="17" />
+      <module name="config-server.main" target="17" />
+      <module name="config-server.test" target="17" />
       <module name="demo" target="17" />
       <module name="demo.main" target="17" />
       <module name="demo.test" target="17" />
+      <module name="eureka-server" target="17" />
+      <module name="eureka-server.main" target="17" />
+      <module name="eureka-server.test" target="17" />
+      <module name="hotdogs-client" target="17" />
+      <module name="hotdogs-client.main" target="17" />
+      <module name="hotdogs-client.test" target="17" />
       <module name="hotdogs-service" target="17" />
       <module name="hotdogs-service.main" target="17" />
       <module name="hotdogs-service.test" target="17" />
+      <module name="owner-service" target="17" />
+      <module name="owner-service.main" target="17" />
+      <module name="owner-service.test" target="17" />
+      <module name="ru.itmo.api-gateway.main" target="17" />
+      <module name="ru.itmo.api-gateway.test" target="17" />
       <module name="ru.itmo.hotdogs" target="17" />
       <module name="ru.itmo.hotdogs.main" target="17" />
       <module name="ru.itmo.hotdogs.test" target="17" />
+      <module name="user-service" target="17" />
+      <module name="user-service.main" target="17" />
+      <module name="user-service.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
