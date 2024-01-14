@@ -1,13 +1,13 @@
-name: push api-gateway image to dockerhub
+name: push owner-service image to dockerhub
 
 on:
     push:
         paths:
-            - api-gateway/**
+            - owner-service/**
         branches: [ "master" ]
 
 env:
-    SERVICE_NAME: api-gateway
+    SERVICE_NAME: owner-service
 
 jobs:
     dockerhub:

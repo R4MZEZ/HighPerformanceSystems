@@ -67,6 +67,21 @@ services:
           EUREKA_URL: ${EUREKA_URL}
           CONFIG_SERVER_URL: http://config:8888
 #          CONFIG_SERVER_URL: ${CONFIG_URL}
+  file_service:
+      build: file-service
+      restart: always
+      container_name: file-service
+      depends_on:
+          - postgresql_database
+          - eureka-server
+      environment:
+          POSTGRES_URL: jdbc:postgresql://postgresql_database:5432/postgres
+          POSTGRES_USERNAME: ${POSTGRES_USERNAME}
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+          JWT_SECRET: ${JWT_SECRET}
+          EUREKA_URL: ${EUREKA_URL}
+          CONFIG_SERVER_URL: http://config:8888
+#          CONFIG_SERVER_URL: ${CONFIG_URL}
 
   user_service:
       build: user-service
