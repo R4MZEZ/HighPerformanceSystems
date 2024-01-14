@@ -81,13 +81,26 @@ public class UserController {
 		@ApiResponse(responseCode = "403", description = "Нет прав")})
 
 	@GetMapping("/find")
-	public ResponseDto<UserEntity> findByLogin(@RequestParam String login) {
-		UserEntity user = userService.findByLogin(login).block();
-		if (user == null || user.getId() == null) {
-			return new ResponseDto<>(null, new NotFoundException(""), HttpStatus.NOT_FOUND);
-		} else {
-			return new ResponseDto<>(user, null, HttpStatus.OK);
-		}
+	public Mono<ResponseDto<UserEntity>> findByLogin(@RequestParam String login) {
+
+		return userService.findByLogin(login)
+			.map(userEntity -> {
+				if (userEntity == null || userEntity.getId() == null) {
+					return new ResponseDto<>(null, new NotFoundException(""), HttpStatus.NOT_FOUND);
+				} else {
+					return new ResponseDto<>(userEntity, null, HttpStatus.OK);
+				}
+				}
+			);
+
+
+//
+//		UserEntity user = userService.findByLogin(login).block();
+//		if (user == null || user.getId() == null) {
+//			return new ResponseDto<>(null, new NotFoundException(""), HttpStatus.NOT_FOUND);
+//		} else {
+//			return new ResponseDto<>(user, null, HttpStatus.OK);
+//		}
 	}
 
 	@Operation(description = "Добавление роли пользователю",
