@@ -31,6 +31,7 @@ public class RoleServiceTest {
 
 	@Test
 	void invalidRoleNameTest(){
+		Assertions.assertEquals(1,2);
 		Assertions.assertThrows(ConstraintViolationException.class, () -> roleService.createRole(new RoleEntity("ROLE_GOD!!!")));
 	}
 
