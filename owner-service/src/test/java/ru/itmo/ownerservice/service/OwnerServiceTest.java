@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import reactor.core.publisher.Mono;
 import ru.itmo.ownerservice.exceptions.AlreadyExistsException;
 import ru.itmo.ownerservice.exceptions.NotEnoughMoneyException;
 import ru.itmo.ownerservice.model.dto.OwnerDto;
@@ -99,7 +101,7 @@ public class OwnerServiceTest {
 		String name = "Elton";
 		OwnerDto ownerDto = new OwnerDto(name, "John", 500f, 1d, 1d, false);
 
-		when(userApi.findByLogin(anyString())).thenReturn(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK));
+		when(userApi.findByLogin(anyString())).thenReturn(Mono.just(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK)));
 		OwnerEntity owner = new OwnerEntity();
 		owner.setName(name);
 		when(ownerRepository.findByUser(any(UserEntity.class))).thenReturn(Optional.of(owner));
@@ -114,12 +116,12 @@ public class OwnerServiceTest {
 
 
 	@Test
-	void notEnoughMoneyTest() {
+	void notEnoughMoneyTest() throws ExecutionException, InterruptedException {
 		ShowDtoRequest newShowDto = new ShowDtoRequest(Timestamp.valueOf("2023-11-01 10:00:00"), 500L,
 			Set.of());
 		OwnerEntity owner = new OwnerEntity();
 		owner.setBalance(1f);
-		when(userApi.findByLogin(anyString())).thenReturn(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK));
+		when(userApi.findByLogin(anyString())).thenReturn(Mono.just(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK)));
 		when(ownerService.findByLogin(anyString())).thenReturn(Optional.of(owner));
 
 

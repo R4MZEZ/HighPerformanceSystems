@@ -3,6 +3,7 @@ package ru.itmo.ownerservice.service;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -59,7 +60,7 @@ public class OwnerService {
 	}
 
 	public OwnerEntity createNewOwner(@Valid UserDto userDto, @Valid OwnerDto ownerUserDto)
-		throws AlreadyExistsException, ConstraintViolationException {
+		throws AlreadyExistsException, ConstraintViolationException, ExecutionException, InterruptedException {
 		Set<ConstraintViolation<OwnerDto>> violations = validator.validate(ownerUserDto);
 		if (!validator.validate(ownerUserDto).isEmpty()) {
 			throw new ConstraintViolationException(violations);
@@ -69,11 +70,11 @@ public class OwnerService {
 			: Set.of(2);
 		userDto.setRoles(roles);
 
-		ResponseDto<UserEntity> response = userApi.createNewUser(userDto);
+		ResponseDto<UserEntity> response = userApi.createNewUser(userDto).toFuture().get();
 		if (!response.code().is2xxSuccessful()){
 			throw new AlreadyExistsException(response.error().getMessage());
 		}
-		response = userApi.findByLogin(userDto.getLogin());
+		response = userApi.findByLogin(userDto.getLogin()).toFuture().get();
 		for (Integer roleId : userDto.getRoles()){
 			userApi.addRole(response.body().getId(), roleId);
 		}
@@ -94,8 +95,9 @@ public class OwnerService {
 		return ownerRepository.findAll(pageable);
 	}
 
-	public Optional<OwnerEntity> findByLogin(String login){
-			ResponseDto<UserEntity> userResponse = userApi.findByLogin(login);
+	public Optional<OwnerEntity> findByLogin(String login)
+		throws ExecutionException, InterruptedException {
+			ResponseDto<UserEntity> userResponse = userApi.findByLogin(login).toFuture().get();
 			if (userResponse.code().is2xxSuccessful())
 				return ownerRepository.findByUser(userResponse.body());
 			else
@@ -104,7 +106,7 @@ public class OwnerService {
 
 	@Transactional
 	public ShowEntity createShow(String login, @Valid ShowDtoRequest newShowDto)
-		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException {
+		throws NotFoundException, NotEnoughMoneyException, ConstraintViolationException, ExecutionException, InterruptedException {
 		OwnerEntity owner = findByLogin(login).orElseThrow(() -> new NotFoundException("Владельца с таким логином не существует"));
 
 		if (owner.getBalance() < newShowDto.getPrize()) {
@@ -121,7 +123,7 @@ public class OwnerService {
 
 	@Transactional
 	public DogEntity finishShow(String login, long showId, long winnerId)
-		throws NotFoundException, AccessDeniedException, ShowDateException, AlreadyExistsException {
+		throws NotFoundException, AccessDeniedException, ShowDateException, AlreadyExistsException, ExecutionException, InterruptedException {
 		OwnerEntity organizer = findByLogin(login).orElseThrow(() -> new NotFoundException("Владельца с таким логином не существует"));
 
 		ShowEntity show = showService.findById(showId);

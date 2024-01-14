@@ -23,10 +23,10 @@ import ru.itmo.ownerservice.model.entity.UserEntity;
 public interface UserApi {
 
 	@PostMapping(path = "/users/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
+	Mono<ResponseDto<UserEntity>> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
 
 	@GetMapping(path = "/users/find", produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseDto<UserEntity> findByLogin(@RequestParam String login);
+	Mono<ResponseDto<UserEntity>> findByLogin(@RequestParam String login);
 
 	@PostMapping("/users/addRole")
 	Mono<ResponseDto<UserEntity>> addRole(@RequestParam Long userId, @RequestParam Integer roleId);

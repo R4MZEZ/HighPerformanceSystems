@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,7 +74,8 @@ public class OwnerController {
 		@ApiResponse(responseCode = "200", description = "Успешно"),
 		@ApiResponse(responseCode = "404", description = "Хозяин с таким логином не найден"),
 		@ApiResponse(responseCode = "403", description = "Нет прав")})
-	public OwnerEntity findByLogin(@PathVariable String login) throws NotFoundException {
+	public OwnerEntity findByLogin(@PathVariable String login)
+		throws NotFoundException, ExecutionException, InterruptedException {
 		return ownerService.findByLogin(login)
 			.orElseThrow(() -> new NotFoundException("Хозяин с таким логином не найден"));
 	}
@@ -90,7 +92,7 @@ public class OwnerController {
 			ownerService.createNewOwner(registrationOwnerDto.getUserInfo(),
 				registrationOwnerDto.getOwnerInfo());
 			return ResponseEntity.status(HttpStatus.CREATED).body("Владелец успешно создан.");
-		} catch (AlreadyExistsException | ConstraintViolationException e) {
+		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
@@ -106,7 +108,7 @@ public class OwnerController {
 		try {
 			ownerService.createShow(jwtUtils.getUsernameFromRequest(request), newShowDto);
 			return ResponseEntity.status(HttpStatus.CREATED).body("Выставка успешно создана");
-		} catch (NotFoundException | NotEnoughMoneyException | ConstraintViolationException e) {
+		} catch (NotFoundException | NotEnoughMoneyException | ConstraintViolationException | ExecutionException | InterruptedException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
@@ -126,7 +128,7 @@ public class OwnerController {
 			return ResponseEntity.ok(
 				"Выставка успешно завершена! Победитель: %s!".formatted(winner.getName()));
 		} catch (NotFoundException | AccessDeniedException | ShowDateException |
-				 AlreadyExistsException e) {
+				 AlreadyExistsException | InterruptedException | ExecutionException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
