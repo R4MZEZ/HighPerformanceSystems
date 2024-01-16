@@ -74,7 +74,7 @@ public class OwnerService {
 		if (!response.code().is2xxSuccessful()){
 			throw new AlreadyExistsException(response.error().getMessage());
 		}
-		response = userApi.findByLogin(userDto.getLogin()).toFuture().get();
+		response = userApi.findByLogin(userDto.getLogin());
 		for (Integer roleId : userDto.getRoles()){
 			userApi.addRole(response.body().getId(), roleId);
 		}
@@ -97,7 +97,7 @@ public class OwnerService {
 
 	public Optional<OwnerEntity> findByLogin(String login)
 		throws ExecutionException, InterruptedException {
-			ResponseDto<UserEntity> userResponse = userApi.findByLogin(login).toFuture().get();
+			ResponseDto<UserEntity> userResponse = userApi.findByLogin(login);
 			if (userResponse.code().is2xxSuccessful())
 				return ownerRepository.findByUser(userResponse.body());
 			else

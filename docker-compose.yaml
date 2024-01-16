@@ -40,7 +40,7 @@ services:
   hotdogs-client:
     build: hotdogs-client
     restart: always
-    container_name: dog-service
+    container_name: hotdogs-client
 #    ports:
 #      - "8080:8080"
     depends_on:

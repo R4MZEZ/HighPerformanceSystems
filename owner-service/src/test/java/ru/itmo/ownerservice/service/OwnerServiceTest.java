@@ -101,7 +101,7 @@ public class OwnerServiceTest {
 		String name = "Elton";
 		OwnerDto ownerDto = new OwnerDto(name, "John", 500f, 1d, 1d, false);
 
-		when(userApi.findByLogin(anyString())).thenReturn(Mono.just(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK)));
+		when(userApi.findByLogin(anyString())).thenReturn(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK));
 		OwnerEntity owner = new OwnerEntity();
 		owner.setName(name);
 		when(ownerRepository.findByUser(any(UserEntity.class))).thenReturn(Optional.of(owner));
@@ -121,7 +121,7 @@ public class OwnerServiceTest {
 			Set.of());
 		OwnerEntity owner = new OwnerEntity();
 		owner.setBalance(1f);
-		when(userApi.findByLogin(anyString())).thenReturn(Mono.just(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK)));
+		when(userApi.findByLogin(anyString())).thenReturn(new ResponseDto<>(new UserEntity(), null, HttpStatus.OK));
 		when(ownerService.findByLogin(anyString())).thenReturn(Optional.of(owner));
 
 

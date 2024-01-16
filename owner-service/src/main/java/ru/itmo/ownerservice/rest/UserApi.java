@@ -27,7 +27,7 @@ public interface UserApi {
 	Mono<ResponseDto<UserEntity>> createNewUser(@RequestBody UserDto userDto) throws AlreadyExistsException;
 
 	@GetMapping(path = "/users/find", produces = MediaType.APPLICATION_JSON_VALUE)
-	Mono<ResponseDto<UserEntity>> findByLogin(@RequestParam String login);
+	ResponseDto<UserEntity> findByLogin(@RequestParam String login);
 
 	@PostMapping("/users/addRole")
 	Mono<ResponseDto<UserEntity>> addRole(@RequestParam Long userId, @RequestParam Integer roleId);
