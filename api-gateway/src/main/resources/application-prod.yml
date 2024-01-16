@@ -39,6 +39,7 @@ spring:
                     uri: lb://efile
                     filters:
                         - SetPath=/{segment}
+                        - AddRequestHeadersIfNotPresent=Content-Type:multipart/form-data
 
                 -   id: file-service-1
                     predicates:
