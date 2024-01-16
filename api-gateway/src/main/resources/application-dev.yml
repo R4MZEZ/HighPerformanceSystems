@@ -84,5 +84,5 @@ spring:
                         - SetPath=/actuator/refresh
                 -   id: notification-service
                     predicates:
-                        - Path=/messages/**
+                        - Path=/connect
                     uri: lb://epush
