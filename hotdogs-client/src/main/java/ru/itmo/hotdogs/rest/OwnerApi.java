@@ -24,6 +24,7 @@ import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
 //)
 @FeignClient(
 	name = "owner-service",
+	url = "api-gateway:8081",
 	configuration = FeignConfig.class
 	,fallback = OwnerApiFallback.class
 )

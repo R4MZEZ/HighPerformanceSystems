@@ -17,6 +17,7 @@ import ru.itmo.ownerservice.model.entity.DogEntity;
 ////	url = "localhost:8081/dogs",
 //	configuration = FeignConfig.class)
 @FeignClient(name = "hotdogs-client",
+	url = "api-gateway:8081",
 	configuration = FeignConfig.class)
 public interface DogsApi {
 	@GetMapping(path = "/dogs/find/{id}", produces = MediaType.APPLICATION_JSON)

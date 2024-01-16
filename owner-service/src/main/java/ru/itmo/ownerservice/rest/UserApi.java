@@ -19,6 +19,7 @@ import ru.itmo.ownerservice.model.entity.UserEntity;
 ////	url = "localhost:8081/users",
 //	configuration = FeignConfig.class)
 @FeignClient(name = "user-service",
+	url = "api-gateway:8081",
 	configuration = FeignConfig.class)
 public interface UserApi {
 
