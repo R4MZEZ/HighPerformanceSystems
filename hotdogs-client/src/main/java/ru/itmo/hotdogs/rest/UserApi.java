@@ -15,11 +15,11 @@ import ru.itmo.hotdogs.model.dto.ResponseDto;
 import ru.itmo.hotdogs.model.dto.UserDto;
 import ru.itmo.hotdogs.model.entity.UserEntity;
 
-@FeignClient(name = "user-service",
-	url = "localhost:8081",
-	configuration = FeignConfig.class)
 //@FeignClient(name = "user-service",
+//	url = "localhost:8081",
 //	configuration = FeignConfig.class)
+@FeignClient(name = "user-service",
+	configuration = FeignConfig.class)
 public interface UserApi {
 	@PostMapping(path = "/users/new", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseDto<UserEntity> createNewUser(@RequestBody UserDto userDto);
