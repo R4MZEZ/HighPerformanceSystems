@@ -1,0 +1,88 @@
+server:
+    port: 8081
+eureka:
+    client:
+        service-url:
+            defaultZone: http://localhost:8761/eureka
+#            defaultZone: ${EUREKA_URL}
+#            defaultZone: http://eureka-server:8761/eureka
+jwt:
+    secret: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
+
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+        urls:
+            - url: /files/v3/api-docs
+              name: File Service
+            - url: /users/v3/api-docs
+              name: User Service
+            - url: /dogs/v3/api-docs
+              name: Dog Service
+            - url: /owners/v3/api-docs
+              name: Owner/Organizer Service
+
+
+spring:
+    application:
+        name: egateway
+    cloud:
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+                    lower-case-service-id: true
+            routes:
+                -   id: file-service
+                    predicates:
+                        - Path=/dogs/profile/picture/{segment}
+                    uri: lb://efile
+                    filters:
+                        - SetPath=/{segment}
+
+                -   id: file-service-1
+                    predicates:
+                        - Path=/files/v3/api-docs
+                    uri: lb://efile
+
+                -   id: hotdogs-client
+                    predicates:
+                        - Path=/dogs/**
+                    uri: lb://eclient
+
+                -   id: hotdogs-client-refresh
+                    predicates:
+                        - Path=/hotdogs_client/refresh
+                    uri: lb://eclient
+                    filters:
+                        - SetPath=/actuator/refresh
+
+                -   id: user-service
+                    predicates:
+                        - Path=/users/**, /auth/**
+                    uri: lb://euser
+
+                -   id: user-service-refresh
+                    predicates:
+                        - Path=/user_service/refresh
+                    uri: lb://euser
+                    filters:
+                        - SetPath=/actuator/refresh
+
+                -   id: owner-service
+                    predicates:
+                        - Path=/owners/**
+                    uri: lb://eowner
+
+                -   id: owner-service-refresh
+                    predicates:
+                        - Path=/owner_service/refresh
+                    uri: lb://eowner
+                    filters:
+                        - SetPath=/actuator/refresh
+                -   id: notification-service
+                    predicates:
+                        - Path=/messages/**
+                    uri: lb://epush

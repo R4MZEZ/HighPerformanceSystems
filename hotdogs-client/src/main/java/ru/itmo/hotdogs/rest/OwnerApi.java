@@ -16,17 +16,17 @@ import ru.itmo.hotdogs.model.entity.OwnerEntity;
 import ru.itmo.hotdogs.model.entity.ShowEntity;
 import ru.itmo.hotdogs.rest.OwnerApi.OwnerApiFallback;
 
-//@FeignClient(
-//	name = "OwnerApi",
-//	url = "localhost:8081",
-//	configuration = FeignConfig.class
-//	,fallback = OwnerApiFallback.class
-//)
 @FeignClient(
 	name = "owner-service",
+	url = "localhost:8081",
 	configuration = FeignConfig.class
 	,fallback = OwnerApiFallback.class
 )
+//@FeignClient(
+//	name = "owner-service",
+//	configuration = FeignConfig.class
+//	,fallback = OwnerApiFallback.class
+//)
 public interface OwnerApi {
 
 	@GetMapping(path = "/owners/find/{login}", produces = MediaType.APPLICATION_JSON)

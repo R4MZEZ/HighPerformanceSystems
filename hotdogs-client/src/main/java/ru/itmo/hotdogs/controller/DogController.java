@@ -43,6 +43,7 @@ import ru.itmo.hotdogs.service.DogService;
 import ru.itmo.hotdogs.utils.DtoConverter;
 import ru.itmo.hotdogs.utils.JwtUtils;
 
+
 @RequiredArgsConstructor
 @RequestMapping("/dogs")
 @RestController
@@ -54,6 +55,7 @@ public class DogController {
 
 	@Value("${page-size}")
 	Integer pageSize;
+
 
 	@PostMapping(path = "/new")
 	@Operation(summary = "Создание новой собаки")
@@ -238,5 +240,6 @@ public class DogController {
 			return new ResponseDto<>(null, e, HttpStatus.NOT_FOUND);
 		}
 	}
+
 
 }

@@ -14,6 +14,7 @@ import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.itmo.hotdogs.exceptions.AlreadyExistsException;
 import ru.itmo.hotdogs.exceptions.IllegalLevelException;
@@ -51,6 +52,9 @@ public class DogService {
 	private final Validator validator;
 	private final OwnerApi ownerApi;
 	private final UserApi userApi;
+
+	private final KafkaTemplate<String, String> kafkaTemplate;
+	private static final String KAFKA_TOPIC_NAME = "notification";
 
 	public Page<DogEntity> findAll(Pageable pageable) {
 		return dogRepository.findAll(pageable);
@@ -162,6 +166,8 @@ public class DogService {
 		DogsInteractionsEntity reverseInteracted = dogsInteractionsService.findBySenderAndReceiver(
 			recommended, dog);
 		if (isLike && reverseInteracted != null && reverseInteracted.getIsLiked()) {
+			kafkaTemplate.send(KAFKA_TOPIC_NAME, dog.getName(), recommended.getUser().getLogin());
+
 			if (dog.getMatches() == null) {
 				dog.setMatches(new HashSet<>());
 			}

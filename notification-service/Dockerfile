@@ -15,7 +15,7 @@
 #
 #RUN ./gradlew build -x test -i --stacktrace
 #
-#ENTRYPOINT ["java", "-jar", "/app/build/libs/owner-service-0.0.1.jar"]
+#ENTRYPOINT ["java", "-jar", "/app/build/libs/hotdogs-client-0.0.1.jar"]
 
 FROM gradle:8.2-jdk17-alpine AS build
 COPY --chown=gradle:gradle . /home/gradle/src
@@ -24,4 +24,4 @@ RUN gradle build -x test --no-daemon
 
 FROM amazoncorretto:17-alpine-jdk
 COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
-ENTRYPOINT ["java","-Dspring.profiles.active=prod", "-jar","/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar","/app.jar"]

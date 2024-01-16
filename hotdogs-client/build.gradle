@@ -46,6 +46,7 @@ dependencies {
     implementation 'org.hibernate:hibernate-spatial:6.2.4.Final'
     implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webflux-ui', version: '2.3.0'
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 dependencyManagement {

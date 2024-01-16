@@ -3,8 +3,6 @@ server:
 eureka:
     client:
         service-url:
-#            defaultZone: http://localhost:8761/eureka
-#            defaultZone: ${EUREKA_URL}
             defaultZone: http://eureka-server:8761/eureka
 jwt:
     secret: anuidisudagovnosobachyetireshilkomneleztubludokvonychiy
@@ -82,4 +80,7 @@ spring:
                     uri: lb://eowner
                     filters:
                         - SetPath=/actuator/refresh
-
+                -   id: notification-service
+                    predicates:
+                        - Path=/messages/**
+                    uri: lb://epush
