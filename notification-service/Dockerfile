@@ -25,3 +25,4 @@ RUN gradle build -x test --no-daemon
 FROM amazoncorretto:17-alpine-jdk
 COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar","/app.jar"]
+
